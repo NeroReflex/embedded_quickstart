@@ -1,2 +1,2 @@
-name: embedded_quickstart
-
+name: EMBEDDED_QUICKSTART
+desc: specialized tools for quickly build a linux embedded distro
