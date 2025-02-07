@@ -1,0 +1,7 @@
+config BR2_PACKAGE_GREETD
+	bool "greetd"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	depends on BR2_USE_MMU # fork()
+	help
+		greetd login daemon
