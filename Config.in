@@ -1,4 +1,4 @@
 menu "Embedded Quickstart"
-	source "package/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/Config.in"
 endmenu
 

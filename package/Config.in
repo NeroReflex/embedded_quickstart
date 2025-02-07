@@ -1,5 +1,5 @@
 menu "Embedded Quickstart Packages"
-	source "stupid1/Config.in"
-	source "init/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/stupid1/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/init/Config.in"
 endmenu
 
