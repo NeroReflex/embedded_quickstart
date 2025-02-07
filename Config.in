@@ -1,0 +1,4 @@
+menu "Embedded Quickstart"
+	source "package/Config.in"
+endmenu
+

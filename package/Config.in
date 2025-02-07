@@ -1,0 +1,5 @@
+menu "Embedded Quickstart Packages"
+	source "stupid1/Config.in"
+	source "init/Config.in"
+endmenu
+
