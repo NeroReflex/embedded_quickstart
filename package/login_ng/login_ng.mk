@@ -9,8 +9,8 @@ define LOGIN_NG_FIX_STAGING_GREETD_CONFIG
 endef
 
 define LOGIN_NG_POST_INSTALL
-	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login-ng/login_ng.pam $(TARGET_DIR)/etc/pam.d/login_ng
-	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login-ng/login_ng-autologin.pam $(TARGET_DIR)/etc/pam.d/login_ng-autologin
+	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login_ng/login_ng.pam $(TARGET_DIR)/etc/pam.d/login_ng
+	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login_ng/login_ng-autologin.pam $(TARGET_DIR)/etc/pam.d/login_ng-autologin
 endef
 
 LOGIN_NG_POST_INSTALL_STAGING_HOOKS += LOGIN_NG_FIX_STAGING_GREETD_CONFIG
