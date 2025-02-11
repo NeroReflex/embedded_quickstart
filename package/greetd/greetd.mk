@@ -13,6 +13,10 @@ define GREETD_POST_INSTALL
 	$(INSTALL) -D -m 644 $(@D)/config.toml $(TARGET_DIR)/etc/greetd/config.toml
 endef
 
+define GREETD_USERS
+    greeter -1 greeter -1 * - - video Greetd System Daemon
+endef
+
 GREETD_POST_INSTALL_TARGET_HOOKS += GREETD_POST_INSTALL
 
 $(eval $(cargo-package))
