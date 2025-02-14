@@ -12,9 +12,6 @@ endef
 define GREETD_POST_INSTALL
 	$(INSTALL) -D -m 644 $(@D)/config.toml $(TARGET_DIR)/etc/greetd/config.toml
 	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/greetd/greetd.pam $(TARGET_DIR)/etc/pam.d/greetd
-	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/greetd/system-local-login.pam $(TARGET_DIR)/etc/pam.d/system-local-login
-	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/greetd/system-login.pam $(TARGET_DIR)/etc/pam.d/system-login
-	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/greetd/system-auth.pam $(TARGET_DIR)/etc/pam.d/system-auth
 endef
 
 define GREETD_USERS
