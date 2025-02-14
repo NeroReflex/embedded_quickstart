@@ -3,7 +3,7 @@ GREETD_LICENSE = GPL-3.0
 GREETD_SITE = $(call github,kennylevinsen,greetd,$(GREETD_VERSION))
 GREETD_DEPENDENCIES = host-rustc
 GREETD_SUBDIR = greetd
-LOGIN_NG_INSTALL_STAGING = YES
+GREETD_INSTALL_STAGING = YES
 
 define GREETD_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 644 $(@D)/greetd.service $(TARGET_DIR)/lib/systemd/system/greetd.service

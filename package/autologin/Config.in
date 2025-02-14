@@ -1,0 +1,6 @@
+menu "Embedded Quickstart Autologin"
+	config BR2_EQ_AUTOLOGIN_USER
+	string "login-ng autologin user"
+	help
+		The user to autologin
+endmenu

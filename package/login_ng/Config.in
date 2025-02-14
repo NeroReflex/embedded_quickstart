@@ -1,6 +1,0 @@
-config BR2_PACKAGE_LOGIN_NG
-	bool "login-ng"
-	depends on BR2_PACKAGE_GREETD
-	select BR2_PACKAGE_HOST_RUSTC
-	help
-		login-ng software to interface with greetd

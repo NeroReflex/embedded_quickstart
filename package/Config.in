@@ -2,6 +2,15 @@ menu "Embedded Quickstart Packages"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/stupid1/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/greetd/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/agreety/Config.in"
-	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-cli/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-ctl/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/autologin/Config.in"
 endmenu
 
+menu "Embedded Quickstart Options"
+	config LOGIN_NG_VERSION
+		string "login_ng version"
+		default "0.1.9"
+		help
+			Select the login_ng version to be used
+endmenu
