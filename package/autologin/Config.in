@@ -1,5 +1,12 @@
-menu "Embedded Quickstart Autologin"
+config BR2_PACKAGE_AUTOLOGIN
+	bool "autologin"
+	select BR2_PACKAGE_LOGIN_NG_CLI
+	help
+		enable the autologin
+
+menu "Autologin Configurations"
 	config BR2_EQ_AUTOLOGIN_USER
+	depends on BR2_PACKAGE_AUTOLOGIN
 	string "login-ng autologin user"
 	help
 		The user to autologin
