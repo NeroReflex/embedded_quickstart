@@ -2,6 +2,9 @@
 
 auth       required     pam_securetty.so
 auth       requisite    pam_nologin.so
+
+# pam_login_ng
+
 auth       include      system-local-login
 account    include      system-local-login
 session    include      system-local-login
