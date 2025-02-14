@@ -1,0 +1,5 @@
+config BR2_PACKAGE_PAM_LOGIN_NG
+	bool "pam_login_ng"
+	depends on BR2_PACKAGE_LINUX_PAM
+	help
+		login_ng module for linux-pam to allow autologin and secondary authentication methods
