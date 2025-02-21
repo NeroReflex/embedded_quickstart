@@ -4,6 +4,8 @@ LOGIN_NG_CTL_SITE = $(call github,NeroReflex,login-ng,$(LOGIN_NG_CTL_VERSION))
 LOGIN_NG_CTL_DEPENDENCIES = host-rustc
 LOGIN_NG_CTL_INSTALL_STAGING = YES
 LOGIN_NG_CTL_SUBDIR = login_ng-ctl
+LOGIN_NG_CTL_CARGO_BUILD_OPTS = --all-features
+LOGIN_NG_CTL_CARGO_INSTALL_OPTS = --all-features
 
 define LOGIN_NG_CTL_POST_INSTALL
 	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login_ng-ctl/login_ng-ctl.pam \

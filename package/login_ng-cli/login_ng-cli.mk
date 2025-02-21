@@ -4,6 +4,8 @@ LOGIN_NG_CLI_SITE = $(call github,NeroReflex,login-ng,$(LOGIN_NG_CLI_VERSION))
 LOGIN_NG_CLI_DEPENDENCIES = host-rustc
 LOGIN_NG_CLI_INSTALL_STAGING = YES
 LOGIN_NG_CLI_SUBDIR = login_ng-cli
+LOGIN_NG_CLI_CARGO_BUILD_OPTS = --all-features
+LOGIN_NG_CLI_CARGO_INSTALL_OPTS = --all-features
 
 define LOGIN_NG_CLI_FIX_STAGING_GREETD_CONFIG
 	$(SED) 's|agreety --cmd /bin/sh|/usr/bin/login_ng-cli --autologin true|' $(TARGET_DIR)/etc/greetd/config.toml
