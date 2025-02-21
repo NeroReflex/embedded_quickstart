@@ -16,4 +16,6 @@ Then use buildroot normally.
 
 Make sure to include a user table (see *users_table.txt* as an example).
 
-Add to __BR2_ROOTFS_POST_IMAGE_SCRIPT__ as the last one the file *finalize.sh*
+Add to __BR2_ROOTFS_POST_IMAGE_SCRIPT__ as the last one the file *post_rootfs.sh*
+
+Add to __BR2_ROOTFS_POST_BUILD_SCRIPT__ as the last one the file *pre_rootfs.sh*
