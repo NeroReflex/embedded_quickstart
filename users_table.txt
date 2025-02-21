@@ -1,0 +1,2 @@
+user 1000 user 1000 =user /home/user /usr/bin/bash - the main user
+admin 1001 admin 1001 =admin /home/admin /usr/bin/bash sudo the administrator user
