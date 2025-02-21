@@ -1,5 +1,6 @@
 menu "Embedded Quickstart Packages"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/stupid1/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/rust_coreutils/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/greetd/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/agreety/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-cli/Config.in"
