@@ -1,0 +1,26 @@
+config BR2_PACKAGE_AUTOLOGIN
+	bool "autologin"
+	select BR2_PACKAGE_LOGIN_NG_CLI
+	select BR2_PACKAGE_HOST_LOGIN_NG_CTL
+	help
+		enable the autologin feature
+
+menu "Autologin Configurations"
+	config BR2_EQ_AUTOLOGIN_USER
+	depends on BR2_PACKAGE_AUTOLOGIN
+	string "login-ng autologin user"
+	help
+		The user to autologin: must match the user definition in users_table.txt
+
+	config BR2_EQ_AUTOLOGIN_MAIN_PASSWORD
+	depends on BR2_PACKAGE_AUTOLOGIN
+	string "login-ng autologin user's main password"
+	help
+		The main password for the autologin user: must match the user definition in users_table.txt
+
+	config BR2_EQ_AUTOLOGIN_INTERMEDIATE_PASSWORD
+	depends on BR2_PACKAGE_AUTOLOGIN
+	string "login-ng autologin user's intermediate password"
+	help
+		The intermediate password for the autologin user
+endmenu

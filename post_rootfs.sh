@@ -7,3 +7,17 @@
 # $BINARIES_DIR the place where all binary files (aka images) are stored
 # $BASE_DIR the base output directory 
 # $PARALLEL_JOBS the number of jobs to use when running parallel processes
+
+LNG_CTL="${HOST_DIR}/login_ng-ctl"
+
+if [ ! -f "${LNG_CTL}" ]; then
+    echo "Could not find ${LNG_CTL}"
+    exit -1
+else
+    echo "Program ${LNG_CTL} has been found."
+fi
+
+if [ -f "${TARGET_DIR}/user_autologin_username" ]; then
+    # TODO: invoke the command
+    exit -1
+fi

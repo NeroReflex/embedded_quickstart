@@ -1,16 +1,14 @@
-AUTOLOGIN_VERSION = $(LOGIN_NG_VERSION)
-AUTOLOGIN_LICENSE = GPL-2.0-or-later
-AUTOLOGIN_SITE = $(call github,NeroReflex,login-ng,$(AUTOLOGIN_VERSION))
-AUTOLOGIN_DEPENDENCIES = host-rustc
-AUTOLOGIN_SUBDIR = login_ng-ctl
-AUTOLOGIN_INSTALL_STAGING = YES
+AUTOLOGIN_VERSION = v0.1
+AUTOLOGIN_SITE_METHOD = local
+AUTOLOGIN_SITE = ${BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH}/package/autologin
+AUTOLOGIN_INSTALL_TARGET = YES
 
 define AUTOLOGIN_STORE_USER_PASSWORD
-	echo "${BR2_EQ_AUTOLOGIN_USER}" > $(TARGET_DIR)/user_autologin_pw
-	echo "${BR2_EQ_AUTOLOGIN_USER}"
-	exit -1
+	$(shell echo "${BR2_EQ_AUTOLOGIN_USER}" > "$(TARGET_DIR)/user_autologin_username") \
+    $(shell echo "${BR2_EQ_AUTOLOGIN_MAIN_PASSWORD}" > "$(TARGET_DIR)/user_autologin_main_password") \
+    $(shell echo "${BR2_EQ_AUTOLOGIN_INTERMEDIATE_PASSWORD}" > "$(TARGET_DIR)/user_autologin_intermediate_password")
 endef
 
-AUUTOLOGIN_POST_INSTALL_STAGING_HOOKS += AUTOLOGIN_STORE_USER_PASSWORD
+AUTOLOGIN_POST_INSTALL_TARGET_HOOKS += AUTOLOGIN_STORE_USER_PASSWORD
 
-$(eval $(host-cargo-package))
+$(eval $(generic-package))
