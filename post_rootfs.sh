@@ -17,6 +17,19 @@ else
     echo "Program ${LNG_CTL} has been found."
 fi
 
+BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
+rm -f "${BTRFS_IMAGE_FILE_PATH}"
+
+if ! fallocate -l 1G "${BTRFS_IMAGE_FILE_PATH}"; then
+    echo "Could not allocate space for target file '${BTRFS_IMAGE_FILE_PATH}'"
+fi
+
+mkfs.btrfs "${BTRFS_IMAGE_FILE_PATH}"
+
+TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
+mkdir -p "${BASE_DIR}/rootfs_mnt"
+fakeroot mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"
+
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_USERNAME=$(cat "${BUILD_DIR}/user_autologin_username")
     AUTOLOGIN_MAIN_PASSWORD=$(cat "${BUILD_DIR}/user_autologin_main_password")
@@ -36,7 +49,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         fi
     fi
 
-    set -e -i "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "$(TARGET_DIR)/etc/greetd/config.toml"
+    fakeroot set -e -i "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "$(TARGET_DIR)/etc/greetd/config.toml"
 else
     echo "WARNING: No autologin user specified"
 fi

@@ -12,10 +12,8 @@ Configure buildroot initially with
 make BR2_EXTERNAL=/path/to/embedded_quickstart menuconfig
 ```
 
-Then use buildroot normally.
+Then use buildroot normally to:
+  - Add to __BR2_ROOTFS_POST_IMAGE_SCRIPT__ as the last one the file *post_rootfs.sh*
+  - Add to __BR2_ROOTFS_POST_BUILD_SCRIPT__ as the last one the file *pre_rootfs.sh*
 
-Make sure to include a user table (see *users_table.txt* as an example).
-
-Add to __BR2_ROOTFS_POST_IMAGE_SCRIPT__ as the last one the file *post_rootfs.sh*
-
-Add to __BR2_ROOTFS_POST_BUILD_SCRIPT__ as the last one the file *pre_rootfs.sh*
+It is also suggested that you __disable__ *the remount rootfs as r/w*, and manage it via /etc/fstab.
