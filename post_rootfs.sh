@@ -22,29 +22,42 @@ rm -f "${BTRFS_IMAGE_FILE_PATH}"
 
 if ! fallocate -l 1G "${BTRFS_IMAGE_FILE_PATH}"; then
     echo "Could not allocate space for target file '${BTRFS_IMAGE_FILE_PATH}'"
+    exit -1
 fi
 
 mkfs.btrfs "${BTRFS_IMAGE_FILE_PATH}"
 
 TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
 mkdir -p "${BASE_DIR}/rootfs_mnt"
-fakeroot mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"
+if ! sudo mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"; then
+    echo "Could not mount the target file '${BTRFS_IMAGE_FILE_PATH}'"
+    exit -1
+fi
+
+# TODO: Use fakeroot to copy files from tar
 
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
+    AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
+    AUTOLOGIN_GID=$(cat "${BUILD_DIR}/user_autologin_gid")
     AUTOLOGIN_USERNAME=$(cat "${BUILD_DIR}/user_autologin_username")
     AUTOLOGIN_MAIN_PASSWORD=$(cat "${BUILD_DIR}/user_autologin_main_password")
     AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${BUILD_DIR}/user_autologin_intermediate_key")
 
-    AUTOLOGIN_USER_HOME_DIR="${TARGET_DIR}/home/${AUTOLOGIN_USERNAME}"
+    AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/home/${AUTOLOGIN_USERNAME}"
+
+    sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
+    sudo chown -R "${AUTOLOGIN_UID}":"${AUTOLOGIN_GID}" "${AUTOLOGIN_USER_HOME_DIR}"
 
     if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
         echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
+        sudo umount "${TARGET_ROOTFS}"
         exit -1
     else
         if $LNG_CTL -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
             echo "Autologin data written correctly"
         else
             echo "Error setting up the autologin data"
+            sudo umount "${TARGET_ROOTFS}"
             exit -1
         fi
     fi
