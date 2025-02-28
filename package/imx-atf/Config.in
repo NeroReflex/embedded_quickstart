@@ -3,7 +3,7 @@ config BR2_PACKAGE_IMX_ATF
 	help
 		ARM Trusted Firmware (i.mx8 variant)
 
-menu "Autologin Configurations"
+menu "imx-atf configuration"
 
 	config BR2_EQ_IMX_ATF_PLAT
 	depends on BR2_PACKAGE_IMX_ATF
