@@ -20,21 +20,9 @@ else
 fi
 
 BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
-rm -f "${BTRFS_IMAGE_FILE_PATH}"
-
-if ! fallocate -l 1G "${BTRFS_IMAGE_FILE_PATH}"; then
-    echo "Could not allocate space for target file '${BTRFS_IMAGE_FILE_PATH}'"
-    exit -1
-fi
-
-mkfs.btrfs "${BTRFS_IMAGE_FILE_PATH}"
 
 TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
-mkdir -p "${BASE_DIR}/rootfs_mnt"
-if ! sudo mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"; then
-    echo "Could not mount the target file '${BTRFS_IMAGE_FILE_PATH}'"
-    exit -1
-fi
+
 
 HOME_SUBVOL_NAME="@home"
 DEPLOYMENTS_SUBVOL_NAME="factory"
@@ -43,31 +31,16 @@ DEPLOYMENTS_DATA_DIR="deployments_data"
 
 EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
 
-sudo btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
-sudo mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
-sudo btrfs subvolume create "$EXTRACTED_ROOTFS_HOST_PATH"
-sudo mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/etc"
-sudo mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/var"
-sudo mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/boot"
-sudo mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/root"
+FS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/create_fs.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENTS_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
+FS_CREATE_RESULT=$?
 
-ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "$EXTRACTED_ROOTFS_HOST_PATH")
-ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
-
-if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
-    if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
-        echo "Invalid subvolid for the rootfs subvolume"
-        sudo umount "${TARGET_ROOTFS}"
-        exit -1
-    elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
-        echo "Couldn't identify the correct subvolid of the deployment"
-        sudo umount "${TARGET_ROOTFS}"
-        exit -1
-    fi
-
-    if ! btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
-        echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
-    fi
+if [ $FS_CREATE_RESULT -eq 0 ]; then
+    echo "----------------------------------------------------------"
+    echo "$FS_CREATE_OUTPUT"
+    echo ""
+    echo "Image created: '${BTRFS_IMAGE_FILE_PATH}'"
+    echo "Image mounted: '$TARGET_ROOTFS'"
+    echo "----------------------------------------------------------"
 else
     echo "Unable to identify the subvolid for the rootfs subvolume"
     sudo umount "${TARGET_ROOTFS}"

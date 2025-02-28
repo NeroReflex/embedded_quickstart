@@ -89,11 +89,14 @@ btrfs_subvol_get_id() {
 
 	if is_btrfs_subvolume "$dir"; then
 		local subvolid=$(btrfs subvolume show $dir | grep "Subvolume ID:" | cut -d ':' -f 2 | tr -d '[:space:]')
+		local result=$?
+
 		echo "$subvolid"
 
-        return 0
+        return $result
 	else
 		echo "ERROR: $dir is not a valid btrfs subvolume"
+
         return -1
 	fi
 }
