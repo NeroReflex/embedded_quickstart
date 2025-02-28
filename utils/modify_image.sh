@@ -6,14 +6,25 @@ IMAGE_FILE_PATH=${1}
 IMAGE_PART_NUMBER=${2}
 TARGET_ROOTFS=${3}
 
-losetup -P -f --show "${IMAGE_FILE_PATH}"
+LOOPBACK_OUTPUT=$(losetup -P -f --show "${IMAGE_FILE_PATH}")
+LOOPBACK_RESULT=$?
+if [ $LOOPBACK_RESULT -eq 0 ]; then
+    echo "loopback device '$LOOPBACK_OUTPUT'"
+else
+    echo "ERROR: Cannot setup loop device for file '$IMAGE_FILE_PATH'"
+fi
 
-#if ! sudo mount -o loop "${IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"; then
-#    echo "ERROR: Could not mount the target file '${BTRFS_IMAGE_FILE_PATH}'"
-#    exit -1
-#fi
-#
-#mkfs.btrfs "${BTRFS_IMAGE_FILE_PATH}"
+export LOOPBACK_DEV_PART="${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}"
+if ! mkfs.btrfs -f "${LOOPBACK_DEV_PART}"; then
+    echo "ERROR: Could not format loopback device partition '${LOOPBACK_DEV_PART}'"
+    losetup -D
+    exit -1
+fi
 
+if ! sudo mount -o loop "${LOOPBACK_DEV_PART}" "${TARGET_ROOTFS}"; then
+    echo "ERROR: Could not mount the target loopback partition '${LOOPBACK_DEV_PART}'"
+    losetup -D
+    exit -1
+fi
 
 exit 0

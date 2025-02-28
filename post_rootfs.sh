@@ -39,7 +39,7 @@ if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
     FS_MODIFY_RESULT=$?
 
     echo "$FS_MODIFY_OUTPUT"
-    if [ $FS_CREATE_RESULT -eq 0 ]; then
+    if [ $FS_MODIFY_RESULT -eq 0 ]; then
         echo "Image modified: '${IMAGE_FILE_PATH}'"
         echo "Image mounted: '$TARGET_ROOTFS'"
     else
@@ -74,6 +74,7 @@ if [ $ROOTFS_CREATE_RESULT -eq 0 ]; then
 else
     echo "Unable to initialize the root filesystem"
     sudo umount "${TARGET_ROOTFS}"
+    sudo losetup -D
     exit -1
 fi
 echo "----------------------------------------------------------"
@@ -83,6 +84,7 @@ if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
 else
     echo "No tar rootfs found in '${BINARIES_DIR}/rootfs.tar'"
     sudo umount "${TARGET_ROOTFS}"
+    sudo losetup -D
     exit -1
 fi
 
@@ -101,6 +103,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
         echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
         sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
         exit -1
     else
         if $LNG_CTL -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
@@ -113,6 +116,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         else
             echo "Error setting up the autologin data"
             sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
             exit -1
         fi
     fi
@@ -125,3 +129,4 @@ fi
 echo "Image generated successfully!"
 
 sudo umount "${TARGET_ROOTFS}"
+sudo losetup -D
