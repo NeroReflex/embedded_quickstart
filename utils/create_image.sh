@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Function to handle errors
+error_handler() {
+    echo "Error occurred at line: $LINENO"
+}
+
+# Set the trap to call the error_handler function on ERR
+trap 'error_handler' ERR
+
 source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
 BTRFS_IMAGE_FILE_PATH=${1}

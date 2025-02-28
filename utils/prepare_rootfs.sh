@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Function to handle errors
+error_handler() {
+    echo "Error occurred at line: $LINENO"
+}
+
+# Set the trap to call the error_handler function on ERR
+trap 'error_handler' ERR
+
 source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
 TARGET_ROOTFS=${1}
@@ -28,12 +36,10 @@ ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
 
 if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
     if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
-        echo "Invalid subvolid for the rootfs subvolume"
-        umount "${TARGET_ROOTFS}"
+        echo "ERROR: Invalid subvolid for the rootfs subvolume"
         exit -1
     elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
-        echo "Couldn't identify the correct subvolid of the deployment"
-        umount "${TARGET_ROOTFS}"
+        echo "ERROR: Couldn't identify the correct subvolid of the deployment"
         exit -1
     fi
 
@@ -41,12 +47,10 @@ if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
         echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
     else
         echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
-        umount "${TARGET_ROOTFS}"
         exit -1
     fi
 else
-    echo "Unable to identify the subvolid for the rootfs subvolume"
-    umount "${TARGET_ROOTFS}"
+    echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
     exit -1
 fi
 

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Function to handle errors
+error_handler() {
+    echo "Error occurred at line: $LINENO"
+}
+
+# Set the trap to call the error_handler function on ERR
+trap 'error_handler' ERR
+
 source "${BASH_SOURCE%/*}/utils/btrfs_utils.sh"
 
 # $BR2_CONFIG the path to the Buildroot .config file
@@ -72,7 +80,7 @@ ROOTFS_CREATE_RESULT=$?
 if [ $ROOTFS_CREATE_RESULT -eq 0 ]; then
     echo "$ROOTFS_CREATE_OUTPUT"
 else
-    echo "Unable to initialize the root filesystem"
+    echo "ERROR: Unable to initialize the root filesystem"
     sudo umount "${TARGET_ROOTFS}"
     sudo losetup -D
     exit -1
