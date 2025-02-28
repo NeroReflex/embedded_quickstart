@@ -2,29 +2,13 @@
 
 source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
-BTRFS_IMAGE_FILE_PATH=${1}
-TARGET_ROOTFS=${2}
-HOME_SUBVOL_NAME=${3}
-DEPLOYMENTS_SUBVOL_NAME=${4}
-DEPLOYMENTS_DIR=${5}
-DEPLOYMENTS_DATA_DIR=${6}
+TARGET_ROOTFS=${1}
+HOME_SUBVOL_NAME=${2}
+DEPLOYMENTS_SUBVOL_NAME=${3}
+DEPLOYMENTS_DIR=${4}
+DEPLOYMENTS_DATA_DIR=${5}
 
 EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
-
-rm -f "${BTRFS_IMAGE_FILE_PATH}"
-
-if ! fallocate -l 1G "${BTRFS_IMAGE_FILE_PATH}"; then
-    echo "Could not allocate space for target file '${BTRFS_IMAGE_FILE_PATH}'"
-    exit -1
-fi
-
-mkfs.btrfs "${BTRFS_IMAGE_FILE_PATH}"
-
-mkdir -p "${BASE_DIR}/rootfs_mnt"
-if ! sudo mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"; then
-    echo "Could not mount the target file '${BTRFS_IMAGE_FILE_PATH}'"
-    exit -1
-fi
 
 btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
 mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"

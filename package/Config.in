@@ -11,4 +11,5 @@ endmenu
 
 menu "Embedded Quickstart Options"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/autologin/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/image/Config.in"
 endmenu

@@ -19,10 +19,8 @@ else
     echo "Program ${LNG_CTL} has been found."
 fi
 
-BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
-
 TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
-
+mkdir -p "${BASE_DIR}/rootfs_mnt"
 
 HOME_SUBVOL_NAME="@home"
 DEPLOYMENTS_SUBVOL_NAME="factory"
@@ -31,21 +29,54 @@ DEPLOYMENTS_DATA_DIR="deployments_data"
 
 EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
 
-FS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/create_fs.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENTS_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
-FS_CREATE_RESULT=$?
+# Create the image and mount the rootfs
+echo "----------------------------------------------------------"
+if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
+    IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
+    IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
 
-if [ $FS_CREATE_RESULT -eq 0 ]; then
-    echo "----------------------------------------------------------"
-    echo "$FS_CREATE_OUTPUT"
-    echo ""
-    echo "Image created: '${BTRFS_IMAGE_FILE_PATH}'"
-    echo "Image mounted: '$TARGET_ROOTFS'"
-    echo "----------------------------------------------------------"
+    FS_MODIFY_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/modify_image.sh" "$IMAGE_FILE_PATH" "$IMAGE_PART_NUMBER" "$TARGET_ROOTFS")
+    FS_MODIFY_RESULT=$?
+
+    echo "$FS_MODIFY_OUTPUT"
+    if [ $FS_CREATE_RESULT -eq 0 ]; then
+        echo "Image modified: '${IMAGE_FILE_PATH}'"
+        echo "Image mounted: '$TARGET_ROOTFS'"
+    else
+        echo "Unable to modify the image"
+        sudo umount "${TARGET_ROOTFS}"
+        exit -1
+    fi
 else
-    echo "Unable to identify the subvolid for the rootfs subvolume"
+    BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
+
+    FS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/create_image.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS")
+    FS_CREATE_RESULT=$?
+
+    echo "$FS_CREATE_OUTPUT"
+    if [ $FS_CREATE_RESULT -eq 0 ]; then
+        echo "Image created: '${BTRFS_IMAGE_FILE_PATH}'"
+        echo "Image mounted: '$TARGET_ROOTFS'"
+    else
+        echo "Unable to create the image."
+        sudo umount "${TARGET_ROOTFS}"
+        exit -1
+    fi
+fi
+echo "----------------------------------------------------------"
+
+# Initialize the mounted rootfs
+echo "----------------------------------------------------------"
+ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENTS_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
+ROOTFS_CREATE_RESULT=$?
+if [ $ROOTFS_CREATE_RESULT -eq 0 ]; then
+    echo "$ROOTFS_CREATE_OUTPUT"
+else
+    echo "Unable to initialize the root filesystem"
     sudo umount "${TARGET_ROOTFS}"
     exit -1
 fi
+echo "----------------------------------------------------------"
 
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
     sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
