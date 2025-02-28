@@ -34,7 +34,13 @@ if ! sudo mount -o loop "${BTRFS_IMAGE_FILE_PATH}" "${TARGET_ROOTFS}"; then
     exit -1
 fi
 
-# TODO: Use fakeroot to copy files from tar
+if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
+    sudo tar xvpf "${BINARIES_DIR}/rootfs.tar" -C "${TARGET_ROOTFS}"
+else
+    echo "No tar rootfs found in '${BINARIES_DIR}/rootfs.tar'"
+    sudo umount "${TARGET_ROOTFS}"
+    exit -1
+fi
 
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
@@ -62,7 +68,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         fi
     fi
 
-    fakeroot set -e -i "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "$(TARGET_DIR)/etc/greetd/config.toml"
+    sudo sed -e -i "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "${TARGET_ROOTFS}/etc/greetd/config.toml"
 else
     echo "WARNING: No autologin user specified"
 fi
