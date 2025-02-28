@@ -5,8 +5,8 @@ menu "Embedded Quickstart Packages"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/agreety/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-cli/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-ctl/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-ctl/Config.in.host"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/pam_login_ng/Config.in"
-	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/login_ng-ctl-host/Config.in.host"
 endmenu
 
 menu "Embedded Quickstart Options"

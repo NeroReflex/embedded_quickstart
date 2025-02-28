@@ -15,3 +15,4 @@ endef
 LOGIN_NG_CTL_POST_INSTALL_TARGET_HOOKS += LOGIN_NG_CTL_POST_INSTALL
 
 $(eval $(cargo-package))
+$(eval $(host-cargo-package))
