@@ -77,8 +77,10 @@ echo "----------------------------------------------------------"
 echo "----------------------------------------------------------"
 ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENTS_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
 ROOTFS_CREATE_RESULT=$?
+
+echo "$ROOTFS_CREATE_OUTPUT"
 if [ $ROOTFS_CREATE_RESULT -eq 0 ]; then
-    echo "$ROOTFS_CREATE_OUTPUT"
+    echo "rootfs initialized: '${TARGET_ROOTFS}'"
 else
     echo "ERROR: Unable to initialize the root filesystem"
     sudo umount "${TARGET_ROOTFS}"
