@@ -1,0 +1,14 @@
+config BR2_PACKAGE_IMX_ATF
+	bool "imx-atf"
+	help
+		ARM Trusted Firmware (i.mx8 variant)
+
+menu "Autologin Configurations"
+
+	config BR2_EQ_IMX_ATF_PLAT
+	depends on BR2_PACKAGE_IMX_ATF
+	string "imx-atf platform"
+	help
+		The platform name as in PLAT= make parameter
+
+endmenu
