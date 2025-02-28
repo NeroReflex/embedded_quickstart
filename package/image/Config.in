@@ -1,5 +1,7 @@
 config BR2_PACKAGE_IMAGE
 	bool "modify image"
+	select BR2_PACKAGE_HOST_BTRFS_PROGS
+	select BR2_PACKAGE_HOST_BMAP_TOOLS
 	help
 		Modify a pre-made image instead of creating a new rootfs
 

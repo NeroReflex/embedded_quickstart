@@ -37,6 +37,8 @@ DEPLOYMENTS_DATA_DIR="deployments_data"
 
 EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
 
+export PATH="${HOST_DIR}/bin:${PATH}"
+
 # Create the image and mount the rootfs
 echo "----------------------------------------------------------"
 if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
@@ -116,7 +118,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         sudo losetup -D
         exit -1
     else
-        if $LNG_CTL -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
+        if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
             echo "----------------------------------------------------------"
             echo "Username: ${AUTOLOGIN_USERNAME}"
             echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
@@ -134,6 +136,10 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     sudo sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
 else
     echo "WARNING: No autologin user specified"
+fi
+
+if [ ! -z "$IMAGE_FILE_PATH" ]; then
+    bmaptool create -o "$IMAGE_FILE_PATH.bmap" "$IMAGE_FILE_PATH"
 fi
 
 echo "Image generated successfully!"

@@ -17,3 +17,12 @@ Then use buildroot normally to:
   - Add to __BR2_ROOTFS_POST_BUILD_SCRIPT__ as the last one the file *pre_rootfs.sh*
 
 It is also suggested that you __disable__ *the remount rootfs as r/w*, and manage it via /etc/fstab.
+
+## Bootloader
+
+The following is bootloader-specific configurations: choose based on your bootloader of preference.
+
+### U-Boot
+
+If you use u-boot you have to include the *uboot.conf* file to *Additional configuration fragment files* in
+bootloaders -> u-boot.
