@@ -1,7 +1,7 @@
 # Define the package name and version
 IMX_MKIMAGE_POST_NAME := imx-mkimage-post
-IMX_MKIMAGE_POST_VERSION := 1.0
-IMX_MKIMAGE_POST_SITE = $(call github,nxp-imx,imx-mkimage,lf-6.12.3-imx943-er1)
+IMX_MKIMAGE_POST_VERSION := 5.10
+IMX_MKIMAGE_POST_SITE = $(call github,NeroReflex,imx-mkimage,$(IMX_MKIMAGE_POST_VERSION))
 
 IMX_MKIMAGE_POST_MAKE_ENV = \
         $(HOST_MAKE_ENV) \
