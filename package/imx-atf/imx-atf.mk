@@ -17,7 +17,7 @@ IMX_ATF_MAKE = $(BR2_MAKE)
 # Define the target
 define IMX_ATF_BUILD_CMDS
     $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET) \
-    $(shell cp $(@D)/build/$(BR2_EQ_IMX_ATF_PLAT)/release/$(IMX_ATF_FILENAME) $(HOST_DIR)/usr/lib/firmware/$(IMX_ATF_FILENAME))
+    $(shell cp $(@D)/build/$(BR2_EQ_IMX_ATF_PLAT)/release/*.bin $(BINARIES_DIR)/usr/lib/firmware/)
 endef
 
 ## Define the install commands
