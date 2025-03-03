@@ -16,13 +16,14 @@ IMX_ATF_MAKE = $(BR2_MAKE)
 
 # Define the target
 define IMX_ATF_BUILD_CMDS
-    $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET)
+    $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET) \
+    $(shell cp $(@D)/build/$(BR2_EQ_IMX_ATF_PLAT)/release/$(IMX_ATF_FILENAME) $(HOST_DIR)/usr/lib/firmware/$(IMX_ATF_FILENAME))
 endef
 
 ## Define the install commands
-define IMX_ATF_INSTALL_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/build/$(BR2_EQ_IMX_ATF_PLAT)/release/$(IMX_ATF_FILENAME) $(HOST_DIR)/usr/lib/firmware/$(IMX_ATF_FILENAME)
-endef
+#define IMX_ATF_INSTALL_CMDS
+#    $(INSTALL) -D -m 0755 $(@D)/build/$(BR2_EQ_IMX_ATF_PLAT)/release/$(IMX_ATF_FILENAME) $(HOST_DIR)/usr/lib/firmware/$(IMX_ATF_FILENAME)
+#endef
 
 # Package definition
 $(eval $(generic-package))
