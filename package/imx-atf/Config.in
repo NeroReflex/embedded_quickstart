@@ -8,7 +8,15 @@ menu "imx-atf configuration"
 	config BR2_EQ_IMX_ATF_PLAT
 	depends on BR2_PACKAGE_IMX_ATF
 	string "imx-atf platform"
+	default imx8mm
 	help
 		The platform name as in PLAT= make parameter
+
+	config BR2_EQ_IMX_ATF_TARGET
+	depends on BR2_PACKAGE_IMX_ATF
+	string "imx-atf make target"
+	default bl31
+	help
+		The make target
 
 endmenu
