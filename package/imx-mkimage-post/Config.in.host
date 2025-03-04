@@ -1,6 +1,8 @@
 config BR2_PACKAGE_HOST_IMX_MKIMAGE_POST
 	bool "imx-mkimage"
 	select BR2_PACKAGE_HOST_UBOOT_TOOLS
+	select BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SUPPORT
+	select BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SIGNATURE_SUPPORT
 	help
 		build the u-boot image
 
@@ -9,7 +11,7 @@ menu "imx-mkimage configuration"
 	config BR2_EQ_IMX_MKIMAGE_POST_SOC
 	depends on BR2_PACKAGE_HOST_IMX_MKIMAGE_POST
 	string "imx-mkimage target SoC"
-	default IMX8MM
+	default iMX8MM
 	help
 		The platform name as in SOC= make parameter
 
