@@ -5,7 +5,7 @@ IMX_MKIMAGE_POST_SITE = $(call github,NeroReflex,imx-mkimage,$(IMX_MKIMAGE_POST_
 
 IMX_MKIMAGE_POST_DEPENDENCIES = \
         imx-atf \
-        u-boot \
+        uboot \
         host-uboot-tools \
         firmware-imx
 
