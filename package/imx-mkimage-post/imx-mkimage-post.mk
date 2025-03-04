@@ -1,6 +1,6 @@
 # Define the package name and version
 IMX_MKIMAGE_POST_NAME := imx-mkimage-post
-IMX_MKIMAGE_POST_VERSION := 5.12
+IMX_MKIMAGE_POST_VERSION := 5.13
 IMX_MKIMAGE_POST_SITE = $(call github,NeroReflex,imx-mkimage,$(IMX_MKIMAGE_POST_VERSION))
 
 IMX_MKIMAGE_POST_DEPENDENCIES = \
