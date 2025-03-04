@@ -25,8 +25,15 @@ menu "imx-mkimage configuration"
 	config BR2_EQ_IMX_MKIMAGE_POST_TARGET
 	depends on BR2_PACKAGE_HOST_IMX_MKIMAGE_POST
 	string "imx-mkimage make target"
-	default flash_evk
+	default flash_lpddr4_ddr4_evk
 	help
 		The make target
+
+	config BR2_EQ_IMX_MKIMAGE_POST_DTBS
+	depends on BR2_PACKAGE_HOST_IMX_MKIMAGE_POST
+	string "imx-mkimage dtbs"
+	default "imx8mm-var-dart-dt8mcustomboard.dtb imx8mm-var-som-symphony.dtb"
+	help
+		The list of dtbs
 
 endmenu
