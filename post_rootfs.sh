@@ -127,14 +127,21 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         exit -1
     else
         if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
-            echo "----------------------------------------------------------"
-            echo "Username: ${AUTOLOGIN_USERNAME}"
-            echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
-            echo "Intermediate Key: ${AUTOLOGIN_INTERMEDIATE_KEY}"
-            echo "----------------------------------------------------------"
-            echo "Autologin data written correctly."
+            if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
+                echo "----------------------------------------------------------"
+                echo "Username: ${AUTOLOGIN_USERNAME}"
+                echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
+                echo "Intermediate Key: ${AUTOLOGIN_INTERMEDIATE_KEY}"
+                echo "----------------------------------------------------------"
+                echo "Autologin data written correctly."
+            else
+                echo "Error setting up the user autologin"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
         else
-            echo "Error setting up the autologin data"
+            echo "Error setting up the user login data"
             sudo umount "${TARGET_ROOTFS}"
             sudo losetup -D
             exit -1
