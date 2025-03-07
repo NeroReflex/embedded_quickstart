@@ -18,6 +18,10 @@ Then use buildroot normally to:
 
 It is also suggested that you __disable__ *the remount rootfs as r/w*, and manage it via /etc/fstab.
 
+## Kernel
+
+Include the *linux.conf* file to *Additional configuration fragment files* in Kernel menu.
+
 ## Bootloader
 
 The following is bootloader-specific configurations: choose based on your bootloader of preference.
