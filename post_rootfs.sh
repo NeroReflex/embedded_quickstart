@@ -172,12 +172,19 @@ sudo losetup -D
 
 # Write the bootloader to the image
 if [ ! -z "${IMAGE_FILE_PATH}" ]; then
-    if [ -f "${BUILD_DIR}/boot-imx" ]; then
-        echo "Writing the bootloader"
-        if ! sudo dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
-            echo "ERROR: Could not write boot-imx to image"
-            exit -1
+    LOOPBACK_OUTPUT=$(sudo losetup -P -f --show "${IMAGE_FILE_PATH}")
+    LOOPBACK_RESULT=$?
+    if [ $LOOPBACK_RESULT -eq 0 ]; then
+        if [ -f "${BUILD_DIR}/boot-imx" ]; then
+            echo "Writing the bootloader..."
+            if ! sudo dd if="${BUILD_DIR}/boot-imx" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
+                echo "ERROR: Could not write boot-imx to image"
+                exit -1
+            fi
         fi
+    else
+        echo "ERROR: Cannot setup loop device for file '$IMAGE_FILE_PATH'"
+        exit -1
     fi
 fi
 
