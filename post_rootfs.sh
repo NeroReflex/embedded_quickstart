@@ -171,10 +171,10 @@ sudo umount "${TARGET_ROOTFS}"
 sudo losetup -D
 
 # Write the bootloader to the image
-if [ -z "${IMAGE_FILE_PATH}" ]; then
+if [ ! -z "${IMAGE_FILE_PATH}" ]; then
     if [ -f "${BUILD_DIR}/boot-imx" ]; then
         echo "Writing the bootloader"
-        if ! dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
+        if ! sudo dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
             echo "ERROR: Could not write boot-imx to image"
             exit -1
         fi
