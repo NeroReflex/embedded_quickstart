@@ -19,13 +19,15 @@ ATF_BOOT_UART_BASE ?= ""
 
 # Define the target
 # TODO: Add SPD=opteed if requested
-define IMX_ATF_BUILD_CMDS
-    ifeq ($(BR2_EQ_IMX_ATF_TARGET_OPTEE),y)
+ifeq ($(BR2_EQ_IMX_ATF_TARGET_OPTEE),y)
+    define IMX_ATF_BUILD_CMDS
         $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) IMX_BOOT_UART_BASE=${ATF_BOOT_UART_BASE} $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" BUILD_BASE=build-optee SPD=opteed $(BR2_EQ_IMX_ATF_TARGET)
-    else
+    endef
+else
+    define IMX_ATF_BUILD_CMDS
         $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) IMX_BOOT_UART_BASE=${ATF_BOOT_UART_BASE} $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET)
-    endif
-endef
+    endef
+endif
 
 # Define the install commands
 define IMX_ATF_INSTALL_TARGET_CMDS
