@@ -118,7 +118,6 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
 
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
-    sudo chown -R "${AUTOLOGIN_UID}":"${AUTOLOGIN_GID}" "${AUTOLOGIN_USER_HOME_DIR}"
 
     if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
         echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
@@ -126,8 +125,8 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         sudo losetup -D
         exit -1
     else
-        if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
-            if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
+        if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
+            if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
                 echo "----------------------------------------------------------"
                 echo "Username: ${AUTOLOGIN_USERNAME}"
                 echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
@@ -147,6 +146,9 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             exit -1
         fi
     fi
+
+    # Assign the user directory to the proper uid and gid
+    sudo chown -R "${AUTOLOGIN_UID}":"${AUTOLOGIN_GID}" "${AUTOLOGIN_USER_HOME_DIR}"
 
     sudo sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
 else
