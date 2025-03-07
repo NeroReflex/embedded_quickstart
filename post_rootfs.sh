@@ -45,9 +45,9 @@ if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
     IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
     IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
 
-    if [ -f "${BUILD_DIR}boot-imx" ]; then
+    if [ -f "${BUILD_DIR}/boot-imx" ]; then
         echo "Writing the bootloader"
-        if ! dd if="${BUILD/DIR}boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
+        if ! dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
             echo "ERROR: Could not write boot-imx to image"
             exit -1
         fi
