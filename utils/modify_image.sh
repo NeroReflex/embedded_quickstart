@@ -10,9 +10,9 @@ trap 'error_handler' ERR
 
 source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
-IMAGE_FILE_PATH=${1}
-IMAGE_PART_NUMBER=${2}
-TARGET_ROOTFS=${3}
+readonly IMAGE_FILE_PATH=${1}
+readonly IMAGE_PART_NUMBER=${2}
+readonly TARGET_ROOTFS=${3}
 
 LOOPBACK_OUTPUT=$(losetup -P -f --show "${IMAGE_FILE_PATH}")
 LOOPBACK_RESULT=$?
@@ -20,6 +20,7 @@ if [ $LOOPBACK_RESULT -eq 0 ]; then
     echo "loopback device '$LOOPBACK_OUTPUT'"
 else
     echo "ERROR: Cannot setup loop device for file '$IMAGE_FILE_PATH'"
+    exit -1
 fi
 
 export LOOPBACK_DEV_PART="${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}"
