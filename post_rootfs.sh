@@ -42,16 +42,8 @@ export PATH="${HOST_DIR}/bin:${PATH}"
 # Create the image and mount the rootfs
 echo "----------------------------------------------------------"
 if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
-    IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
-    IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
-
-    if [ -f "${BUILD_DIR}/boot-imx" ]; then
-        echo "Writing the bootloader"
-        if ! dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
-            echo "ERROR: Could not write boot-imx to image"
-            exit -1
-        fi
-    fi
+    readonly IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
+    readonly IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
 
     FS_MODIFY_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/modify_image.sh" "$IMAGE_FILE_PATH" "$IMAGE_PART_NUMBER" "$TARGET_ROOTFS")
     FS_MODIFY_RESULT=$?
@@ -173,6 +165,17 @@ overlay         /var     overlay     x-initrd.mount,defaults,x-systemd.requires-
 
 # Seal the roofs
 btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+
+# Write the bootloader to the image
+if [ -z "${IMAGE_FILE_PATH}" ]; then
+    if [ -f "${BUILD_DIR}/boot-imx" ]; then
+        echo "Writing the bootloader"
+        if ! dd if="${BUILD_DIR}/boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
+            echo "ERROR: Could not write boot-imx to image"
+            exit -1
+        fi
+    fi
+fi
 
 sync
 
