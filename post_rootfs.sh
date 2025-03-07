@@ -164,7 +164,11 @@ overlay         /var     overlay     x-initrd.mount,defaults,x-systemd.requires-
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
 # Seal the roofs
-btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+
+# Umount the filesyste and the loopback device
+sudo umount "${TARGET_ROOTFS}"
+sudo losetup -D
 
 # Write the bootloader to the image
 if [ -z "${IMAGE_FILE_PATH}" ]; then
@@ -180,6 +184,3 @@ fi
 sync
 
 echo "Image generated successfully!"
-
-sudo umount "${TARGET_ROOTFS}"
-sudo losetup -D
