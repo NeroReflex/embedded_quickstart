@@ -12,6 +12,12 @@ menu "imx-atf configuration"
 	help
 		The platform name as in PLAT= make parameter
 
+	config BR2_EQ_IMX_ATF_TARGET_OPTEE
+	depends on BR2_PACKAGE_IMX_ATF
+	bool "OP-TEE Support"
+	help
+		Enable OP-TEE Support
+
 	config BR2_EQ_IMX_ATF_TARGET
 	depends on BR2_PACKAGE_IMX_ATF
 	string "imx-atf make target"
