@@ -1,7 +1,7 @@
 # Define the package name and version
 IMX_ATF_NAME := imx-atf
-IMX_ATF_VERSION := 1.0
-IMX_ATF_SITE = $(call github,nxp-imx,imx-atf,lf-6.12.3-imx943-er1)
+IMX_ATF_VERSION := 2.10
+IMX_ATF_SITE = $(call github,varigit,imx-atf,lf_v2.10_6.6.52-2.2.0_var01)
 
 IMX_ATF_FILENAME=$(BR2_EQ_IMX_ATF_TARGET).bin
 
@@ -14,9 +14,12 @@ IMX_ATF_DEPENDENCIES = \
         $(BR2_MAKE_HOST_DEPENDENCY)
 IMX_ATF_MAKE = $(BR2_MAKE)
 
+ATF_BOOT_UART_BASE ?= ""
+
 # Define the target
+# TODO: Add SPD=opteed if requested
 define IMX_ATF_BUILD_CMDS
-    $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) SPD=opteed CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET)
+    $(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) IMX_BOOT_UART_BASE=${ATF_BOOT_UART_BASE} $(MAKE) -C $(@D) PLAT=$(BR2_EQ_IMX_ATF_PLAT) CROSS_COMPILE="$(TARGET_CROSS)" $(BR2_EQ_IMX_ATF_TARGET)
 endef
 
 # Define the install commands
