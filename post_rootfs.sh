@@ -47,7 +47,7 @@ if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
 
     if [ -f "${BUILD_DIR}boot-imx" ]; then
         echo "Writing the bootloader"
-        if ! dd if="${BUILD/DIR}boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ;then
+        if ! dd if="${BUILD/DIR}boot-imx" of="${IMAGE_FILE_PATH}" bs=1K seek=33 conv=fsync ; then
             echo "ERROR: Could not write boot-imx to image"
             exit -1
         fi
@@ -154,6 +154,8 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
 else
     echo "WARNING: No autologin user specified"
 fi
+
+sync
 
 echo "Image generated successfully!"
 
