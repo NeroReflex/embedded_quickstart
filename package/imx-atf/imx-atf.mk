@@ -2,6 +2,7 @@
 IMX_ATF_NAME := imx-atf
 IMX_ATF_VERSION := 2.10
 IMX_ATF_SITE = $(call github,varigit,imx-atf,lf_v2.10_6.6.52-2.2.0_var01)
+# last successful build commit: 3b57a2b9cc3bb103f7ed5d044b1d1a8fcf3a42f6
 
 IMX_ATF_FILENAME=$(BR2_EQ_IMX_ATF_TARGET).bin
 
