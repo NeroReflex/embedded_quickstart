@@ -12,26 +12,41 @@ source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
 TARGET_ROOTFS=${1}
 HOME_SUBVOL_NAME=${2}
-DEPLOYMENTS_SUBVOL_NAME=${3}
+DEPLOYMENT_SUBVOL_NAME=${3}
 DEPLOYMENTS_DIR=${4}
 DEPLOYMENTS_DATA_DIR=${5}
 
-EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
+EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
 
+# Create the home subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
+
+# Create directories for deployments and deployment-specific data
 mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
 mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
-btrfs subvolume create "$EXTRACTED_ROOTFS_HOST_PATH"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/.etc_workdir"
-mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/etc"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/.var_workdir"
-mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/var"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/.boot_workdir"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/boot"
-btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/.root_workdir"
-mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/root"
 
+# Create the default deployment rootfs snapshot
+btrfs subvolume create "$EXTRACTED_ROOTFS_HOST_PATH"
+
+readonly SUBVOL_DATA="${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+mkdir -p "${SUBVOL_DATA}/etc_overlay/upperdir"
+mkdir -p "${SUBVOL_DATA}/etc_overlay/workdir"
+mkdir -p "${SUBVOL_DATA}/var_overlay/upperdir"
+mkdir -p "${SUBVOL_DATA}/var_overlay/workdir"
+mkdir -p "${SUBVOL_DATA}/root_overlay"
+mkdir -p "${SUBVOL_DATA}/root_overlay/upperdir"
+mkdir -p "${SUBVOL_DATA}/root_overlay/workdir"
+btrfs subvol create "${SUBVOL_DATA}/usr_overlay"
+mkdir "${SUBVOL_DATA}/usr_overlay/upperdir"
+mkdir "${SUBVOL_DATA}/usr_overlay/workdir"
+btrfs subvol create "${SUBVOL_DATA}/boot_overlay"
+mkdir "${SUBVOL_DATA}/boot_overlay/upperdir"
+mkdir "${SUBVOL_DATA}/boot_overlay/workdir"
+
+btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
+btrfs property set -fts "${SUBVOL_DATA}/boot_overlay" ro true
+
+# Change the default subvolid so that the written deployment will get booted
 ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "$EXTRACTED_ROOTFS_HOST_PATH")
 ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
 

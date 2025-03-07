@@ -31,11 +31,11 @@ TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
 mkdir -p "${BASE_DIR}/rootfs_mnt"
 
 HOME_SUBVOL_NAME="@home"
-DEPLOYMENTS_SUBVOL_NAME="factory"
+DEPLOYMENT_SUBVOL_NAME="factory"
 DEPLOYMENTS_DIR="deployments"
 DEPLOYMENTS_DATA_DIR="deployments_data"
 
-EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENTS_SUBVOL_NAME}/"
+EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
 
 export PATH="${HOST_DIR}/bin:${PATH}"
 
@@ -85,7 +85,7 @@ echo "----------------------------------------------------------"
 
 # Initialize the mounted rootfs
 echo "----------------------------------------------------------"
-ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENTS_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
+ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
 ROOTFS_CREATE_RESULT=$?
 
 echo "$ROOTFS_CREATE_OUTPUT"
@@ -154,6 +154,25 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
 else
     echo "WARNING: No autologin user specified"
 fi
+
+sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/base"
+
+# write /etc/fstab with mountpoints
+echo "
+/dev/root       /        btrfs       x-initrd.mount,subvol=/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw                   0  0
+/dev/root       /home    btrfs       subvol=/${HOME_SUBVOL_NAME},skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,remount,rw                   0  0
+/dev/root       /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,remount,rw                       0  0
+overlay         /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
+overlay         /boot    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/boot,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
+overlay         /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                   0   0
+overlay         /etc     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
+overlay         /var     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
+
+
+" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+
+# Seal the roofs
+btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
 sync
 

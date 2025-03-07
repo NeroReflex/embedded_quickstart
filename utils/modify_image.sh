@@ -29,7 +29,7 @@ if ! mkfs.btrfs -f "${LOOPBACK_DEV_PART}"; then
     exit -1
 fi
 
-if ! sudo mount -o loop "${LOOPBACK_DEV_PART}" "${TARGET_ROOTFS}"; then
+if ! sudo mount -t btrfs -o subvolid=5,compress-force=zstd:15,noatime,rw "${LOOPBACK_DEV_PART}" "${TARGET_ROOTFS}"; then
     echo "ERROR: Could not mount the target loopback partition '${LOOPBACK_DEV_PART}'"
     losetup -D
     exit -1
