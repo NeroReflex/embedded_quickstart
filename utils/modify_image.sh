@@ -24,7 +24,7 @@ else
 fi
 
 export LOOPBACK_DEV_PART="${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}"
-if ! mkfs.btrfs -f "${LOOPBACK_DEV_PART}"; then
+if ! mkfs.btrfs -f "${LOOPBACK_DEV_PART}" -L rootfs; then
     echo "ERROR: Could not format loopback device partition '${LOOPBACK_DEV_PART}'"
     losetup -D
     exit -1
