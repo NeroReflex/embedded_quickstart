@@ -134,6 +134,29 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 sudo losetup -D
                 exit -1
             fi
+
+            readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
+
+            if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
+                echo "Error writing the /etc/passwd file"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! echo "${AUTOLOGIN_USERNAME}:${hashed_password}:18000:0:99999:7:-1:-1:" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/shadow"; then
+                echo "Error writing the /etc/shadow file"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_GID}:" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"; then
+                echo "Error writing the /etc/group file"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
         else
             echo "Error setting up the user login data"
             sudo umount "${TARGET_ROOTFS}"
