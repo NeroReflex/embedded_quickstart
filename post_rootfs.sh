@@ -92,9 +92,7 @@ fi
 echo "----------------------------------------------------------"
 
 # Get the UUID of the partition
-readonly uuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
-
-echo "UUID: ${uuid}"
+readonly partuuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
 
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
     sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
@@ -154,22 +152,27 @@ fi
 
 sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/base"
 
+echo "----------------------------------------------------------"
+echo "Setting boot partition to PARTUUID: ${partuuid}"
+
 # write /etc/fstab with mountpoints
 echo "
-/dev/mmcblk1p1  /        btrfs       x-initrd.mount,subvol=/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw  0  0
-/dev/mmcblk1p1  /home    btrfs       subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw                                          0  0
-/dev/mmcblk1p1  /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,rw              0  0
-overlay         /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
-overlay         /boot    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/boot,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
-overlay         /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                   0   0
-overlay         /etc     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
-overlay         /var     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
-
-
+PARTUUID=${partuuid}  /        btrfs       x-initrd.mount,subvol=/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw  0  0
+PARTUUID=${partuuid}  /home    btrfs       subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw                                          0  0
+PARTUUID=${partuuid}  /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,rw              0  0
+overlay               /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
+overlay               /boot    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/boot,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
+overlay               /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                   0   0
+overlay               /etc     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
+overlay               /var     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0   0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+
+echo "Sealing the BTRFS subvolume containing the rootfs"
 
 # Seal the roofs
 sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+
+echo "----------------------------------------------------------"
 
 # Umount the filesyste and the loopback device
 sudo umount "${TARGET_ROOTFS}"

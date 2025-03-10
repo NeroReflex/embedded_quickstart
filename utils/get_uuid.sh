@@ -17,14 +17,14 @@ if [ -z "$DEVICE" ]; then
     exit 1
 fi
 
-# Get the UUID of the device
-UUID=$(blkid -s UUID -o value "$DEVICE")
+# Get the UUID of the partition
+UUID=$(blkid -s PARTUUID -o value "$DEVICE")
 
 # Check if the UUID was found
 if [ -z "$UUID" ]; then
-    echo "No UUID found for the device: $DEVICE"
+    echo "No PARTUUID found for the device: $DEVICE"
     exit 1
 fi
 
 # Output the UUID
-echo "The UUID of the disk mounted on $MOUNT_DIR is: $UUID"
+echo "The PARTUUID of the disk mounted on $MOUNT_DIR is: $UUID"
