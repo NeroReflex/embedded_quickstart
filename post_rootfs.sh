@@ -92,7 +92,7 @@ fi
 echo "----------------------------------------------------------"
 
 # Get the UUID of the partition
-readonly uuid=$(./utils/get_uuid.sh "${TARGET_ROOTFS}")
+readonly uuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
 
 echo "UUID: ${uuid}"
 
