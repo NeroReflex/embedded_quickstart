@@ -91,6 +91,11 @@ else
 fi
 echo "----------------------------------------------------------"
 
+# Get the UUID of the partition
+readonly uuid=$(./utils/get_uuid.sh "${TARGET_ROOTFS}")
+
+echo "UUID: ${uuid}"
+
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
     sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
@@ -151,9 +156,9 @@ sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/base"
 
 # write /etc/fstab with mountpoints
 echo "
-/dev/root       /        btrfs       x-initrd.mount,subvol=/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw                   0  0
-/dev/root       /home    btrfs       subvol=/${HOME_SUBVOL_NAME},skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,remount,rw                   0  0
-/dev/root       /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,remount,rw                       0  0
+/dev/mmcblk1p1  /        btrfs       x-initrd.mount,subvol=/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw  0  0
+/dev/mmcblk1p1  /home    btrfs       subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw                                          0  0
+/dev/mmcblk1p1  /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd,noatime,rw              0  0
 overlay         /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
 overlay         /boot    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/boot,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                0   0
 overlay         /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                   0   0
