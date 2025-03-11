@@ -113,6 +113,12 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
 
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
+    if ! sudo cp -a "${BASH_SOURCE%/*}"/user_directory/* "${AUTOLOGIN_USER_HOME_DIR}"; then
+        echo "Could not populate user directory '${AUTOLOGIN_USER_HOME_DIR}'"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
 
     if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
         echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
