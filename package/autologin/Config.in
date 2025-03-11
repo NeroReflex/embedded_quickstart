@@ -39,6 +39,7 @@ menu "Autologin Configurations"
 
 	config BR2_EQ_AUTOLOGIN_CMD
 	depends on BR2_PACKAGE_AUTOLOGIN
+	default /usr/bin/kiosk
 	string "login-ng autologin command"
 	help
 		The command to be run when the autologin account is logged in.

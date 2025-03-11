@@ -1,0 +1,5 @@
+#!/bin/bash
+
+readonly UID=$(id -u)
+export XDG_RUNTIME_DIR="/run/user/$UID"
+/usr/bin/weston --shell=kiosk-shell.so
