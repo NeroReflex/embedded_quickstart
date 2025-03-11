@@ -8,7 +8,8 @@ define AUTOLOGIN_STORE_USER_PASSWORD
     $(shell echo "${BR2_EQ_AUTOLOGIN_MAIN_PASSWORD}" > "$(BUILD_DIR)/user_autologin_main_password") \
     $(shell echo "${BR2_EQ_AUTOLOGIN_INTERMEDIATE_PASSWORD}" > "$(BUILD_DIR)/user_autologin_intermediate_key") \
 	$(shell echo "${BR2_EQ_AUTOLOGIN_USER_UID}" > "$(BUILD_DIR)/user_autologin_uid") \
-	$(shell echo "${BR2_EQ_AUTOLOGIN_USER_GID}" > "$(BUILD_DIR)/user_autologin_gid")
+	$(shell echo "${BR2_EQ_AUTOLOGIN_USER_GID}" > "$(BUILD_DIR)/user_autologin_gid") \
+	$(shell echo "${BR2_EQ_AUTOLOGIN_CMD}" > "$(BUILD_DIR)/user_autologin_cmd")
 endef
 
 define AUTOLOGIN_USERS

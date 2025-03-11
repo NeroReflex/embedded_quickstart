@@ -175,6 +175,12 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     sudo chown -R "${AUTOLOGIN_UID}":"${AUTOLOGIN_GID}" "${AUTOLOGIN_USER_HOME_DIR}"
 
     sudo sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+
+    # set the default autologin command
+    if [ -f "${BUILD_DIR}/user_autologin_cmd" ]; then
+        AUTOLOGIN_CMD=$(cat "${BUILD_DIR}/user_autologin_cmd")
+        sudo sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c ${AUTOLOGIN_CMD}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+    fi
 else
     echo "WARNING: No autologin user specified"
 fi

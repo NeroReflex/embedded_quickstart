@@ -37,4 +37,10 @@ menu "Autologin Configurations"
 	help
 		The intermediate password for the autologin user: same restrictions for the main password
 
+	config BR2_EQ_AUTOLOGIN_CMD
+	depends on BR2_PACKAGE_AUTOLOGIN
+	string "login-ng autologin command"
+	help
+		The command to be run when the autologin account is logged in.
+
 endmenu
