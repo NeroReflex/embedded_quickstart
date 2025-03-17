@@ -157,6 +157,55 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 sudo losetup -D
                 exit -1
             fi
+
+            if ! sudo btrfs subvol create "${TARGET_ROOTFS}/.autologin"; then
+                echo "Error setting the autologin user's data subvolume"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "/dev/mmcblk1p1" --fstype "btrfs" --flags "subvol=/.autologin"; then
+                echo "Error setting the user home mount"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo mkdir "${TARGET_ROOTFS}/xdg"; then
+                echo "Error setting the shared xdg folder"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo mkdir "${TARGET_ROOTFS}/xdg/${AUTOLOGIN_UID}"; then
+                echo "Error setting the xdg folder for user ${AUTOLOGIN_USERNAME}"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo chown $AUTOLOGIN_UID:$AUTOLOGIN_GID "${TARGET_ROOTFS}/xdg/${AUTOLOGIN_UID}"; then
+                echo "Error setting permissions to the xdg folder for user ${AUTOLOGIN_USERNAME}"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-pre-mount --device "tmpfs" --dir "/xdg/${AUTOLOGIN_UID}" --fstype "tmpfs" --flags "size=16m" --flags "uid=${AUTOLOGIN_UID}" --flags "gid=${AUTOLOGIN_GID}"; then
+                echo "Error setting the user home mount"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect; then
+                echo "Error inspecting autologin data"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
         else
             echo "Error setting up the user login data"
             sudo umount "${TARGET_ROOTFS}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
 readonly UID=$(id -u)
-export XDG_RUNTIME_DIR="/run/user/$UID"
+export XDG_RUNTIME_DIR="/xdg/$UID"
 mkdir -p "${XDG_RUNTIME_DIR}"
 /usr/bin/weston --config=/etc/weston.ini
