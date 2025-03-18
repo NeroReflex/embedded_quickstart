@@ -187,6 +187,13 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             fi
 
             if ! sudo chown $AUTOLOGIN_UID:$AUTOLOGIN_GID "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
+                echo "Error setting owner to the xdg folder for user ${AUTOLOGIN_USERNAME}"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            if ! sudo chmod 700 "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
                 echo "Error setting permissions to the xdg folder for user ${AUTOLOGIN_USERNAME}"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
