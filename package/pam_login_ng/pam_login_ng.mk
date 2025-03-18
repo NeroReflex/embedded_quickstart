@@ -13,11 +13,16 @@ define PAM_LOGIN_NG_INSTALL_PAM_MODULE
 		$(TARGET_DIR)/usr/lib/security/pam_login_ng.so
 endef
 
+define PAM_LOGIN_NG_INSTALL_DBUS_FILE
+	$(INSTALL) -D -m 644 $(@D)/rootfs/usr/share/dbus-1/system.d/org.zbus.login_ng.conf \
+		$(TARGET_DIR)/usr/share/dbus-1/system.d/org.zbus.login_ng.conf
+endef
+
 define PAM_LOGIN_NG_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 644 $(@D)/rootfs/usr/lib/systemd/system/pam_login_ng.service \
 		$(TARGET_DIR)/usr/lib/systemd/system/pam_login_ng.service
 endef
 
-PAM_LOGIN_NG_POST_INSTALL_TARGET_HOOKS += PAM_LOGIN_NG_INSTALL_PAM_MODULE
+PAM_LOGIN_NG_POST_INSTALL_TARGET_HOOKS += PAM_LOGIN_NG_INSTALL_PAM_MODULE PAM_LOGIN_NG_INSTALL_DBUS_FILE
 
 $(eval $(cargo-package))
