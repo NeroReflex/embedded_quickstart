@@ -16,15 +16,9 @@ define AUTOLOGIN_KIOSK_DEFAULT
 	$(INSTALL) -D -m 755 $(@D)/kiosk $(TARGET_DIR)/usr/bin/kiosk
 endef
 
-ifeq ($(strip $(BR2_EQ_AUTOLOGIN_WESTON_CONFIG_FILE)),)
 define AUTOLOGIN_INSTALL_WESTON_CONF
 	$(INSTALL) -D -m 644 $(@D)/weston.ini $(TARGET_DIR)/etc/weston.ini
 endef
-else
-define AUTOLOGIN_INSTALL_WESTON_CONF
-	$(INSTALL) -D -m 644 $(BR2_EQ_AUTOLOGIN_WESTON_CONFIG_FILE) $(TARGET_DIR)/etc/weston.ini
-endef
-endif
 
 define AUTOLOGIN_USERS
     ${BR2_EQ_AUTOLOGIN_USER} ${BR2_EQ_AUTOLOGIN_USER_UID} ${BR2_EQ_AUTOLOGIN_USER} ${BR2_EQ_AUTOLOGIN_USER_GID} =${BR2_EQ_AUTOLOGIN_MAIN_PASSWORD} /home/${BR2_EQ_AUTOLOGIN_USER} /bin/sh video Main system user (autologin enabled)

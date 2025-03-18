@@ -3,7 +3,7 @@ config BR2_PACKAGE_AUTOLOGIN
 	select BR2_PACKAGE_LOGIN_NG_CLI
 	select BR2_PACKAGE_HOST_LOGIN_NG_CTL
 	help
-		enable the autologin feature
+		Enable the autologin feature. You need an /etc/weston.ini file with weston configuration!!!
 
 menu "Autologin Configurations"
 
@@ -43,17 +43,5 @@ menu "Autologin Configurations"
 	string "login-ng autologin command"
 	help
 		The command to be run when the autologin account is logged in.
-
-	menu "Autologin Weston Configuration"
-
-		config BR2_EQ_AUTOLOGIN_WESTON_CONFIG_FILE
-		depends on BR2_PACKAGE_AUTOLOGIN
-		string "A weston.ini file to be copied on /etc/weston.ini"
-		help
-			A weston.ini file to be copied on /etc/weston.ini: this is the weston
-			configuration that will be used on a successful autologin attempt
-			when calling /usr/bin/kiosk as command.
-
-	endmenu
 
 endmenu
