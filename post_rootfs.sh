@@ -172,21 +172,21 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 exit -1
             fi
 
-            if ! sudo mkdir "${TARGET_ROOTFS}/xdg"; then
+            if ! sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/xdg"; then
                 echo "Error setting the shared xdg folder"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
             fi
 
-            if ! sudo mkdir "${TARGET_ROOTFS}/xdg/${AUTOLOGIN_UID}"; then
+            if ! sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
                 echo "Error setting the xdg folder for user ${AUTOLOGIN_USERNAME}"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
             fi
 
-            if ! sudo chown $AUTOLOGIN_UID:$AUTOLOGIN_GID "${TARGET_ROOTFS}/xdg/${AUTOLOGIN_UID}"; then
+            if ! sudo chown $AUTOLOGIN_UID:$AUTOLOGIN_GID "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
                 echo "Error setting permissions to the xdg folder for user ${AUTOLOGIN_USERNAME}"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
