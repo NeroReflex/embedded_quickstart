@@ -221,7 +221,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             fi
 
             if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-pre-mount --device "tmpfs" --dir "/xdg/${AUTOLOGIN_UID}" --fstype "tmpfs" --flags "size=16m" --flags "uid=${AUTOLOGIN_UID}" --flags "gid=${AUTOLOGIN_GID}"; then
-                echo "Error setting the user home mount"
+                echo "Error setting the user mount for xdg folder"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
