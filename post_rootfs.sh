@@ -192,48 +192,6 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 exit -1
             fi
 
-            if ! sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/xdg"; then
-                echo "Error setting the shared xdg folder"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
-                echo "Error setting the xdg folder for user ${AUTOLOGIN_USERNAME}"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo chown $AUTOLOGIN_UID:$AUTOLOGIN_GID "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
-                echo "Error setting owner to the xdg folder for user ${AUTOLOGIN_USERNAME}"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo chmod 700 "${EXTRACTED_ROOTFS_HOST_PATH}/xdg/${AUTOLOGIN_UID}"; then
-                echo "Error setting permissions to the xdg folder for user ${AUTOLOGIN_USERNAME}"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-pre-mount --device "tmpfs" --dir "/xdg/${AUTOLOGIN_UID}" --fstype "tmpfs" --flags "size=16m" --flags "uid=${AUTOLOGIN_UID}" --flags "gid=${AUTOLOGIN_GID}"; then
-                echo "Error setting the user mount for xdg folder"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "/dev/mmcblk1p1" --fstype "btrfs" --flags "subvol=/.autologin"; then
-                echo "Error setting the user home mount"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
             # Create the service directory
             if ! sudo mkdir -p "${TARGET_ROOTFS}/etc/login_ng/"; then
                 echo "Error in creating ${TARGET_ROOTFS}/etc/login_ng/"
