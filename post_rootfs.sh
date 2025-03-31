@@ -227,8 +227,42 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 exit -1
             fi
 
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect; then
-                echo "Error inspecting autologin data"
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "/dev/mmcblk1p1" --fstype "btrfs" --flags "subvol=/.autologin"; then
+                echo "Error setting the user home mount"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            # Create the service directory
+            if ! sudo mkdir -p "${TARGET_ROOTFS}/etc/login_ng/"; then
+                echo "Error in creating ${TARGET_ROOTFS}/etc/login_ng/"
+                sudo umount "${TARGET_ROOTFS}"
+                sudo losetup -D
+                exit -1
+            fi
+
+            # Authorize the mount
+            AUTOLOGIN_USER_MOUNTS_HASH=$(sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | grep 'hash:' | awk '{print $2}')
+            AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
+            if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
+                echo '{' > "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '    "authorizations": {' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '        "denis": [' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo "            $AUTOLOGIN_USER_MOUNTS_HASH" >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '        ]' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '    }' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '}' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+
+                # Give the service directory correct permissions
+                if ! sudo chmod 600 -R "${TARGET_ROOTFS}/etc/login_ng/"; then
+                    echo "Error in setting 700 permissions to ${TARGET_ROOTFS}/etc/login_ng/"
+                    sudo umount "${TARGET_ROOTFS}"
+                    sudo losetup -D
+                    exit -1
+                fi
+            else
+                echo "Error fetching autologin user's mounts"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
