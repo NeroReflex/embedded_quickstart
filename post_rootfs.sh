@@ -123,6 +123,8 @@ if [ -f "$login_ng_pkey_file" ]; then
     fi
 fi
 
+echo "----------------------------------------------------------"
+
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
     AUTOLOGIN_GID=$(cat "${BUILD_DIR}/user_autologin_gid")
@@ -133,6 +135,15 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
 
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
+
+
+
+    ls -lah "${TARGET_ROOTFS}/etc"
+    sudo umount "${TARGET_ROOTFS}"
+    sudo losetup -D
+    exit -1
+
+
 
     sudo sed -i '/^auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
     sudo sed -i '/^account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
@@ -216,10 +227,13 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 echo '    }' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
                 echo '}' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
 
+                echo ""
+                echo ""
                 echo "----------------------------------------------------------"
                 cat "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
                 echo "----------------------------------------------------------"
-
+                echo ""
+                echo ""
                 echo "----------------------------------------------------------"
                 sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
                 echo "----------------------------------------------------------"
