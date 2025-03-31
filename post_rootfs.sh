@@ -148,12 +148,13 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     else
         if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
             if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
-                echo "----------------------------------------------------------"
+                echo "------------------ Autologin User ------------------------"
                 echo "Username: ${AUTOLOGIN_USERNAME}"
                 echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
                 echo "Intermediate Key: ${AUTOLOGIN_INTERMEDIATE_KEY}"
                 echo "----------------------------------------------------------"
-                echo "Autologin data written correctly."
+                echo ""
+                echo ""
             else
                 echo "Error setting up the user autologin"
                 sudo umount "${TARGET_ROOTFS}"
@@ -210,6 +211,9 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             AUTOLOGIN_USER_MOUNTS_HASH=$(sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | grep 'hash:' | awk '{print $2}')
             AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
             if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
+                echo ""
+                echo ""
+                echo "---------------- Authorized Mounts -----------------------"
                 echo '{' | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '    "authorizations": {' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '        "denis": [' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
@@ -217,15 +221,10 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 echo '        ]' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '    }' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '}' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-
-                echo ""
-                echo ""
-                echo "----------------------------------------------------------"
-                cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo "----------------------------------------------------------"
                 echo ""
                 echo ""
-                echo "----------------------------------------------------------"
+                echo "----------------- Autologin Review -----------------------"
                 sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
                 echo "----------------------------------------------------------"
 
