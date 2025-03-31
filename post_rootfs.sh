@@ -134,9 +134,9 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
 
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
 
-    sed -i '/^auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
-    sed -i '/^account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
-    sed -i '/^session\s\+optional\s\+pam_loginuid.so/a -session  optional   pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
+    sudo sed -i '/^auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
+    sudo sed -i '/^account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
+    sudo sed -i '/^session\s\+optional\s\+pam_loginuid.so/a -session  optional   pam_login_ng.so' "${TARGET_ROOTFS}/etc/pam.d/system-auth"
 
     if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
         echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
@@ -208,13 +208,21 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             AUTOLOGIN_USER_MOUNTS_HASH=$(sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | grep 'hash:' | awk '{print $2}')
             AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
             if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
-                echo '{' > "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo '    "authorizations": {' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo '        "denis": [' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo "            $AUTOLOGIN_USER_MOUNTS_HASH" >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo '        ]' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo '    }' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
-                echo '}' >> "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '{' | sudo tee "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '    "authorizations": {' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '        "denis": [' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo "            $AUTOLOGIN_USER_MOUNTS_HASH" | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '        ]' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '    }' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo '}' | sudo tee -a "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+
+                echo "----------------------------------------------------------"
+                cat "${TARGET_ROOTFS}/etc/login_ng/authorized_mounts.json"
+                echo "----------------------------------------------------------"
+
+                echo "----------------------------------------------------------"
+                sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
+                echo "----------------------------------------------------------"
 
                 # Give the service directory correct permissions
                 if ! sudo chmod 600 -R "${TARGET_ROOTFS}/etc/login_ng/"; then
