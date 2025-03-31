@@ -13,9 +13,14 @@ define PAM_LOGIN_NG_INSTALL_PAM_MODULE
 		$(TARGET_DIR)/usr/lib/security/pam_login_ng.so
 endef
 
-define PAM_LOGIN_NG_INSTALL_DBUS_FILE
-	$(INSTALL) -D -m 644 $(@D)/rootfs/usr/share/dbus-1/system.d/org.zbus.login_ng.conf \
-		$(TARGET_DIR)/usr/share/dbus-1/system.d/org.zbus.login_ng.conf
+define PAM_LOGIN_NG_INSTALL_DBUS_MOUNT_FILE
+	$(INSTALL) -D -m 644 $(@D)/rootfs/usr/share/dbus-1/system.d/org.neroreflex.login_ng_mount.conf \
+		$(TARGET_DIR)/usr/share/dbus-1/system.d/org.neroreflex.login_ng_mount.conf
+endef
+
+define PAM_LOGIN_NG_INSTALL_DBUS_SESSION_FILE
+	$(INSTALL) -D -m 644 $(@D)/rootfs/usr/share/dbus-1/system.d/org.neroreflex.login_ng_session.conf \
+		$(TARGET_DIR)/usr/share/dbus-1/system.d/org.neroreflex.login_ng_session.conf
 endef
 
 define PAM_LOGIN_NG_INSTALL_INIT_SYSTEMD
@@ -23,6 +28,6 @@ define PAM_LOGIN_NG_INSTALL_INIT_SYSTEMD
 		$(TARGET_DIR)/usr/lib/systemd/system/pam_login_ng.service
 endef
 
-PAM_LOGIN_NG_POST_INSTALL_TARGET_HOOKS += PAM_LOGIN_NG_INSTALL_PAM_MODULE PAM_LOGIN_NG_INSTALL_DBUS_FILE
+PAM_LOGIN_NG_POST_INSTALL_TARGET_HOOKS += PAM_LOGIN_NG_INSTALL_PAM_MODULE PAM_LOGIN_NG_INSTALL_DBUS_MOUNT_FILE PAM_LOGIN_NG_INSTALL_DBUS_SESSION_FILE
 
 $(eval $(cargo-package))
