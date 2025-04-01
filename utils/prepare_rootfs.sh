@@ -45,9 +45,17 @@ mkdir "${SUBVOL_DATA}/boot_overlay/workdir"
 btrfs subvol create "${SUBVOL_DATA}/opt_overlay"
 mkdir "${SUBVOL_DATA}/opt_overlay/upperdir"
 mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
+btrfs subvol create "${SUBVOL_DATA}/include_overlay"
+mkdir "${SUBVOL_DATA}/include_overlay/upperdir"
+mkdir "${SUBVOL_DATA}/include_overlay/workdir"
+btrfs subvol create "${SUBVOL_DATA}/media_overlay"
+mkdir "${SUBVOL_DATA}/media_overlay/upperdir"
+mkdir "${SUBVOL_DATA}/media_overlay/workdir"
 
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/opt_overlay" ro true
+btrfs property set -fts "${SUBVOL_DATA}/media_overlay" ro true
+btrfs property set -fts "${SUBVOL_DATA}/include_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/boot_overlay" ro true
 
 # Change the default subvolid so that the written deployment will get booted

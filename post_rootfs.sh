@@ -94,6 +94,7 @@ echo "----------------------------------------------------------"
 # Get the UUID of the partition
 readonly partuuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
 
+echo "---------------- Filesystem ------------------------------"
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
     sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
@@ -102,6 +103,13 @@ else
     sudo losetup -D
     exit -1
 fi
+
+# Avoid failing due to fstab not finding these
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/include"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/media"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/opt"
+echo "----------------------------------------------------------"
 
 login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
 if [ -f "$login_ng_pkey_file" ]; then
@@ -276,6 +284,8 @@ LABEL=rootfs  /base    btrfs       x-initrd.mount,subvol=/,skip_balance,x-system
 overlay       /boot    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/boot,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                    0   0
 overlay       /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                       0   0
 overlay       /opt     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                       0   0
+overlay       /media   overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/media,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                 0   0
+overlay       /include overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/include,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off           0   0
 overlay       /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off  0   0
 overlay       /etc     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off     0   0
 overlay       /var     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off     0   0
