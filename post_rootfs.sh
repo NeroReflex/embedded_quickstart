@@ -111,7 +111,7 @@ sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/media"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/opt"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/srv"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/libexec"
-cho "----------------------------------------------------------"
+echo "----------------------------------------------------------"
 
 echo "---------------- login-ng private key --------------------"
 login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
