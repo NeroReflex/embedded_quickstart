@@ -109,6 +109,8 @@ sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/include"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/media"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/opt"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/srv"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/libexec"
 cho "----------------------------------------------------------"
 
 echo "---------------- login-ng private key --------------------"
@@ -286,6 +288,8 @@ overlay       /usr     overlay     x-initrd.mount,defaults,x-systemd.requires-mo
 overlay       /opt     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                       0   0
 overlay       /media   overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/media,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                 0   0
 overlay       /include overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/include,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off           0   0
+overlay       /libexec overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/libexec,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/libexec_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/libexec_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off           0   0
+overlay       /srv     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/srv,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/srv_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/srv_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                       0   0
 overlay       /root    overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off  0   0
 overlay       /etc     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off     0   0
 overlay       /var     overlay     x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off     0   0
