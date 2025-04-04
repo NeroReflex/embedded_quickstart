@@ -240,7 +240,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
 
                 # Give the service directory correct permissions
                 if ! sudo chmod 600 -R "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
-                    echo "Error in setting 700 permissions to ${TARGET_ROOTFS}/etc/login_ng/"
+                    echo "Error in setting 700 permissions to ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
                     sudo umount "${TARGET_ROOTFS}"
                     sudo losetup -D
                     exit -1
