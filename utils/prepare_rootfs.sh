@@ -57,6 +57,9 @@ mkdir "${SUBVOL_DATA}/srv_overlay/workdir"
 btrfs subvol create "${SUBVOL_DATA}/libexec_overlay"
 mkdir "${SUBVOL_DATA}/libexec_overlay/upperdir"
 mkdir "${SUBVOL_DATA}/libexec_overlay/workdir"
+btrfs subvol create "${SUBVOL_DATA}/mnt_overlay"
+mkdir "${SUBVOL_DATA}/mnt_overlay/upperdir"
+mkdir "${SUBVOL_DATA}/mnt_overlay/workdir"
 
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/opt_overlay" ro true
@@ -65,6 +68,7 @@ btrfs property set -fts "${SUBVOL_DATA}/include_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/boot_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/srv_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/libexec_overlay" ro true
+btrfs property set -fts "${SUBVOL_DATA}/mnt_overlay" ro true
 
 # Change the default subvolid so that the written deployment will get booted
 ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "$EXTRACTED_ROOTFS_HOST_PATH")
