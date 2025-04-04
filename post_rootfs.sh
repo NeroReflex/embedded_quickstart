@@ -76,7 +76,7 @@ fi
 echo "----------------------------------------------------------"
 
 # Initialize the mounted rootfs
-echo "----------------------------------------------------------"
+echo "------------------- root filesystem ----------------------"
 ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
 ROOTFS_CREATE_RESULT=$?
 
@@ -109,8 +109,9 @@ sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/include"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/media"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/opt"
-echo "----------------------------------------------------------"
+cho "----------------------------------------------------------"
 
+echo "---------------- login-ng private key --------------------"
 login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
 if [ -f "$login_ng_pkey_file" ]; then
     if sudo chmod 600 "$login_ng_pkey_file"; then
@@ -130,7 +131,6 @@ if [ -f "$login_ng_pkey_file" ]; then
         exit -1
     fi
 fi
-
 echo "----------------------------------------------------------"
 
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
@@ -273,7 +273,7 @@ fi
 
 sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/base"
 
-echo "----------------------------------------------------------"
+echo "------------------- /etc/fstab ---------------------------"
 echo "Setting boot partition to PARTUUID: ${partuuid}"
 
 # write /etc/fstab with mountpoints
