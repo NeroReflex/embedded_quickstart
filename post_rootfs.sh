@@ -113,6 +113,20 @@ sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/srv"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/libexec"
 echo "----------------------------------------------------------"
 
+echo "---------------- Boot Process ----------------------------"
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
+    echo "stuPID1 has been found: setting it as the default init program."
+    if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
+        echo "/sbin/init found: removing default one"
+        sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+    fi
+
+    sudo ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+else
+    echo "stuPID1 not found: not touching /sbin/init"
+fi
+echo "----------------------------------------------------------"
+
 echo "---------------- login-ng private key --------------------"
 login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
 if [ -f "$login_ng_pkey_file" ]; then
