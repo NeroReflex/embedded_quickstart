@@ -3,4 +3,10 @@ ATOMBUTTER_LICENSE = GPLv2
 ATOMBUTTER_SITE = $(call github,NeroReflex,AtomButter,v$(ATOMBUTTER_VERSION))
 ATOMBUTTER_DEPENDENCIES = host-rustc
 
+define ATOMBUTTER_POST_INSTALL
+	$(shell ln -sf /usr/bin/atombutter ${TARGET_DIR}/etc/tab )
+endef
+
+ATOMBUTTER_POST_INSTALL_POST_INSTALL_TARGET_HOOKS += ATOMBUTTER_POST_INSTALL
+
 $(eval $(cargo-package))
