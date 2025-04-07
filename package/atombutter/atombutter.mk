@@ -1,6 +1,6 @@
 ATOMBUTTER_VERSION = 0.1.2
 ATOMBUTTER_LICENSE = GPL-2.0-or-later
-ATOMBUTTER_SITE = $(call github,NeroReflex,AtomButter,v$(ATOMBUTTER_VERSION))
+ATOMBUTTER_SITE = https://github.com/NeroReflex/AtomButter/archive/refs/tags/$(ATOMBUTTER_VERSION).tar.gz
 ATOMBUTTER_DEPENDENCIES = host-rustc
 ATOMBUTTER_INSTALL_STAGING = YES
 ATOMBUTTER_CARGO_BUILD_OPTS = --all-features
