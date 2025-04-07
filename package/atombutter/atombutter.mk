@@ -1,0 +1,6 @@
+ATOMBUTTER_VERSION = 0.1.1
+ATOMBUTTER_LICENSE = GPLv2
+ATOMBUTTER_SITE = $(call github,NeroReflex,AtomButter,v$(ATOMBUTTER_VERSION))
+ATOMBUTTER_DEPENDENCIES = host-rustc
+
+$(eval $(cargo-package))
