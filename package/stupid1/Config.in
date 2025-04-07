@@ -5,8 +5,4 @@ config BR2_PACKAGE_STUPID1
 	depends on BR2_USE_MMU # fork()
 	help
 		stuPID1 is the smallest possible PID1 implementation.
-	
-config BR2_EXTERNAL_STUPID1_PATH
-	string "stuPID1 host path (sources)"
-	depends on BR2_PACKAGE_STUPID1
 
