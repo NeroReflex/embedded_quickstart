@@ -121,9 +121,24 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
         sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
     fi
 
-    sudo ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+    if ! sudo ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
+        echo "Unable to link /sbin/init -> /usr/bin/stupid1"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
 else
     echo "stuPID1 not found: not touching /sbin/init"
+fi
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
+    echo "AtomButter has been found: setting it as a second stage after stuPID1."
+    if ! sudo ln -sf "/usr/bin/atombutter" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/init"; then
+        echo "Unable to link /usr/bin/init -> /usr/bin/atombutter"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
 fi
 echo "----------------------------------------------------------"
 
