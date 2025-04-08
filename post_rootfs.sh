@@ -138,6 +138,11 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
         fi
     fi
 elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
+    if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
+        echo "/sbin/init found: removing default one"
+        sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+    fi
+    
     echo "AtomButter has been found: setting it as first stage."
     if ! sudo ln -sf "/usr/bin/atombutter" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
         echo "Unable to link /sbin/init -> /usr/bin/atombutter"
