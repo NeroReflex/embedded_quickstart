@@ -1,4 +1,4 @@
-ATOMBUTTER_VERSION = 0.2.2
+ATOMBUTTER_VERSION = 0.2.3
 ATOMBUTTER_LICENSE = GPL-2.0-or-later
 ATOMBUTTER_SOURCE = $(ATOMBUTTER_VERSION).tar.gz
 ATOMBUTTER_SITE = https://github.com/NeroReflex/AtomButter/archive/refs/tags
