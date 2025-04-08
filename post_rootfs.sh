@@ -153,6 +153,17 @@ elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
 else
     echo "Neither stuPID1 nor AtomButter have been found: not touching /sbin/init"
 fi
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
+    if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}"; then
+        echo "Unable to create /sysroot: boot process would fail."
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    else
+        echo "Created /sysroot for the initial mounting from AtomButter"
+    fi
+fi
 echo "----------------------------------------------------------"
 
 echo "---------------- login-ng private key --------------------"
