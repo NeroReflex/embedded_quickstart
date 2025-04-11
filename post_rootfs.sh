@@ -350,7 +350,7 @@ overlay   /sysroot/etc  overlay  rw,noatime,noatime,lowerdir=/sysroot/etc,upperd
 overlay   /sysroot/var  overlay  rw,noatime,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
-echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/name"
+echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
 echo "Sealing the BTRFS subvolume containing the rootfs"
 
