@@ -106,11 +106,10 @@ fi
 
 # Avoid failing due to fstab not finding these
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr"
-sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/include"
-sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/media"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/opt"
-sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/srv"
-sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/libexec"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/root"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc"
+sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/var"
 echo "----------------------------------------------------------"
 
 echo "---------------- Boot Process ----------------------------"
@@ -333,28 +332,25 @@ echo "Setting boot partition to PARTUUID: ${partuuid}"
 
 # write /etc/fstab with mountpoints
 echo "
-LABEL=rootfs /home btrfs subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw 0  0
+LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd                                                                                                                                                                                                                                                                    0  0
+LABEL=rootfs /base btrfs   rw,noatime,x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd                                                                                                                                                                                                                                        0  0
+overlay      /usr  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
+overlay      /opt  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
+overlay      /root overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0
+overlay      /etc  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
+overlay      /var  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
 echo "
-/sysroot         /                      bind     bind
-/sysroot/dev     dev                    devtmpfs rw
-/sysroot/proc    proc                   proc     rw
-/sysroot/sys     sys                    sysfs    rw
-/sysroot/home    /sysroot/dev/mmcblk1p1 btrfs    subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd,noatime,rw
-/sysroot/base    /sysroot/dev/mmcblk1p1 btrfs    subvol=/,skip_balance,compress=zstd,noatime,rw
-/sysroot/boot    overlay                overlay  lowerdir=/sysroot/boot,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/usr     overlay                overlay  lowerdir=/sysroot/usr,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/opt     overlay                overlay  lowerdir=/sysroot/opt,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/mnt     overlay                overlay  lowerdir=/sysroot/mnt,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/mnt_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/mnt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/media   overlay                overlay  lowerdir=/sysroot/media,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/media_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/include overlay                overlay  lowerdir=/sysroot/include,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/include_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/libexec overlay                overlay  lowerdir=/sysroot/libexec,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/libexec_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/libexec_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/srv     overlay                overlay  lowerdir=/sysroot/srv,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/srv_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/srv_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/root    overlay                overlay  lowerdir=/sysroot/root,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/etc     overlay                overlay  lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-/sysroot/var     overlay                overlay  lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off
-" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/bstab"
+/dev/root /sysroot/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
+dev       /sysroot/dev  devtmpfs rw 0 0
+proc      /sysroot/proc proc     rw 0 0
+sys       /sysroot/sys  sysfs    rw 0 0
+overlay   /sysroot/etc  overlay  rw,noatime,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+overlay   /sysroot/var  overlay  rw,noatime,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+
+echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/name"
 
 echo "Sealing the BTRFS subvolume containing the rootfs"
 
