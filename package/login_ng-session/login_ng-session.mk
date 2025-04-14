@@ -1,0 +1,11 @@
+LOGIN_NG_SESSION_VERSION = $(LOGIN_NG_VERSION)
+LOGIN_NG_SESSION_LICENSE = GPL-2.0-or-later
+LOGIN_NG_SESSION_SITE = $(call github,NeroReflex,login-ng,$(LOGIN_NG_SESSION_VERSION))
+LOGIN_NG_SESSION_DEPENDENCIES = host-rustc
+LOGIN_NG_SESSION_INSTALL_STAGING = YES
+LOGIN_NG_SESSION_SUBDIR = login_ng-session
+LOGIN_NG_SESSION_CARGO_BUILD_OPTS = --all-features
+LOGIN_NG_SESSION_CARGO_INSTALL_OPTS = --all-features
+
+$(eval $(cargo-package))
+$(eval $(host-cargo-package))
