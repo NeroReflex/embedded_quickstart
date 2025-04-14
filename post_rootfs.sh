@@ -224,6 +224,15 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 exit -1
             fi
 
+            if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-session" ]; then
+                if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-session --cmd "/usr/bin/login_ng-session"; then
+                    echo "Error setting up the user session"
+                    sudo umount "${TARGET_ROOTFS}"
+                    sudo losetup -D
+                    exit -1
+                fi
+            fi
+
             readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
 
             if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
