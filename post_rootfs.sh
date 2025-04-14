@@ -279,7 +279,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 echo '{' | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '    "authorizations": {' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '        "denis": [' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "            $AUTOLOGIN_USER_MOUNTS_HASH" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "            \"$AUTOLOGIN_USER_MOUNTS_HASH\"" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '        ]' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '    }' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo '}' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
