@@ -1,2 +1,2 @@
-LOGIN_NG_VERSION=0.2.7
+LOGIN_NG_VERSION=0.2.8
 include $(sort $(wildcard $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/*/*.mk))
