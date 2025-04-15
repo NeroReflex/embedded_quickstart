@@ -20,6 +20,8 @@ source "${BASH_SOURCE%/*}/utils/btrfs_utils.sh"
 
 LNG_CTL="${HOST_DIR}/bin/login_ng-ctl"
 
+ROOTDEV="mmcblk1p1"
+
 if [ ! -f "${LNG_CTL}" ]; then
     echo "Could not find ${LNG_CTL}"
     exit -1
@@ -135,6 +137,13 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
             sudo losetup -D
             exit -1
         fi
+
+        if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/sysroot"; then
+            echo "Error creating /sysroot"
+            sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
+            exit -1
+        fi
     fi
 elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
@@ -145,6 +154,13 @@ elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
     echo "AtomButter has been found: setting it as first stage."
     if ! sudo ln -sf "/usr/bin/atombutter" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
         echo "Unable to link /sbin/init -> /usr/bin/atombutter"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
+
+    if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/sysroot"; then
+        echo "Error creating /sysroot"
         sudo umount "${TARGET_ROOTFS}"
         sudo losetup -D
         exit -1
@@ -285,13 +301,13 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 echo ""
                 echo ""
                 echo "---------------- Authorized Mounts -----------------------"
-                echo '{' | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo '    "authorizations": {' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo '        "denis": [' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "            \"$AUTOLOGIN_USER_MOUNTS_HASH\"" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo '        ]' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo '    }' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo '}' | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "{" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "    \"authorizations\": {" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "        \"${AUTOLOGIN_USERNAME}\": [" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "            \"${AUTOLOGIN_USER_MOUNTS_HASH}\"" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "        ]" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "    }" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+                echo "}" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
                 echo "----------------------------------------------------------"
                 echo ""
                 echo ""
@@ -342,21 +358,21 @@ echo "Setting boot partition to PARTUUID: ${partuuid}"
 # write /etc/fstab with mountpoints
 echo "
 LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd                                                                                                                                                                                                                                                                    0  0
-LABEL=rootfs /base btrfs   rw,noatime,x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd                                                                                                                                                                                                                                        0  0
+LABEL=rootfs /base btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd                                                                                                                                                                                                                                        0  0
 overlay      /usr  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
 overlay      /opt  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
 overlay      /root overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0
-overlay      /etc  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
-overlay      /var  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
+overlay      /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
+overlay      /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
 echo "
-/dev/root /sysroot/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
-dev       /sysroot/dev  devtmpfs rw 0 0
-proc      /sysroot/proc proc     rw 0 0
-sys       /sysroot/sys  sysfs    rw 0 0
-overlay   /sysroot/etc  overlay  rw,noatime,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
-overlay   /sysroot/var  overlay  rw,noatime,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+dev                   /sysroot/dev  devtmpfs rw 0 0
+proc                  /sysroot/proc proc     rw 0 0
+sys                   /sysroot/sys  sysfs    rw 0 0
+/sysroot/dev/$ROOTDEV /sysroot/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
+overlay               /sysroot/etc  overlay  rw,noatime,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+overlay               /sysroot/var  overlay  rw,noatime,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
 echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
