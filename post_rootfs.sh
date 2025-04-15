@@ -263,14 +263,19 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
                 exit -1
             fi
 
-            if ! sudo btrfs subvol create "${TARGET_ROOTFS}/.autologin"; then
+            if ! sudo btrfs subvol create "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}"; then
                 echo "Error setting the autologin user's data subvolume"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
             fi
 
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "/dev/mmcblk1p1" --fstype "btrfs" --flags "subvol=/.autologin"; then
+            sudo mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
+            sudo mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
+            sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
+            sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
+
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "rw,noatime,lowerdir=/home/user,upperdir=/base/$AUTOLOGIN_USERNAME/upperdir,workdir=/base/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
                 echo "Error setting the user home mount"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
