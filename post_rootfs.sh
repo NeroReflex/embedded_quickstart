@@ -278,8 +278,8 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             fi
 
             # Create the service directory
-            if ! sudo mkdir -p "${TARGET_ROOTFS}/etc/login_ng/"; then
-                echo "Error in creating ${TARGET_ROOTFS}/etc/login_ng/"
+            if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
+                echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
                 exit -1
