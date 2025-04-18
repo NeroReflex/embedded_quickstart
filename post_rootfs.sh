@@ -275,7 +275,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
             sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
 
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "rw,noatime,lowerdir=/home/user,upperdir=/base/$AUTOLOGIN_USERNAME/upperdir,workdir=/base/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=/base/$AUTOLOGIN_USERNAME/upperdir,workdir=/base/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
                 echo "Error setting the user home mount"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
@@ -355,8 +355,8 @@ echo "Setting boot partition to PARTUUID: ${partuuid}"
 echo "
 LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd                                                                                                                                                                                                                                                                    0  0
 LABEL=rootfs /base btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,x-systemd.requires-mounts-for=/,compress=zstd                                                                                                                                                                                                                                        0  0
-overlay      /usr  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
-overlay      /opt  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
+overlay      /usr  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
+overlay      /opt  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                      0  0
 overlay      /root overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0
 overlay      /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
 overlay      /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0  0
@@ -367,8 +367,8 @@ dev                   /sysroot/dev  devtmpfs rw 0 0
 proc                  /sysroot/proc proc     rw 0 0
 sys                   /sysroot/sys  sysfs    rw 0 0
 /sysroot/dev/$ROOTDEV /sysroot/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
-overlay               /sysroot/etc  overlay  rw,noatime,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
-overlay               /sysroot/var  overlay  rw,noatime,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+overlay               /sysroot/etc  overlay  rw,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+overlay               /sysroot/var  overlay  rw,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
 #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
