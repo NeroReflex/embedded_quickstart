@@ -6,6 +6,13 @@ LOGIN_NG_SESSION_INSTALL_STAGING = YES
 LOGIN_NG_SESSION_SUBDIR = login_ng-session
 LOGIN_NG_SESSION_CARGO_BUILD_OPTS = --all-features
 LOGIN_NG_SESSION_CARGO_INSTALL_OPTS = --all-features
+LOGIN_NG_SESSION_INSTALL_TARGET = YES
+
+define LOGIN_NG_SESSION_DBUS_START
+	$(INSTALL) -D -m 755 $(@D)/rootfs/usr/bin/start-login_ng-session $(TARGET_DIR)/usr/bin/start-login_ng-session
+endef
+
+LOGIN_NG_SESSION_POST_INSTALL_TARGET_HOOKS += LOGIN_NG_SESSION_DBUS_START
+
 
 $(eval $(cargo-package))
-$(eval $(host-cargo-package))

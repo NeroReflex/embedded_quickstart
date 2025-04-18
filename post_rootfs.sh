@@ -342,6 +342,11 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         AUTOLOGIN_CMD=$(cat "${BUILD_DIR}/user_autologin_cmd")
         sudo sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c ${AUTOLOGIN_CMD}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
     fi
+
+    # TODO: symlink '/home/user/.config/systemd/user/dbus.service' → '/usr/lib/systemd/user/dbus-broker.service'
+    # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
+    # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
+
 else
     echo "WARNING: No autologin user specified"
 fi
