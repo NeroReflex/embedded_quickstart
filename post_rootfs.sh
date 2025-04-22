@@ -137,13 +137,6 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
             sudo losetup -D
             exit -1
         fi
-
-        if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/sysroot"; then
-            echo "Error creating /sysroot"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
-            exit -1
-        fi
     fi
 elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
@@ -158,27 +151,10 @@ elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
         sudo losetup -D
         exit -1
     fi
-
-    if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/sysroot"; then
-        echo "Error creating /sysroot"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
-        exit -1
-    fi
 else
     echo "Neither stuPID1 nor AtomButter have been found: not touching /sbin/init"
 fi
 
-if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
-    if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}"; then
-        echo "Unable to create /sysroot: boot process would fail."
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
-        exit -1
-    else
-        echo "Created /sysroot for the initial mounting from AtomButter"
-    fi
-fi
 echo "----------------------------------------------------------"
 
 echo "---------------- login-ng private key --------------------"
@@ -373,12 +349,12 @@ overlay      /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
 echo "
-dev                   /sysroot/dev  devtmpfs rw 0 0
-proc                  /sysroot/proc proc     rw 0 0
-sys                   /sysroot/sys  sysfs    rw 0 0
-/sysroot/dev/$ROOTDEV /sysroot/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
-overlay               /sysroot/etc  overlay  rw,noatime,lowerdir=/sysroot/etc,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
-overlay               /sysroot/var  overlay  rw,noatime,lowerdir=/sysroot/var,upperdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/sysroot/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+dev                   /mnt/dev  devtmpfs rw 0 0
+proc                  /mnt/proc proc     rw 0 0
+sys                   /mnt/sys  sysfs    rw 0 0
+/mnt/dev/$ROOTDEV     /mnt/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0
+overlay               /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
+overlay               /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0
 " | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
 #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
