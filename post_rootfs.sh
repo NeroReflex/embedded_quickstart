@@ -212,6 +212,11 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
 
     AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
 
+    # Because buildroot is bugged and appending more than one additional group in a package breaks every group.
+    sed -i "/^seat:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^seat:/ s/:$/:,${AUTOLOGIN_USERNAME}/" /etc/group
+    sed -i "/^video:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^video:/ s/:$/:,${AUTOLOGIN_USERNAME}/" /etc/group
+    sed -i "/^render:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^render:/ s/:$/:,${AUTOLOGIN_USERNAME}/" /etc/group
+
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
 
     sudo sed -i '/^[-]auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
