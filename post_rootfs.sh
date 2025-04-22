@@ -189,9 +189,9 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
 
     # Because buildroot is bugged and appending more than one additional group in a package breaks every group.
-    sed -i "/^seat:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^seat:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
-    sed -i "/^video:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^video:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
-    sed -i "/^render:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^render:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
+    sudo sed -i "/^seat:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^seat:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
+    sudo sed -i "/^video:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^video:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
+    sudo sed -i "/^render:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^render:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
 
     sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
 
