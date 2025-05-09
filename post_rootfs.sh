@@ -24,7 +24,6 @@ ROOTDEV="mmcblk1p1"
 
 if [ ! -f "${LNG_CTL}" ]; then
     echo "Could not find ${LNG_CTL}"
-    exit -1
 else
     echo "Program ${LNG_CTL} has been found."
 fi
@@ -205,6 +204,11 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
         sudo losetup -D
         exit -1
     else
+        if [ ! -f "${LNG_CTL}" ]; then
+            echo "Could not find ${LNG_CTL}"
+            exit -1
+        fi
+
         if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
             if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
                 echo "------------------ Autologin User ------------------------"
