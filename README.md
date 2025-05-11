@@ -30,11 +30,11 @@ export HOST_CXXFLAGS=$HOST_CFLAGS
 make -j$(nproc)
 ```
 
-## Kernel
+### Kernel
 
 Include the *linux.conf* file to *Additional configuration fragment files* in Kernel menu.
 
-## Bootloader
+### Bootloader
 
 The following is bootloader-specific configurations: choose based on your bootloader of preference.
 
@@ -49,7 +49,18 @@ __NOTE__ when generating a target for i.MX8 make sure to create u-boot-nodtb.bin
 and it only needs to be specified as an additional u-boot binary format to be copied into BINARIES_DIR and therefore picked up
 by mkimage.
 
-## Weston
+### Init
+
+By default the kernel run */init* if started on a initramfs or */usr/init* if a initramfs is not in use.
+
+Buildroot automatically places links to start the configured init system, however shall you want to use either stuPID1 or
+atomrootfs you will need to use a skeleton that defines relevant links.
+
+You can also customize the bootloader to chanke kernel cmdline init= or rdinit= to point directly to the executable you want to run.
+
+atomrootfs will be installed in */usr/bin/atomrootfsinit*.
+
+### Weston
 
 You can use a custom weston.ini file to customize weston settings.
 
