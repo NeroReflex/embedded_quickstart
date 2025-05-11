@@ -128,30 +128,30 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
         exit -1
     fi
 
-    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
-        echo "AtomButter has been found: setting it as a second stage after stuPID1."
-        if ! sudo ln -sf "/usr/bin/atombutter" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/init"; then
-            echo "Unable to link /usr/bin/init -> /usr/bin/atombutter"
+    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+        echo "atomrootfsinit has been found: setting it as a second stage after stuPID1."
+        if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/init"; then
+            echo "Unable to link /usr/bin/init -> /usr/bin/atomrootfsinit"
             sudo umount "${TARGET_ROOTFS}"
             sudo losetup -D
             exit -1
         fi
     fi
-elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atombutter" ]; then
+elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
         echo "/sbin/init found: removing default one"
         sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
     fi
     
-    echo "AtomButter has been found: setting it as first stage."
-    if ! sudo ln -sf "/usr/bin/atombutter" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
-        echo "Unable to link /sbin/init -> /usr/bin/atombutter"
+    echo "atomrootfsinit has been found: setting it as first stage."
+    if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
+        echo "Unable to link /sbin/init -> /usr/bin/atomrootfsinit"
         sudo umount "${TARGET_ROOTFS}"
         sudo losetup -D
         exit -1
     fi
 else
-    echo "Neither stuPID1 nor AtomButter have been found: not touching /sbin/init"
+    echo "Neither stuPID1 nor atomrootfsinit have been found: not touching /sbin/init"
 fi
 
 echo "----------------------------------------------------------"

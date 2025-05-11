@@ -22,6 +22,14 @@ __WARNING__: The script that builds the image needs to perform filesystem operat
 and mounting btrfs subvolumes, writing files attributes and others that requires the user to be root:
 for this reason the user that runs buildroot __MUST__ a passwordless sudo user! Use a *fedora* Virtual Machine!
 
+__NOTE__: if compilation fails (probably building host-m4 with a new gcc version) try to launch it with these flags:
+
+```sh
+export HOST_CFLAGS="-Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=format-overflow=  -Wno-int-conversion -Wno-attributes -std=gnu17"
+export HOST_CXXFLAGS=$HOST_CFLAGS
+make -j$(nproc)
+```
+
 ## Kernel
 
 Include the *linux.conf* file to *Additional configuration fragment files* in Kernel menu.
@@ -63,3 +71,4 @@ You can read more about winpr-makecert [here](https://manpages.debian.org/testin
 This project has been initially developed using buildroot [2024.02.11](https://buildroot.org/downloads/buildroot-2024.02.11.tar.gz).
 Other versions known to work are:
   - [2024.11.2](https://buildroot.org/downloads/buildroot-2024.11.2.tar.gz)
+  - [2025.02]
