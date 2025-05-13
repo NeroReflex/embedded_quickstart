@@ -91,7 +91,6 @@ else
     exit -1
 fi
 echo "----------------------------------------------------------"
-echo ""
 
 # Get the UUID of the partition
 readonly partuuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
@@ -113,7 +112,49 @@ sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/root"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc"
 sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/var"
 echo "----------------------------------------------------------"
-echo ""
+
+echo "---------------- Boot Process ----------------------------"
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
+    echo "stuPID1 has been found: setting it as the default init program."
+    if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
+        echo "/sbin/init found: removing default one"
+        sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+    fi
+
+    if ! sudo ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
+        echo "Unable to link /sbin/init -> /usr/bin/stupid1"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
+
+    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+        echo "atomrootfsinit has been found: setting it as a second stage after stuPID1."
+        if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/init"; then
+            echo "Unable to link /usr/bin/init -> /usr/bin/atomrootfsinit"
+            sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
+            exit -1
+        fi
+    fi
+elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+    if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
+        echo "/sbin/init found: removing default one"
+        sudo rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+    fi
+    
+    echo "atomrootfsinit has been found: setting it as first stage."
+    if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
+        echo "Unable to link /sbin/init -> /usr/bin/atomrootfsinit"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
+        exit -1
+    fi
+else
+    echo "Neither stuPID1 nor atomrootfsinit have been found: not touching /sbin/init"
+fi
+
+echo "----------------------------------------------------------"
 
 echo "---------------- login-ng private key --------------------"
 login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
@@ -136,7 +177,6 @@ if [ -f "$login_ng_pkey_file" ]; then
     fi
 fi
 echo "----------------------------------------------------------"
-echo ""
 
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
@@ -335,7 +375,6 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
     echo "----------------------------------------------------------"
-    echo ""
 fi
 
 # Umount the filesyste and the loopback device
