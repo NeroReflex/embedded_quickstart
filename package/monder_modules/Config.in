@@ -1,0 +1,5 @@
+config BR2_PACKAGE_MENDER_MODULES
+	bool "Mender Modules"
+	select BR2_PACKAGE_MENDER
+	help
+		Modules for mender updates

@@ -262,7 +262,7 @@ if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
             sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
             sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
 
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=/base/$AUTOLOGIN_USERNAME/upperdir,workdir=/base/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
+            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=/mnt/$AUTOLOGIN_USERNAME/upperdir,workdir=/mnt/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
                 echo "Error setting the user home mount"
                 sudo umount "${TARGET_ROOTFS}"
                 sudo losetup -D
@@ -338,43 +338,44 @@ else
     echo "WARNING: No autologin user specified"
 fi
 
-sudo mkdir "${EXTRACTED_ROOTFS_HOST_PATH}/base"
+# if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then
+    echo "------------------- /etc/fstab ---------------------------"
+    echo "Setting boot partition to PARTUUID: ${partuuid}"
 
-echo "------------------- /etc/fstab ---------------------------"
-echo "Setting boot partition to PARTUUID: ${partuuid}"
+    # write /etc/fstab with mountpoints
+    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
+        echo "LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd       0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+        echo "LABEL=rootfs /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd   0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    else
+        echo "/dev/$ROOTDEV /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+        echo "/dev/$ROOTDEV /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd  0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    fi
+    echo "overlay      /usr  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "overlay      /opt  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "overlay      /root overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/root,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "overlay      /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/etc,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "overlay      /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/var,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
-# write /etc/fstab with mountpoints
-if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
-    echo "LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd       0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    echo "LABEL=rootfs /base btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd   0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-else
-    echo "/dev/$ROOTDEV /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    echo "/dev/$ROOTDEV /base btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd  0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    # since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
+    # if it is available then configure atomrootfsinit to pre-mount /etc and /var
+    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+        echo "dev                   /mnt/dev  devtmpfs rw 0 0" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "proc                  /mnt/proc proc     rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "sys                   /mnt/sys  sysfs    rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "/mnt/dev/$ROOTDEV     /mnt/mnt btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "overlay               /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "overlay               /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    fi
+
+    #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
+
+    # Seal the roofs
+    echo "Sealing the BTRFS subvolume containing the rootfs"
+    sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+
+    echo "----------------------------------------------------------"
 fi
-echo "overlay      /usr  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/usr,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-echo "overlay      /opt  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,lowerdir=/opt,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-echo "overlay      /root overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/root,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-echo "overlay      /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/etc,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-echo "overlay      /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/base,x-systemd.rw-only,lowerdir=/var,upperdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-
-# since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
-# if it is available then configure atomrootfsinit to pre-mount /etc and /var
-if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
-    echo "dev                   /mnt/dev  devtmpfs rw 0 0" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    echo "proc                  /mnt/proc proc     rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    echo "sys                   /mnt/sys  sysfs    rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    echo "/mnt/dev/$ROOTDEV     /mnt/base btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    echo "overlay               /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    echo "overlay               /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/base/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-fi
-
-#echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
-
-# Seal the roofs
-echo "Sealing the BTRFS subvolume containing the rootfs"
-sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
-
-echo "----------------------------------------------------------"
 
 # Umount the filesyste and the loopback device
 sudo umount "${TARGET_ROOTFS}"

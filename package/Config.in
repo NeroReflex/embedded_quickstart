@@ -12,6 +12,7 @@ menu "Embedded Quickstart Packages"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/rustdesk/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/imx-atf/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/imx-mkimage-post/Config.in.host"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/mender_modules/Config.in"
 endmenu
 
 menu "Embedded Quickstart Options"
