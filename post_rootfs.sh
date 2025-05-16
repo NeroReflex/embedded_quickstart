@@ -20,8 +20,6 @@ source "${BASH_SOURCE%/*}/utils/btrfs_utils.sh"
 
 LNG_CTL="${HOST_DIR}/bin/login_ng-ctl"
 
-ROOTDEV="mmcblk1p1"
-
 if [ ! -f "${LNG_CTL}" ]; then
     echo "Could not find ${LNG_CTL}"
 else
@@ -348,8 +346,8 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
         echo "LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd       0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
         echo "LABEL=rootfs /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd   0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
     else
-        echo "/dev/$ROOTDEV /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-        echo "/dev/$ROOTDEV /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd  0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+        echo "/dev/root /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd      0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+        echo "/dev/root /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd  0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
     fi
     echo "overlay      /usr  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
     echo "overlay      /opt  overlay rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off                           0  0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
@@ -360,10 +358,15 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     # since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
     # if it is available then configure atomrootfsinit to pre-mount /etc and /var
     if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+        # mount /proc so that /proc/cmdline will be available later on to parse rootdev
+        echo "proc                  /proc proc         rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        # kernel auto-mounts /dev
+        #echo "dev                   /mnt/dev  devtmpfs rw 0 0" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+
         echo "dev                   /mnt/dev  devtmpfs rw 0 0" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
         echo "proc                  /mnt/proc proc     rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
         echo "sys                   /mnt/sys  sysfs    rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "/mnt/dev/$ROOTDEV     /mnt/mnt btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+        echo "rootdev               /mnt/mnt  btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
         echo "overlay               /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
         echo "overlay               /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
     fi
