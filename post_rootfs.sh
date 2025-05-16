@@ -358,8 +358,6 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     # since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
     # if it is available then configure atomrootfsinit to pre-mount /etc and /var
     if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
-        # mount /proc so that /proc/cmdline will be available later on to parse rootdev
-        echo "proc                  /proc proc         rw 0 0" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
         # kernel auto-mounts /dev
         #echo "dev                   /mnt/dev  devtmpfs rw 0 0" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
