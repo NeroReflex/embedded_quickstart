@@ -6,8 +6,25 @@ The output file will be located in *$BUILDROOT/output/build/linux-<hash>/vmlinux
 
 ## Configuration
 
+This is for debugging the userspace:
+
 ```
 BR2_DEBUG_3=y
 BR2_ENABLE_DEBUG=y # enable debug symbol in packages
 BR2_OPTIMIZE_0=y
 ```
+
+To build a debug kernel version use *linux-debug.conf* instead of *linux.conf* as kernel configuration fragment.
+
+## Kernel Debugging
+
+These instructions are valid with a SEGGER J-Link PRO: install the official software package from SEGGER website.
+
+Start it this way:
+
+```sh
+JLinkGDBServer -device MIMX8MM1_A53_0 -notimeout -if JTAG -nolocalhostonly
+```
+
+Remeber to change the device type as needed.
+
