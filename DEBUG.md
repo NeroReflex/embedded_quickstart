@@ -44,3 +44,13 @@ continue
 ```
 
 Now make the bootloader continue boot and debugging should work.
+
+## Device Tree
+
+Simple trick to regenerate the device tree from a PC: first install llvm and clang (and dtc) and then:
+
+```sh
+LLVM=1 ARCH=arm64 make freescale/imx8mm-var-som-1.x-symphony.dtb
+```
+
+change ARCH and the device tree according to your board name and CPU architecture.
