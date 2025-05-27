@@ -81,8 +81,6 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
     # Create the service directory
     if ! mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
         echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
-        umount "${TARGET_ROOTFS}"
-        losetup -D
         exit -1
     fi
 
