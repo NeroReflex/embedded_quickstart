@@ -26,13 +26,15 @@ fi
 
 AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
-mkdir -vp "${AUTOLOGIN_USER_HOME_DIR}"
+adduser -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31
 
-usermod -aG render ${AUTOLOGIN_USERNAME}
-usermod -aG video ${AUTOLOGIN_USERNAME}
-usermod -aG seat ${AUTOLOGIN_USERNAME}
-usermod -aG input ${AUTOLOGIN_USERNAME}
-usermod -aG tty ${AUTOLOGIN_USERNAME}
+echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
+
+usermod -aG render $AUTOLOGIN_USERNAME
+usermod -aG video $AUTOLOGIN_USERNAME
+usermod -aG seat $AUTOLOGIN_USERNAME
+usermod -aG input $AUTOLOGIN_USERNAME
+usermod -aG tty $AUTOLOGIN_USERNAME
 
 if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
     if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
