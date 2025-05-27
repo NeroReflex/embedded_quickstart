@@ -8,7 +8,7 @@ define AUTOLOGIN_INSTALL_INIT_SYSTEMD
 endef
 
 define AUTOLOGIN_STORE_USER_PASSWORD
-	$(shell mkdir -v "$(TARGET_DIR)/etc/autologin/") \
+	$(shell mkdir -v "$(TARGET_DIR)/etc/autologin/" > /dev/null) \
 	$(shell echo "${BR2_EQ_AUTOLOGIN_USER}" > "$(TARGET_DIR)/etc/autologin/user_autologin_username") \
 	$(shell chmod 600 "$(TARGET_DIR)/etc/autologin/user_autologin_username") \
     $(shell echo "${BR2_EQ_AUTOLOGIN_MAIN_PASSWORD}" > "$(TARGET_DIR)/etc/autologin/user_autologin_main_password") \
