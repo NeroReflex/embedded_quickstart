@@ -1,6 +1,8 @@
 [Unit]
 Description=Prepare autologin at first boot
 ConditionFirstBoot=yes
+Wants=first-boot-complete.target
+Before=first-boot-complete.target
 
 [Service]
 Type=oneshot
