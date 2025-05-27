@@ -12,8 +12,8 @@ export EXTRACTED_ROOTFS_HOST_PATH=""
 
 LNG_CTL="login_ng-ctl"
 
-#AUTOLOGIN_UID=$(cat "/etc/autologin/user_autologin_uid")
-#AUTOLOGIN_GID=$(cat "/etc/autologin/user_autologin_gid")
+AUTOLOGIN_UID=$(cat "/etc/autologin/user_autologin_uid")
+AUTOLOGIN_GID=$(cat "/etc/autologin/user_autologin_gid")
 AUTOLOGIN_USERNAME=$(cat "/etc/autologin/user_autologin_username")
 AUTOLOGIN_MAIN_PASSWORD=$(cat "/etc/autologin/user_autologin_main_password")
 AUTOLOGIN_INTERMEDIATE_KEY=$(cat "/etc/autologin/user_autologin_intermediate_key")
@@ -106,27 +106,15 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         echo "----------------- Autologin Review -----------------------"
         "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
         echo "----------------------------------------------------------"
-
-        # Give the service directory correct permissions
-        if ! chmod 600 -R "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
-            echo "Error in setting 700 permissions to ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
-            umount "${TARGET_ROOTFS}"
-            losetup -D
-            exit -1
-        fi
     else
         echo "Error fetching autologin user's mounts"
-        umount "${TARGET_ROOTFS}"
-        losetup -D
         exit -1
     fi
 else
     echo "Error setting up the user login data"
-    umount "${TARGET_ROOTFS}"
-    losetup -D
     exit -1
 fi
 
-chown -R "${AUTOLOGIN_USERNAME}":"${AUTOLOGIN_USERNAME}" "${AUTOLOGIN_USER_HOME_DIR}"
+chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
 
 sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "/etc/greetd/config.toml"
