@@ -1,6 +1,7 @@
 config BR2_PACKAGE_LOGIN_NG_CLI
 	bool "login_ng-cli"
 	select BR2_PACKAGE_GREETD
+	select BR2_PACKAGE_SEATD
 	select BR2_PACKAGE_HOST_RUSTC
 	help
 		login_ng software to interface with greetd
