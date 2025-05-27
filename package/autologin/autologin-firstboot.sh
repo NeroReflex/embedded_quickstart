@@ -2,21 +2,21 @@
 
 set -e
 
-if [ ! -f "${BUILD_DIR}/user_autologin_username" ]; then
-    echo "No autologin specified"
-    return 0
-fi
-
 export TARGET_ROOTFS="/mnt"
 export EXTRACTED_ROOTFS_HOST_PATH=""
 
 LNG_CTL="login_ng-ctl"
 
-AUTOLOGIN_UID=$(cat "/etc/autologin/user_autologin_uid")
-AUTOLOGIN_GID=$(cat "/etc/autologin/user_autologin_gid")
-AUTOLOGIN_USERNAME=$(cat "/etc/autologin/user_autologin_username")
-AUTOLOGIN_MAIN_PASSWORD=$(cat "/etc/autologin/user_autologin_main_password")
-AUTOLOGIN_INTERMEDIATE_KEY=$(cat "/etc/autologin/user_autologin_intermediate_key")
+if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" ]; then
+    echo "No autologin specified"
+    exit 0
+fi
+
+AUTOLOGIN_UID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_uid")
+AUTOLOGIN_GID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_gid")
+AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
+AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
+AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
 
 # set the default autologin command
 if [ -f "/etc/autologin/user_autologin_cmd" ]; then
@@ -31,6 +31,8 @@ mkdir -vp "${AUTOLOGIN_USER_HOME_DIR}"
 usermod -aG render ${AUTOLOGIN_USERNAME}
 usermod -aG video ${AUTOLOGIN_USERNAME}
 usermod -aG seat ${AUTOLOGIN_USERNAME}
+usermod -aG input ${AUTOLOGIN_USERNAME}
+usermod -aG tty ${AUTOLOGIN_USERNAME}
 
 if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
     if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
