@@ -1,0 +1,11 @@
+[Unit]
+Description=Prepare autologin at first boot
+ConditionFirstBoot=yes
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/autologin-firstboot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

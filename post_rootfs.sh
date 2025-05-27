@@ -152,167 +152,20 @@ else
     echo "Neither stuPID1 nor atomrootfsinit have been found: not touching /sbin/init"
 fi
 
+echo "------------------ PAM Module ----------------------------"
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
+    sudo sed -i '/^[-]auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+    sudo sed -i '/^[-]account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+    sudo sed -i '/^[-]session\s\+optional\s\+pam_loginuid.so/a -session  optional   pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+fi
+
 echo "----------------------------------------------------------"
 
-if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
-    AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
-    AUTOLOGIN_GID=$(cat "${BUILD_DIR}/user_autologin_gid")
-    AUTOLOGIN_USERNAME=$(cat "${BUILD_DIR}/user_autologin_username")
-    AUTOLOGIN_MAIN_PASSWORD=$(cat "${BUILD_DIR}/user_autologin_main_password")
-    AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${BUILD_DIR}/user_autologin_intermediate_key")
 
-    AUTOLOGIN_USER_HOME_DIR="${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}/${AUTOLOGIN_USERNAME}"
-
-    # Because buildroot is bugged and appending more than one additional group in a package breaks every group.
-    sudo sed -i "/^seat:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^seat:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
-    sudo sed -i "/^video:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^video:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
-    sudo sed -i "/^render:/ s/:$/:${AUTOLOGIN_USERNAME}/; /^render:/ s/:$/:,${AUTOLOGIN_USERNAME}/" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"
-
-    sudo mkdir -p "${AUTOLOGIN_USER_HOME_DIR}"
-
-    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
-        sudo sed -i '/^[-]auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
-        sudo sed -i '/^[-]account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
-        sudo sed -i '/^[-]session\s\+optional\s\+pam_loginuid.so/a -session  optional   pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
-    fi
-
-    if [ ! -d "${AUTOLOGIN_USER_HOME_DIR}" ]; then
-        echo "Could not find user directory '${AUTOLOGIN_USER_HOME_DIR}': at the moment only such directory is supported"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
-        exit -1
-    else
-        if [ ! -f "${LNG_CTL}" ]; then
-            echo "Could not find ${LNG_CTL}"
-            exit -1
-        fi
-
-        if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
-            if sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
-                echo "------------------ Autologin User ------------------------"
-                echo "Username: ${AUTOLOGIN_USERNAME}"
-                echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
-                echo "Intermediate Key: ${AUTOLOGIN_INTERMEDIATE_KEY}"
-                echo "----------------------------------------------------------"
-                echo ""
-                echo ""
-            else
-                echo "Error setting up the user autologin"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
-
-            if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
-                echo "Error writing the /etc/passwd file"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! echo "${AUTOLOGIN_USERNAME}:${hashed_password}:18000:0:99999:7:-1:-1:" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/shadow"; then
-                echo "Error writing the /etc/shadow file"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_GID}:" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group"; then
-                echo "Error writing the /etc/group file"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            if ! sudo btrfs subvol create "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}"; then
-                echo "Error setting the autologin user's data subvolume"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            sudo mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
-            sudo mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
-            sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
-            sudo chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
-
-            if ! sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=/mnt/$AUTOLOGIN_USERNAME/upperdir,workdir=/mnt/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
-                echo "Error setting the user home mount"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            # Create the service directory
-            if ! sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
-                echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-
-            # Authorize the mount
-            AUTOLOGIN_USER_MOUNTS_HASH=$(sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | grep 'hash:' | awk '{print $2}')
-            AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
-            if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
-                echo ""
-                echo ""
-                echo "---------------- Authorized Mounts -----------------------"
-                echo "{" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "    \"authorizations\": {" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "        \"${AUTOLOGIN_USERNAME}\": [" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "            \"${AUTOLOGIN_USER_MOUNTS_HASH}\"" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "        ]" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "    }" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "}" | sudo tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-                echo "----------------------------------------------------------"
-                echo ""
-                echo ""
-                echo "----------------- Autologin Review -----------------------"
-                sudo "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
-                echo "----------------------------------------------------------"
-
-                # Give the service directory correct permissions
-                if ! sudo chmod 600 -R "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
-                    echo "Error in setting 700 permissions to ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
-                    sudo umount "${TARGET_ROOTFS}"
-                    sudo losetup -D
-                    exit -1
-                fi
-            else
-                echo "Error fetching autologin user's mounts"
-                sudo umount "${TARGET_ROOTFS}"
-                sudo losetup -D
-                exit -1
-            fi
-        else
-            echo "Error setting up the user login data"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
-            exit -1
-        fi
-    fi
-
-    # Assign the user directory to the proper uid and gid
-    sudo chown -R "${AUTOLOGIN_UID}":"${AUTOLOGIN_GID}" "${AUTOLOGIN_USER_HOME_DIR}"
-
-    sudo sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
-
-    # set the default autologin command
-    if [ -f "${BUILD_DIR}/user_autologin_cmd" ]; then
-        AUTOLOGIN_CMD=$(cat "${BUILD_DIR}/user_autologin_cmd")
-        sudo sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c ${AUTOLOGIN_CMD}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
-    fi
-
-    # TODO: symlink '/home/user/.config/systemd/user/dbus.service' → '/usr/lib/systemd/user/dbus-broker.service'
-    # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
-    # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
-
-else
-    echo "WARNING: No autologin user specified"
-fi
+# TODO: symlink '/home/user/.config/systemd/user/dbus.service' → '/usr/lib/systemd/user/dbus-broker.service'
+# TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
+# TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
 
 # if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then

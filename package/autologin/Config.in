@@ -1,6 +1,7 @@
 config BR2_PACKAGE_AUTOLOGIN
 	bool "autologin"
 	select BR2_PACKAGE_LOGIN_NG_CLI
+	select BR2_PACKAGE_LOGIN_NG_CTL
 	select BR2_PACKAGE_HOST_LOGIN_NG_CTL
 	help
 		Enable the autologin feature. You need an /etc/weston.ini file with weston configuration!!!
