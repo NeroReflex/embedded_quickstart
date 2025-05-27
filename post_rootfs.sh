@@ -154,28 +154,6 @@ fi
 
 echo "----------------------------------------------------------"
 
-echo "---------------- login-ng private key --------------------"
-login_ng_pkey_file="${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/private_key_pkcs8.pem"
-if [ -f "$login_ng_pkey_file" ]; then
-    if sudo chmod 600 "$login_ng_pkey_file"; then
-        echo "Set permissions 600 to $login_ng_pkey_file"
-        if sudo chown 0:0 "$login_ng_pkey_file"; then
-            echo "Access to file $login_ng_pkey_file secured"
-        else
-            echo "Error changing owner to $login_ng_pkey_file"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
-            exit -1
-        fi
-    else
-        echo "Error setting permissions 600 to $login_ng_pkey_file"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
-        exit -1
-    fi
-fi
-echo "----------------------------------------------------------"
-
 if [ -f "${BUILD_DIR}/user_autologin_username" ]; then
     AUTOLOGIN_UID=$(cat "${BUILD_DIR}/user_autologin_uid")
     AUTOLOGIN_GID=$(cat "${BUILD_DIR}/user_autologin_gid")
