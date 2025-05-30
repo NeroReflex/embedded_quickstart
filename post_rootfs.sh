@@ -18,14 +18,6 @@ source "${BASH_SOURCE%/*}/utils/btrfs_utils.sh"
 # $BASE_DIR the base output directory 
 # $PARALLEL_JOBS the number of jobs to use when running parallel processes
 
-LNG_CTL="${HOST_DIR}/bin/login_ng-ctl"
-
-if [ ! -f "${LNG_CTL}" ]; then
-    echo "Could not find ${LNG_CTL}"
-else
-    echo "Program ${LNG_CTL} has been found."
-fi
-
 TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
 mkdir -p "${BASE_DIR}/rootfs_mnt"
 
