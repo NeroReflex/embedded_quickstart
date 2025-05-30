@@ -7,6 +7,11 @@ export EXTRACTED_ROOTFS_HOST_PATH=""
 
 LNG_CTL="login_ng-ctl"
 
+if [ ! -d "/etc/autologin" ]; then
+    echo "No autologin data to be applied"
+    exit 0
+fi
+
 if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" ]; then
     echo "No autologin specified"
     exit 0
@@ -36,12 +41,6 @@ usermod -aG audio $AUTOLOGIN_USERNAME
 usermod -aG seat $AUTOLOGIN_USERNAME
 usermod -aG input $AUTOLOGIN_USERNAME
 usermod -aG tty $AUTOLOGIN_USERNAME
-
-# set the default autologin command
-if [ -f "/etc/autologin/user_autologin_cmd" ]; then
-    AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
-    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c \"${AUTOLOGIN_CMD}\" -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
-fi
 
 if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
     if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
@@ -126,6 +125,12 @@ fi
 
 chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
 
-sed -i -e "s|/usr/bin/login_ng-cli --autologin true\"|/usr/bin/login_ng-cli --autologin true --user ${AUTOLOGIN_USERNAME}\"|" "/etc/greetd/config.toml"
+# set the default autologin command
+if [ -f "/etc/autologin/user_autologin_cmd" ]; then
+    AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
+    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c '${AUTOLOGIN_CMD}' -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+fi
 
-rm -rf /etc/autologin
+rm -rf "/etc/autologin"
+
+sync

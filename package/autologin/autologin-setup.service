@@ -1,6 +1,5 @@
 [Unit]
 Description=Prepare autologin at first boot
-ConditionFileNotEmpty=!/etc/machine-id
 Wants=greetd.service
 Before=greetd.service
 
