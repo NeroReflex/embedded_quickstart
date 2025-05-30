@@ -18,15 +18,9 @@ AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autol
 AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
 AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
 
-# set the default autologin command
-if [ -f "/etc/autologin/user_autologin_cmd" ]; then
-    AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
-    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c ${AUTOLOGIN_CMD}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
-fi
-
 AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
-adduser -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
+useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
@@ -35,6 +29,12 @@ usermod -aG video $AUTOLOGIN_USERNAME
 usermod -aG seat $AUTOLOGIN_USERNAME
 usermod -aG input $AUTOLOGIN_USERNAME
 usermod -aG tty $AUTOLOGIN_USERNAME
+
+# set the default autologin command
+if [ -f "/etc/autologin/user_autologin_cmd" ]; then
+    AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
+    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c \"${AUTOLOGIN_CMD}\" -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+fi
 
 if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
     if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
