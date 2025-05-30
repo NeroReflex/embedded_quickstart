@@ -89,7 +89,7 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
     fi
 
     # Authorize the mount
-    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | grep 'hash:' | awk '{print $2}')
+    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | awk '/hash:/ {print $2}')
     AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
     if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
         echo ""
