@@ -1,8 +1,8 @@
 [Unit]
 Description=Prepare autologin at first boot
-ConditionFirstBoot=yes
-Wants=first-boot-complete.target
-Before=first-boot-complete.target
+ConditionFileNotEmpty=!/etc/machine-id
+Wants=greetd.service
+Before=greetd.service
 
 [Service]
 Type=oneshot
