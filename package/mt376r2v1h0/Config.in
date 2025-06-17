@@ -1,0 +1,6 @@
+config BR2_PACKAGE_MT376R2V1H0
+	bool "mt376r2v1h0"
+	select BR2_PACKAGE_LIBGPIOD2
+	depends on BR2_PACKAGE_SYSTEMD
+	help
+		Enable features specific to mt376r2v1h0 board

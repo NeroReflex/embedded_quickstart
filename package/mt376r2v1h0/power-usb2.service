@@ -1,0 +1,12 @@
+[Unit]
+Description=Manage power on USB port 2
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=gpioset -t 0 --chip gpiochip3 21=1
+ExecStop=gpioset -t 0 --chip gpiochip3 21=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
