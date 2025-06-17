@@ -74,7 +74,13 @@ wifi_is_bcm43xx() {
 # Return true if board is DART-MX8M-MINI
 som_is_dart_mx8m_mini()
 {
-	grep -q DART-MX8M-MINI /sys/devices/soc0/machine
+	if which rg; then
+		rg "DART-MX8M-MINI" /sys/devices/soc0/machine
+	elif which awk
+		awk '/DART-MX8M-MINI/ {exit 0} END {exit 1}' /sys/devices/soc0/machine
+	else
+		grep -q "DART-MX8M-MINI" /sys/devices/soc0/machine
+	fi
 }
 
 # Power up WIFI chip

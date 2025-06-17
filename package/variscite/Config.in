@@ -2,6 +2,6 @@ config BR2_PACKAGE_VARISCITE
 	bool "Variscite support"
 	select BR2_PACKAGE_BRCM_PATCHRAM_PLUS
 	select BR2_PACKAGE_LIBGPIOD2
-	depends on BR2_PACKAGE_SYSTEMD
+	depends on BR2_PACKAGE_SYSTEMD && (BR2_PACKAGE_RIPGREP || BR2_PACKAGE_GREP)
 	help
 		Enable hardware support for Variscite products
