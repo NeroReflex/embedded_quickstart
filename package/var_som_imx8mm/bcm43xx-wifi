@@ -38,7 +38,7 @@ disable_network_interface() {
 	# Check if the interface exists
 	if ip link show "$iface" >/dev/null 2>&1; then
 		ifconfig "$iface" down
-		usleep 100000
+		sleep_microseconds 100000
 	fi
 }
 
@@ -91,7 +91,7 @@ wifi_up()
 
 	# WIFI_3V3 up
 	gpioset -t 0 --chip ${WIFI_3V3_GPIO}=1
-	usleep 10000
+	sleep_microseconds 10000
 
 	# WIFI_1V8 up
 	if som_is_dart_mx8m_mini; then
@@ -99,7 +99,7 @@ wifi_up()
 	else
 		gpioset -t 0 --chip ${WIFI_1V8_GPIO}=1
 	fi
-	usleep 10000
+	sleep_microseconds 10000
 
 	# WLAN_EN up
 	gpioset -t 0 --chip ${WIFI_EN_GPIO}=1
@@ -112,7 +112,7 @@ wifi_up()
 		gpioset -t 0 --chip ${BT_BUF_GPIO}=0
 
 		# Wait at least 150ms
-		usleep 200000
+		sleep_microseconds 200000
 
 		# BT_BUF down
 		gpioset -t 0 --chip ${BT_BUF_GPIO}=1
@@ -151,7 +151,7 @@ wifi_down()
 
 	# BT_EN down
 	gpioset -t 0 --chip ${BT_EN_GPIO}=0
-	usleep 10000
+	sleep_microseconds 10000
 
 	# WIFI_1V8 down
 	if som_is_dart_mx8m_mini; then

@@ -142,3 +142,17 @@ verify_sdio_id() {
 
     return 1
 }
+
+# Function to sleep for a specified number of microseconds
+sleep_microseconds() {
+    local microseconds=$1
+
+    # Check if usleep is available
+    if command -v usleep &> /dev/null; then
+        usleep "$microseconds"
+    else
+        # Convert microseconds to seconds for sleep
+        local seconds=$(echo "scale=6; $microseconds / 1000000" | bc)
+        sleep "$seconds"
+    fi
+}
