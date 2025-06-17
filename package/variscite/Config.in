@@ -1,0 +1,6 @@
+config BR2_PACKAGE_VARISCITE
+	bool "Variscite support"
+	select BR2_PACKAGE_LIBGPIOD2
+	depends on BR2_PACKAGE_SYSTEMD
+	help
+		Enable hardware support for Variscite products

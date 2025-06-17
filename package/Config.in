@@ -15,6 +15,8 @@ menu "Embedded Quickstart Packages"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/imx-mkimage-post/Config.in.host"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/mender_modules/Config.in"
 	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/mt376r2v1h0/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/variscite/Config.in"
+	source "$BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH/package/var_som_imx8mm/Config.in"
 endmenu
 
 menu "Embedded Quickstart Options"
