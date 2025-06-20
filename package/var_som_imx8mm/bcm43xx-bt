@@ -44,7 +44,7 @@ som_is_var_som_mx8m_mini()
 {
 	if which rg; then
 		rg "VAR-SOM-MX8M-MINI" /sys/devices/soc0/machine
-	elif which awk
+	elif which awk; then
 		awk '/VAR-SOM-MX8M-MINI/ {exit 0} END {exit 1}' /sys/devices/soc0/machine
 	else
 		grep -q "VAR-SOM-MX8M-MINI" /sys/devices/soc0/machine
