@@ -16,17 +16,12 @@ DEPLOYMENT_SUBVOL_NAME=${3}
 DEPLOYMENTS_DIR=${4}
 DEPLOYMENTS_DATA_DIR=${5}
 
-EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
-
 # Create the home subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
 
 # Create directories for deployments and deployment-specific data
 mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
 mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
-
-# Create the default deployment rootfs snapshot
-btrfs subvolume create "$EXTRACTED_ROOTFS_HOST_PATH"
 
 readonly SUBVOL_DATA="${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
 mkdir -p "${SUBVOL_DATA}/etc_overlay/upperdir"
@@ -45,29 +40,5 @@ mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/opt_overlay" ro true
-
-# Change the default subvolid so that the written deployment will get booted
-ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "$EXTRACTED_ROOTFS_HOST_PATH")
-ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
-
-if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
-    if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
-        echo "ERROR: Invalid subvolid for the rootfs subvolume"
-        exit -1
-    elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
-        echo "ERROR: Couldn't identify the correct subvolid of the deployment"
-        exit -1
-    fi
-
-    if btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
-        echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
-    else
-        echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
-        exit -1
-    fi
-else
-    echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
-    exit -1
-fi
 
 exit 0

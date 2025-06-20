@@ -218,7 +218,32 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
 
     # Generate the deployment snapshot
     btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
-    sudo btrfs send --compressed-data -q | xz -e -9 --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
+    sudo btrfs send --compressed-data -f "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs"
+    cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
+
+    # Change the default subvolid so that the written deployment will get booted
+    ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+    ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
+
+    if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
+        if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
+            echo "ERROR: Invalid subvolid for the rootfs subvolume"
+            exit -1
+        elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
+            echo "ERROR: Couldn't identify the correct subvolid of the deployment"
+            exit -1
+        fi
+
+        if btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
+            echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
+        else
+            echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
+            exit -1
+        fi
+    else
+        echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
+        exit -1
+    fi
 
     echo "----------------------------------------------------------"
 fi
