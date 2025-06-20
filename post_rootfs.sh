@@ -39,7 +39,12 @@ EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/"
 export PATH="${HOST_DIR}/bin:${PATH}"
 
 # Create the image and mount the rootfs
+echo "----------------- Creating Image -------------------------"
+echo "Deployment name: $DEPLOYMENT_SUBVOL_NAME"
 echo "----------------------------------------------------------"
+
+# Create the image and mount the rootfs
+echo "----------------- Creating Image -------------------------"
 if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
     readonly IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
     readonly IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
