@@ -208,7 +208,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
     sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
-    sudo echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
+    echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
 
     sudo install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "$(EXTRACTED_ROOTFS_HOST_PATH)/usr/lib/embedded_quickstart/install"
 
@@ -217,8 +217,8 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
     # Generate the deployment snapshot
-    btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
-    sudo btrfs send --compressed-data -f "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs"
+    sudo btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+    sudo btrfs send -f "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
     cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
 
     # Change the default subvolid so that the written deployment will get booted
@@ -234,7 +234,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
             exit -1
         fi
 
-        if btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
+        if sudo btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
             echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
         else
             echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
