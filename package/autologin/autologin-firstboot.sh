@@ -73,17 +73,19 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         exit -1
     fi
 
-    if ! btrfs subvol create "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}"; then
-        echo "Error setting the autologin user's data subvolume"
-        exit -1
+    if [ ! -d "${TARGET_ROOTFS}/user_data" ]; then
+        if ! btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
+            echo "Error setting the autologin user's data subvolume"
+            exit -1
+        fi
     fi
 
-    mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
-    mkdir -p "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
-    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/upperdir"
-    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/${AUTOLOGIN_USERNAME}/workdir"
+    mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
+    mkdir -p "${TARGET_ROOTFS}/user_data/workdir"
+    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/upperdir"
+    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/workdir"
 
-    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=${TARGET_ROOTFS}/$AUTOLOGIN_USERNAME/upperdir,workdir=${TARGET_ROOTFS}/$AUTOLOGIN_USERNAME/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
+    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=${TARGET_ROOTFS}/user_data/upperdir,workdir=${TARGET_ROOTFS}/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
         echo "Error setting the user home mount"
         exit -1
     fi

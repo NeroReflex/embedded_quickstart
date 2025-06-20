@@ -162,6 +162,13 @@ echo "----------------------------------------------------------"
 # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
 # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
 
+if ! btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
+    echo "Error setting the autologin user's data subvolume"
+    sudo umount "${TARGET_ROOTFS}"
+    sudo losetup -D
+    exit -1
+fi
+
 # if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then
     echo "------------------- /etc/fstab ---------------------------"
@@ -207,6 +214,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
 
     #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
+    # prapare the deployment snapshot
     sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
     echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
 
@@ -228,9 +236,13 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
         if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
             echo "ERROR: Invalid subvolid for the rootfs subvolume"
+            sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
             exit -1
         elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
             echo "ERROR: Couldn't identify the correct subvolid of the deployment"
+            sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
             exit -1
         fi
 
@@ -238,10 +250,14 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
             echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
         else
             echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
+            sudo umount "${TARGET_ROOTFS}"
+            sudo losetup -D
             exit -1
         fi
     else
         echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
+        sudo umount "${TARGET_ROOTFS}"
+        sudo losetup -D
         exit -1
     fi
 
