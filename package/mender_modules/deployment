@@ -1,0 +1,127 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+STATE="$1"
+FILES="$2"
+
+PARTITION_MAIN_SUBVOL="/base"
+DEPLOY_PATH="${PARTITION_MAIN_SUBVOL}/deployments"
+
+echoerr() { printf "%s\n" "$*" >&2; }
+
+# Check if the given directory is a btrfs subvolume
+# $1 the directory
+# return 0 if the directory is a subvolume, 1 otherwise
+is_btrfs_subvolume() {
+	local dir=$1
+	[ "$(stat -f --format="%T" "$dir")" == "btrfs" ] || return 1
+	inode="$(stat --format="%i" "$dir")"
+	case "$inode" in
+	2 | 256)
+		return 0
+		;;
+	*)
+		return 1
+		;;
+	esac
+}
+
+# Get the btrfs subvolume id of the given subvolume path
+#
+# PRE=$1 is a btrfs subvolume
+# POST=
+#
+# $1 the subvolume to be inspected
+# stdout SubvolID on success, an error string otherwise
+btrfs_subvol_get_id() {
+	local dir=${1}
+
+	if is_btrfs_subvolume "$dir"; then
+		btrfs subvolume show $dir | grep "Subvolume ID:" | cut -d ':' -f 2 | tr -d '[:space:]'
+	else
+		echo "ERROR: $dir is not a valid btrfs subvolume"
+	fi
+}
+
+if [ ! -d "${DEPLOY_PATH}" ]; then
+    echoerr "ERROR: ${DEPLOY_PATH} does not exists"
+    exit 1
+fi
+
+MAIN_SUBVOL=$(btrfs_subvol_get_id "$PARTITION_MAIN_SUBVOL")
+if echo "$MAIN_SUBVOL" | grep -Fq "ERROR"; then
+    echoerr "$MAIN_SUBVOL"
+    exit 1
+elif [ "$MAIN_SUBVOL" != "5" ]; then
+    echoerr "${PARTITION_MAIN_SUBVOL} is not subvolid=5"
+    exit 1
+fi
+
+#    SupportsRollback)
+#        echo "Yes"
+#        ;;
+#
+#    ArtifactRollback)
+#        # TODO: set the currently-running deployment as the default one
+#        ;;
+
+
+case "$STATE" in
+    Download)
+        # read stream-next to check the next artifact being downloaded
+        while :
+        do
+            fullfile=$(cat "stream-next")
+            if [ -n "$fullfile" ]; then
+                filename=$(basename -- "$fullfile")
+                extension="${filename##*.}"
+
+                # If the artifact has btrfs in the name then use btrfs receive to write it to disk
+                if echo "$filename" | grep -Fq "btrfs"; then
+                    if [[ "${extension}" == "btrfs" ]]; then
+                        cat "${fullfile}" | btrfs receive --quiet "${DEPLOY_PATH}"
+                    elif [[ "${extension}" == "zst" ]]; then
+                        zstd -d -c "${fullfile}" | btrfs receive --quiet "${DEPLOY_PATH}"
+                    elif [[ "${extension}" == "xz" ]]; then
+                        xz -dc "${fullfile}" | btrfs receive --quiet "${DEPLOY_PATH}"
+                    elif [[ "${extension}" == "gz" ]]; then
+                        zcat "${fullfile}" | btrfs receive --quiet "${DEPLOY_PATH}"
+                    fi
+                fi
+            else
+                # documentation says that when the pipe is empty no more reads should be attempted
+                break
+            fi
+        done
+        ;;
+
+    ArtifactInstall)
+        # NOTE: you can use "$FILES" here
+        DEPLOYMENT_NAME=$(cat "header/artifact_name" | xargs)
+        SUBVOL="${DEPLOY_PATH}/${DEPLOYMENT_NAME}"
+        SUBVOLID=$(btrfs_subvol_get_id "$SUBVOL")
+        if echo "$SUBVOLID" | grep -Fq "ERROR"; then
+            echoerr "$SUBVOLID"
+            exit 1
+        fi
+
+        INSTALL_SCRIPT="${SUBVOL}/usr/lib/embedded_quickstart/install"
+        if [[ -x "${INSTALL_SCRIPT}" ]]; then
+            "${INSTALL_SCRIPT}" "$MAIN_SUBVOL" "$SUBVOL" "$DEPLOYMENT_NAME"
+        else
+            echoerr "File ${INSTALL_SCRIPT} is not a valid executable file"
+            exit 1
+        fi
+
+        # WARNING: this performs the real activation
+        btrfs subvolume set-default "${SUBVOLID}" "${PARTITION_MAIN_SUBVOL}"
+        ;;
+
+    Cleanup)
+        # TODO: delete temporary files
+        ;;
+
+esac
+exit 0

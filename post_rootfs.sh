@@ -8,7 +8,9 @@ error_handler() {
 # Set the trap to call the error_handler function on ERR
 trap 'error_handler' ERR
 
-source "${BASH_SOURCE%/*}/utils/btrfs_utils.sh"
+CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
+
+source "${CURRENT_SCRIPT_DIR}/utils/btrfs_utils.sh"
 
 # $BR2_CONFIG the path to the Buildroot .config file
 # $CONFIG_DIR the directory containing the .config file, and therefore the top-level Buildroot Makefile to use (which is correct for both in-tree and out-of-tree builds)
@@ -26,7 +28,8 @@ DEPLOYMENT_SUBVOL_NAME="factory"
 DEPLOYMENTS_DIR="deployments"
 DEPLOYMENTS_DATA_DIR="deployments_data"
 
-EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
+#EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
+EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/"
 
 export PATH="${HOST_DIR}/bin:${PATH}"
 
@@ -36,7 +39,7 @@ if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
     readonly IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
     readonly IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
 
-    FS_MODIFY_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/modify_image.sh" "$IMAGE_FILE_PATH" "$IMAGE_PART_NUMBER" "$TARGET_ROOTFS")
+    FS_MODIFY_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/modify_image.sh" "$IMAGE_FILE_PATH" "$IMAGE_PART_NUMBER" "$TARGET_ROOTFS")
     FS_MODIFY_RESULT=$?
 
     echo "$FS_MODIFY_OUTPUT"
@@ -51,7 +54,7 @@ if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
 else
     BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
 
-    FS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/create_image.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS")
+    FS_CREATE_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/create_image.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS")
     FS_CREATE_RESULT=$?
 
     echo "$FS_CREATE_OUTPUT"
@@ -68,7 +71,7 @@ echo "----------------------------------------------------------"
 
 # Initialize the mounted rootfs
 echo "------------------- root filesystem ----------------------"
-ROOTFS_CREATE_OUTPUT=$(sudo bash "${BASH_SOURCE%/*}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
+ROOTFS_CREATE_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
 ROOTFS_CREATE_RESULT=$?
 
 echo "$ROOTFS_CREATE_OUTPUT"
@@ -83,7 +86,7 @@ fi
 echo "----------------------------------------------------------"
 
 # Get the UUID of the partition
-readonly partuuid=$("${BASH_SOURCE%/*}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
+readonly partuuid=$("${CURRENT_SCRIPT_DIR}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
 
 echo "---------------- Filesystem ------------------------------"
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
@@ -204,9 +207,18 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
 
     #echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
+    sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
+    sudo echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
+
+    sudo install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "$(EXTRACTED_ROOTFS_HOST_PATH)/usr/lib/embedded_quickstart/install"
+
     # Seal the roofs
     echo "Sealing the BTRFS subvolume containing the rootfs"
     sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+
+    # Generate the deployment snapshot
+    btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+    sudo btrfs send --compressed-data -q | xz -e -9 --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
 
     echo "----------------------------------------------------------"
 fi
