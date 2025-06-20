@@ -42,9 +42,9 @@ WIFI_SDIO_ID_FILE=/sys/class/net/wlan0/device/device
 # Return true if SOM is VAR-SOM-MX8M-MINI
 som_is_var_som_mx8m_mini()
 {
-	if which rg; then
+	if which rg > /dev/null 2>&1; then
 		rg "VAR-SOM-MX8M-MINI" /sys/devices/soc0/machine
-	elif which awk; then
+	elif which awk > /dev/null 2>&1; then
 		awk '/VAR-SOM-MX8M-MINI/ {exit 0} END {exit 1}' /sys/devices/soc0/machine
 	else
 		grep -q "VAR-SOM-MX8M-MINI" /sys/devices/soc0/machine
