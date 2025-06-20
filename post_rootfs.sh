@@ -24,7 +24,12 @@ TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
 mkdir -p "${BASE_DIR}/rootfs_mnt"
 
 HOME_SUBVOL_NAME="@home"
-DEPLOYMENT_SUBVOL_NAME="factory"
+DEPLOYMENT_SUBVOL_NAME="$1"
+
+if [ -z "$DEPLOYMENT_SUBVOL_NAME" ]; then
+    DEPLOYMENT_SUBVOL_NAME="factory"
+fi
+
 DEPLOYMENTS_DIR="deployments"
 DEPLOYMENTS_DATA_DIR="deployments_data"
 
