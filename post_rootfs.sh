@@ -162,7 +162,7 @@ echo "----------------------------------------------------------"
 # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
 # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
 
-if ! btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
+if ! sudo btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
     echo "Error setting the autologin user's data subvolume"
     sudo umount "${TARGET_ROOTFS}"
     sudo losetup -D
