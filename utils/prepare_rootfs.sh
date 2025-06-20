@@ -19,9 +19,9 @@ DEPLOYMENTS_DATA_DIR=${5}
 # Create the home subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
 
-# Create directories for deployments and deployment-specific data
-mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
-mkdir -p "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
+# Create subvolumes for deployments and deployment-specific data
+btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
+btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
 
 readonly SUBVOL_DATA="${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
 mkdir -p "${SUBVOL_DATA}/etc_overlay/upperdir"
