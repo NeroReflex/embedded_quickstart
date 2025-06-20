@@ -218,11 +218,11 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
 
     # Generate the deployment snapshot
     sudo btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
-    sudo btrfs send -f "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+    sudo btrfs send "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}" > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs"
     cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
 
     # Change the default subvolid so that the written deployment will get booted
-    ROOTFS_DEFAULT_SUBVOLID=$(btrfs_subvol_get_id "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+    ROOTFS_DEFAULT_SUBVOLID=$(sudo btrfs_subvol_get_id "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
     ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
 
     if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
