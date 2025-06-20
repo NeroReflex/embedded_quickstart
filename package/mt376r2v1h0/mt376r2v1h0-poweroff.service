@@ -1,0 +1,11 @@
+[Unit]
+Description=Save system clock on shutdown
+DefaultDependencies=no
+After=final.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mt376r2v1h0-poweroff.sh
+
+[Install]
+WantedBy=final.target

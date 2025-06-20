@@ -1,0 +1,13 @@
+[Unit]
+Description=mt376r2v1h0 suspend hook
+Before=sleep.target
+StopWhenUnneeded=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/mt376r2v1h0-suspend.sh
+ExecStop=/usr/bin/mt376r2v1h0-resume.sh
+
+[Install]
+WantedBy=sleep.target

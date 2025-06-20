@@ -1,0 +1,5 @@
+# Create a symlink to any touchscreen input device
+SUBSYSTEM=="input", KERNEL=="event[0-9]*", ATTRS{modalias}=="input:*-e0*,3,*a0,1,*18,*", SYMLINK+="input/touchscreen1"
+SUBSYSTEM=="input", KERNEL=="event[0-9]*", ATTRS{modalias}=="ads7846", SYMLINK+="input/touchscreen1"
+#ENV{ID_VENDOR_ID}=="0000",ENV{ID_MODEL_ID}=="0000",ENV{WL_OUTPUT}="LVDS-1"
+SUBSYSTEM=="input", DEVPATH=="/devices/platform/soc@0/30800000.bus/30a40000.i2c/i2c-2/2-0041/input/input1/event1", ENV{WL_OUTPUT}="LVDS-1", SYMLINK+="input/touchscreen0", ENV{LIBINPUT_CALIBRATION_MATRIX}="0.048828125 0 0 0 0.029296875 0 0 0 1"
