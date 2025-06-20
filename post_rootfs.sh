@@ -222,7 +222,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
 
     # Change the default subvolid so that the written deployment will get booted
-    ROOTFS_DEFAULT_SUBVOLID=$(sudo btrfs_subvol_get_id "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+    ROOTFS_DEFAULT_SUBVOLID=$(sudo "${CURRENT_SCRIPT_DIR}/utils/btrfs_get_subvolid.sh" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
     ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
 
     if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
