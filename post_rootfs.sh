@@ -24,7 +24,9 @@ TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
 mkdir -p "${BASE_DIR}/rootfs_mnt"
 
 HOME_SUBVOL_NAME="@home"
-DEPLOYMENT_SUBVOL_NAME="$1"
+
+# TODO: read the name from somewhere
+#DEPLOYMENT_SUBVOL_NAME=""
 
 if [ -z "$DEPLOYMENT_SUBVOL_NAME" ]; then
     DEPLOYMENT_SUBVOL_NAME="factory"
