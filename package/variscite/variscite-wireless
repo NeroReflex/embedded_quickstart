@@ -64,6 +64,8 @@ wifi_mmc_bind() {
 	local mmc_controller_path="$1"
 	local wifi_mmc_host="$2"
 
+    echo "binding ${wifi_mmc_host} to ${mmc_controller_path}..."
+
 	if [ -e "${mmc_controller_path}/bind" ]; then
 		echo "${wifi_mmc_host}" > "${mmc_controller_path}/bind"
 	fi
