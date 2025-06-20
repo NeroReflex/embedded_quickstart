@@ -210,7 +210,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     sudo mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
     echo "${DEPLOYMENT_SUBVOL_NAME}" | sudo tee "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
 
-    sudo install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "$(EXTRACTED_ROOTFS_HOST_PATH)/usr/lib/embedded_quickstart/install"
+    sudo install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/install"
 
     # Seal the roofs
     echo "Sealing the BTRFS subvolume containing the rootfs"
