@@ -11,14 +11,13 @@ trap 'error_handler' ERR
 
 CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
-CURRENT_DEPLOYMENT_NAME=$(cat "/usr/lib/embedded_quickstart")
+CURRENT_DEPLOYMENT_NAME=$(cat "/usr/lib/embedded_quickstart/version")
 
 # Here it is assumed the script is located at /usr/lib/embedded_quickstart
-
 DEPLOYMENT_NAME=$(cat "$CURRENT_SCRIPT_DIR/version")
 
 # this is the place where the subvolid=5 is mounted
-MAIN_SUBVOL_PATH="/mnt/"
+MAIN_SUBVOL_PATH="/mnt"
 
 DEPLOYMENTS_DIR="deployments"
 DEPLOYMENTS_DATA_DIR="deployments_data"

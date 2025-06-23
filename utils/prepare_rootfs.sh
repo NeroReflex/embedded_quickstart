@@ -24,6 +24,7 @@ btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
 btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
 
 readonly SUBVOL_DATA="${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+btrfs subvolume create "${SUBVOL_DATA}"
 mkdir -p "${SUBVOL_DATA}/etc_overlay/upperdir"
 mkdir -p "${SUBVOL_DATA}/etc_overlay/workdir"
 mkdir -p "${SUBVOL_DATA}/var_overlay/upperdir"
@@ -40,5 +41,3 @@ mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/opt_overlay" ro true
-
-exit 0
