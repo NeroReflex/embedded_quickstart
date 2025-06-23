@@ -79,6 +79,25 @@ winpr-makecert -rdp -path $PWD -n server
 
 You can read more about winpr-makecert [here](https://manpages.debian.org/testing/winpr-utils/winpr-makecert.1.en.html)
 
+## Flash and Update
+
+You can use this command to flash the resulting image after uploading it to a website:
+
+```sh
+curl http://192.168.0.93:8080/sd.img > /dev/mmcblk2
+```
+
+then, to update the image upload the .btrfs.xz file to a website and then:
+
+```sh
+curl http://192.168.0.93:8080/v1_0.btrfs.xz | xz -d | btrfs receive "/mnt/deployments"
+/mnt/deployments/v1_0/usr/lib/embedded_quickstart/install
+
+```
+
+__WARNING__: This method of updating skips every check and can install everything, therefore it is suitable __ONLY__
+for a quick testing. Use mender_modules instead and configure mender appropriately.
+
 ## Additional Notes
 
 This project has been initially developed using buildroot [2024.02.11](https://buildroot.org/downloads/buildroot-2024.02.11.tar.gz).
