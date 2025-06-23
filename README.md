@@ -18,6 +18,8 @@ Then use buildroot normally to:
 
 It is also suggested that you __disable__ *the remount rootfs as r/w*, and manage it via /etc/fstab.
 
+__NOTE__: if you specify an additional argument to the script (via the __BR2_ROOTFS_POST_IMAGE_SCRIPT_ARGS__ property) an update file will be generated.
+
 __WARNING__: The script that builds the image needs to perform filesystem operations such as creating
 and mounting btrfs subvolumes, writing files attributes and others that requires the user to be root:
 for this reason the user that runs buildroot __MUST__ a passwordless sudo user! Use a *fedora* Virtual Machine!
