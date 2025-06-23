@@ -92,11 +92,12 @@ then, to update the image upload the .btrfs.xz file to a website and then:
 ```sh
 curl http://192.168.0.93:8080/v1_0.btrfs.xz | xz -d | btrfs receive "/mnt/deployments"
 /mnt/deployments/v1_0/usr/lib/embedded_quickstart/install
-
+btrfs subvolume show /mnt/deployments/v1_0/ # take note of "Subvolume ID"
+btrfs subvolume set-default $subvolid /mnt
 ```
 
 __WARNING__: This method of updating skips every check and can install everything, therefore it is suitable __ONLY__
-for a quick testing. Use mender_modules instead and configure mender appropriately.
+for a quick testing. Use mender_modules instead and configure mender appropriately for updating production devices.
 
 ## Additional Notes
 
