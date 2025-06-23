@@ -25,13 +25,19 @@ DEPLOYMENTS_DATA_DIR="deployments_data"
 OLD_SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$CURRENT_DEPLOYMENT_NAME"
 SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$DEPLOYMENT_NAME"
 
-# here clone the /etc, /var overlay subvolume
+# here clone the /etc, /var overlay subvolumes:
+# these are the overlays with modifications that have to be kept
+# across updates.
 btrfs subvol snapshot "${OLD_SUBVOL_DATA}" "${SUBVOL_DATA}"
 
-# here prepare deployments-specific overlays
+# here prepare deployments-specific /usr overlay
+rmdir "${SUBVOL_DATA}/usr_overlay"
 btrfs subvol create "${SUBVOL_DATA}/usr_overlay"
 mkdir "${SUBVOL_DATA}/usr_overlay/upperdir"
 mkdir "${SUBVOL_DATA}/usr_overlay/workdir"
+
+# here prepare deployments-specific /opt overlay
+rmdir "${SUBVOL_DATA}/opt_overlay"
 btrfs subvol create "${SUBVOL_DATA}/opt_overlay"
 mkdir "${SUBVOL_DATA}/opt_overlay/upperdir"
 mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
