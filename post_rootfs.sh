@@ -21,16 +21,15 @@ source "${CURRENT_SCRIPT_DIR}/utils/btrfs_utils.sh"
 # $BASE_DIR the base output directory 
 # $PARALLEL_JOBS the number of jobs to use when running parallel processes
 
+echo "----------------- Script arguments -----------------------"
 # store arguments in a special array 
 args=("$@") 
 # get number of elements 
 ELEMENTS=${#args[@]} 
- 
-# echo each element in array  
-# for loop 
 for (( i=0;i<$ELEMENTS;i++)); do 
     echo "$i: ${args[${i}]}" 
 done
+echo "----------------------------------------------------------"
 
 # WARNING: this script will work mounting /mnt if not ruunning in buildroot
 TARGET_ROOTFS="${BASE_DIR}/mnt"
@@ -38,9 +37,8 @@ mkdir -p "${TARGET_ROOTFS}"
 
 HOME_SUBVOL_NAME="@home"
 
-# TODO: read the name from somewhere
-#DEPLOYMENT_SUBVOL_NAME=""
-
+# Read the name of the deployment
+DEPLOYMENT_SUBVOL_NAME="${args[1]}"
 if [ -z "$DEPLOYMENT_SUBVOL_NAME" ]; then
     DEPLOYMENT_SUBVOL_NAME="factory"
 fi
