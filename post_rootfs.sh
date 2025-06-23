@@ -12,6 +12,7 @@ CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
 source "${CURRENT_SCRIPT_DIR}/utils/btrfs_utils.sh"
 
+# Buildroot variables
 # $BR2_CONFIG the path to the Buildroot .config file
 # $CONFIG_DIR the directory containing the .config file, and therefore the top-level Buildroot Makefile to use (which is correct for both in-tree and out-of-tree builds)
 # $HOST_DIR $STAGING_DIR $TARGET_DIR
@@ -20,8 +21,20 @@ source "${CURRENT_SCRIPT_DIR}/utils/btrfs_utils.sh"
 # $BASE_DIR the base output directory 
 # $PARALLEL_JOBS the number of jobs to use when running parallel processes
 
-TARGET_ROOTFS="${BASE_DIR}/rootfs_mnt"
-mkdir -p "${BASE_DIR}/rootfs_mnt"
+# store arguments in a special array 
+args=("$@") 
+# get number of elements 
+ELEMENTS=${#args[@]} 
+ 
+# echo each element in array  
+# for loop 
+for (( i=0;i<$ELEMENTS;i++)); do 
+    echo "$i: ${args[${i}]}" 
+done
+
+# WARNING: this script will work mounting /mnt if not ruunning in buildroot
+TARGET_ROOTFS="${BASE_DIR}/mnt"
+mkdir -p "${TARGET_ROOTFS}"
 
 HOME_SUBVOL_NAME="@home"
 
@@ -36,7 +49,7 @@ DEPLOYMENTS_DIR="deployments"
 DEPLOYMENTS_DATA_DIR="deployments_data"
 
 #EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}/"
-EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/"
+readonly EXTRACTED_ROOTFS_HOST_PATH="${TARGET_ROOTFS}/"
 
 export PATH="${HOST_DIR}/bin:${PATH}"
 
