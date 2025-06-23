@@ -85,3 +85,4 @@ This project has been initially developed using buildroot [2024.02.11](https://b
 Other versions known to work are:
   - [2024.11.2](https://buildroot.org/downloads/buildroot-2024.11.2.tar.gz)
   - [2025.02.3](https://buildroot.org/downloads/buildroot-2025.02.3.tar.gz)
+  - [2025.02.3](https://buildroot.org/downloads/buildroot-2025.05.tar.gz)
