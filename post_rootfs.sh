@@ -20,26 +20,4 @@ if [ ! -f "${IMAGE_FILE_PATH}" ]; then
     fi
 fi
 
-echo "----------------- Script arguments -----------------------"
-# store arguments in a special array 
-args=("$@") 
-# get number of elements 
-ELEMENTS=${#args[@]}
-
-if [ $ELEMENTS -lt 2 ]; then
-    echo "Too few arguments provided."
-    exit 1
-fi
-
-for (( i=0;i<$ELEMENTS;i++)); do 
-    echo "$i: ${args[${i}]}" 
-done
-
-if [ -z "$BINARIES_DIR" ]; then
-    echo "Not building as buildroot step: using the first argument as output directory"
-    export BINARIES_DIR="${args[0]}"
-fi
-
-echo "----------------------------------------------------------"
-
 sudo bash "${CURRENT_SCRIPT_DIR}/genimage.sh" $@

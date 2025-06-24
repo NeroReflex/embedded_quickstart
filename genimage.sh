@@ -40,10 +40,7 @@ for (( i=0;i<$ELEMENTS;i++)); do
     echo "$i: ${args[${i}]}" 
 done
 
-if [ -z "$BINARIES_DIR" ]; then
-    echo "Not building as buildroot step: using the first argument as output directory"
-    export BINARIES_DIR="${args[0]}"
-fi
+export BINARIES_DIR="${args[0]}"
 
 echo "----------------------------------------------------------"
 
@@ -157,7 +154,7 @@ fi
 echo "Searching for the rootfs..."
 readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | head -n 1)
 if [ -f "${ROOTFS_TAR_FILE}" ]; then
-    echo "Unpacking '${ROOTFS_TAR_FILE}' inside the deployment subvolume..."
+    echo "Unpacking '${ROOTFS_TAR_FILE}' on the deployment subvolume..."
     tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
     echo "No tar rootfs found."
