@@ -9,26 +9,32 @@ error_handler() {
 # Set the trap to call the error_handler function on ERR
 trap 'error_handler' ERR
 
-CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
-
-CURRENT_DEPLOYMENT_NAME=$(cat "/usr/lib/embedded_quickstart/version")
-
-# Here it is assumed the script is located at /usr/lib/embedded_quickstart
-DEPLOYMENT_NAME=$(cat "$CURRENT_SCRIPT_DIR/version")
+readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
 # this is the place where the subvolid=5 is mounted
-MAIN_SUBVOL_PATH="/mnt"
+readonly MAIN_SUBVOL_PATH="/mnt"
 
-DEPLOYMENTS_DIR="deployments"
-DEPLOYMENTS_DATA_DIR="deployments_data"
+readonly DEPLOYMENTS_DIR="deployments"
+readonly DEPLOYMENTS_DATA_DIR="deployments_data"
 
-OLD_SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$CURRENT_DEPLOYMENT_NAME"
-SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$DEPLOYMENT_NAME"
+# Here it is assumed the script is located at /usr/lib/embedded_quickstart
+readonly DEPLOYMENT_NAME=$(cat "$CURRENT_SCRIPT_DIR/version")
+readonly SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$DEPLOYMENT_NAME"
 
-# here clone the /etc, /var overlay subvolumes:
-# these are the overlays with modifications that have to be kept
-# across updates.
-btrfs subvol snapshot "${OLD_SUBVOL_DATA}" "${SUBVOL_DATA}"
+if [ -f "/usr/lib/embedded_quickstart/version" ]; then
+    readonly CURRENT_DEPLOYMENT_NAME=$(cat "/usr/lib/embedded_quickstart/version")
+    readonly OLD_SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$CURRENT_DEPLOYMENT_NAME"
+
+    # here clone the /etc, /var overlay subvolumes:
+    # these are the overlays with modifications that have to be kept
+    # across updates.
+    btrfs subvol snapshot "${OLD_SUBVOL_DATA}" "${SUBVOL_DATA}"
+else
+    btrfs subvol create "${SUBVOL_DATA}"
+fi
+
+# set /etc and /var overlays as R/W
+btrfs property set -fts "${SUBVOL_DATA}" ro false
 
 # here prepare deployments-specific /usr overlay
 rmdir "${SUBVOL_DATA}/usr_overlay"
