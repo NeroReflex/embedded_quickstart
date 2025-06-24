@@ -1,8 +1,21 @@
 #!/bin/bash
 
+dismantle() {
+    # umount the loopback partition
+    if [ ! -z "${MOUNTED_LOOPBACK_PART}" ]; then
+        sudo umount -R "${MOUNTED_LOOPBACK_PART}"
+    fi
+
+    # umount the loopback device
+    if [ ! -z "${MOUNTED_LOOPBACK}" ]; then
+        sudo losetup -d "${MOUNTED_LOOPBACK}"
+    fi
+}
+
 # Function to handle errors
 error_handler() {
     echo "Error occurred at line: $LINENO"
+    dismantle
 }
 
 # Set the trap to call the error_handler function on ERR
@@ -47,7 +60,7 @@ echo "----------------------------------------------------------"
 TARGET_ROOTFS="${BASE_DIR}/mnt"
 mkdir -p "${TARGET_ROOTFS}"
 
-HOME_SUBVOL_NAME="@home"
+readonly HOME_SUBVOL_NAME="@home"
 
 # Read the name of the deployment
 DEPLOYMENT_SUBVOL_NAME="${args[1]}"
@@ -70,58 +83,75 @@ echo "----------------------------------------------------------"
 
 # Create the image and mount the rootfs
 echo "----------------- Creating Image -------------------------"
-if [ -f "${BUILD_DIR}/image_path" ] && [ -f "${BUILD_DIR}/image_part" ]; then
-    readonly IMAGE_FILE_PATH=$(cat "${BUILD_DIR}/image_path")
-    readonly IMAGE_PART_NUMBER=$(cat "${BUILD_DIR}/image_part")
+readonly IMAGE_FILE_PATH="${BINARIES_DIR}/disk_image.img"
 
-    FS_MODIFY_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/modify_image.sh" "$IMAGE_FILE_PATH" "$IMAGE_PART_NUMBER" "$TARGET_ROOTFS")
-    FS_MODIFY_RESULT=$?
+if ! fallocate -l 1G "${IMAGE_FILE_PATH}"; then
+    echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
+    exit -1
+fi
 
-    echo "$FS_MODIFY_OUTPUT"
-    if [ $FS_MODIFY_RESULT -eq 0 ]; then
-        echo "Image modified: '${IMAGE_FILE_PATH}'"
-        echo "Image mounted: '$TARGET_ROOTFS'"
-    else
-        echo "Unable to modify the image"
-        sudo umount "${TARGET_ROOTFS}"
-        exit -1
-    fi
+readonly LOOPBACK_OUTPUT=$(sudo losetup -P -f --show "${IMAGE_FILE_PATH}")
+readonly LOOPBACK_RESULT=$?
+if [ $LOOPBACK_RESULT -eq 0 ]; then
+    echo "loopback device '$LOOPBACK_OUTPUT'"
+    export MOUNTED_LOOPBACK="${LOOPBACK_OUTPUT}"
 else
-    BTRFS_IMAGE_FILE_PATH="${BINARIES_DIR}/my_btrfs_image.img"
+    echo "ERROR: Cannot setup loop device for file '$IMAGE_FILE_PATH'"
+    exit -1
+fi
 
-    FS_CREATE_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/create_image.sh" "$BTRFS_IMAGE_FILE_PATH" "$TARGET_ROOTFS")
-    FS_CREATE_RESULT=$?
-
-    echo "$FS_CREATE_OUTPUT"
-    if [ $FS_CREATE_RESULT -eq 0 ]; then
-        echo "Image created: '${BTRFS_IMAGE_FILE_PATH}'"
-        echo "Image mounted: '$TARGET_ROOTFS'"
-    else
-        echo "Unable to create the image."
-        sudo umount "${TARGET_ROOTFS}"
+if [ -f "${BINARIES_DIR}/boot-imx" ]; then
+    sudo parted "${LOOPBACK_OUTPUT}" mklabel msdos
+    sudo parted "${LOOPBACK_OUTPUT}" --script mkpart primary btrfs 8MiB 100%
+    echo "Writing the bootloader..."
+    if ! sudo dd if="${BINARIES_DIR}/boot-imx" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
+        echo "ERROR: Could not write boot-imx to image"
+        dismantle
         exit -1
     fi
+    export IMAGE_PART_NUMBER="1"
+else
+    echo "Unsupported hardware."
+    dismantle
+    exit -1
+fi
+
+export LOOPBACK_DEV_PART="${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}"
+if ! sudo mkfs.btrfs -f "${LOOPBACK_DEV_PART}" -L rootfs; then
+    echo "ERROR: Could not format loopback device partition '${LOOPBACK_DEV_PART}'"
+    dismantle
+    exit -1
+fi
+
+readonly FS_MOUNT_OUTPUT=$(sudo mount -t btrfs -o subvolid=5,compress-force=zstd:15,noatime,rw "${LOOPBACK_DEV_PART}" "${TARGET_ROOTFS}")
+readonly FS_MOUNT_RESULT=$?
+if [ $FS_MOUNT_RESULT -eq 0 ]; then
+    echo "Image created: '${IMAGE_FILE_PATH}'"
+    echo "Image mounted: '${LOOPBACK_DEV_PART}' => '${TARGET_ROOTFS}'"
+    export MOUNTED_LOOPBACK_PART="${LOOPBACK_DEV_PART}"
+else
+    echo "ERROR: Could not mount the target loopback partition '${LOOPBACK_DEV_PART}'"
+    dismantle
+    exit -1
 fi
 echo "----------------------------------------------------------"
 
 # Initialize the mounted rootfs
 echo "------------------- root filesystem ----------------------"
-ROOTFS_CREATE_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
-ROOTFS_CREATE_RESULT=$?
+readonly ROOTFS_CREATE_OUTPUT=$(sudo bash "${CURRENT_SCRIPT_DIR}/utils/prepare_rootfs.sh" "$TARGET_ROOTFS" "$HOME_SUBVOL_NAME" "$DEPLOYMENT_SUBVOL_NAME" "$DEPLOYMENTS_DIR" "$DEPLOYMENTS_DATA_DIR")
+readonly ROOTFS_CREATE_RESULT=$?
 
 echo "$ROOTFS_CREATE_OUTPUT"
 if [ $ROOTFS_CREATE_RESULT -eq 0 ]; then
     echo "rootfs initialized: '${TARGET_ROOTFS}'"
 else
     echo "ERROR: Unable to initialize the root filesystem"
-    sudo umount "${TARGET_ROOTFS}"
-    sudo losetup -D
+    dismantle
     exit -1
 fi
 echo "----------------------------------------------------------"
 
 # Get the UUID of the partition
-readonly partuuid=$("${CURRENT_SCRIPT_DIR}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
 readonly REALPATH_EXTRACTED_ROOTFS_HOST_PATH=$(realpath -s "${EXTRACTED_ROOTFS_HOST_PATH}")
 readonly REALPATH_SNAPSHOT=$(realpath -s "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
 
@@ -137,8 +167,7 @@ if [ -f "${ROOTFS_TAR_FILE}" ]; then
     sudo tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
     echo "No tar rootfs found."
-    sudo umount "${TARGET_ROOTFS}"
-    sudo losetup -D
+    dismantle
     exit -1
 fi
 
@@ -160,8 +189,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
 
     if ! sudo ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
         echo "Unable to link /sbin/init -> /usr/bin/stupid1"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
+        dismantle
         exit -1
     fi
 
@@ -169,8 +197,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
         echo "atomrootfsinit has been found: setting it as a second stage after stuPID1."
         if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/init"; then
             echo "Unable to link /usr/bin/init -> /usr/bin/atomrootfsinit"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
+            dismantle
             exit -1
         fi
     fi
@@ -183,8 +210,7 @@ elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
     echo "atomrootfsinit has been found: setting it as first stage."
     if ! sudo ln -sf "/usr/bin/atomrootfsinit" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
         echo "Unable to link /sbin/init -> /usr/bin/atomrootfsinit"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
+        dismantle
         exit -1
     fi
 else
@@ -207,15 +233,13 @@ echo "----------------------------------------------------------"
 
 if ! sudo btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
     echo "Error setting the autologin user's data subvolume"
-    sudo umount "${TARGET_ROOTFS}"
-    sudo losetup -D
+    dismantle
     exit -1
 fi
 
 # if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then
     echo "------------------- /etc/fstab ---------------------------"
-    echo "Setting boot partition to PARTUUID: ${partuuid}"
 
     # write /etc/fstab with mountpoints
     if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
@@ -277,19 +301,17 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
 
     # Change the default subvolid so that the written deployment will get booted
-    ROOTFS_DEFAULT_SUBVOLID=$(sudo "${CURRENT_SCRIPT_DIR}/utils/btrfs_get_subvolid.sh" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
-    ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
+    readonly ROOTFS_DEFAULT_SUBVOLID=$(sudo "${CURRENT_SCRIPT_DIR}/utils/btrfs_get_subvolid.sh" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+    readonly ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
 
     if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
         if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
             echo "ERROR: Invalid subvolid for the rootfs subvolume"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
+            dismantle
             exit -1
         elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
             echo "ERROR: Couldn't identify the correct subvolid of the deployment"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
+            dismantle
             exit -1
         fi
 
@@ -297,14 +319,12 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
             echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
         else
             echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
-            sudo umount "${TARGET_ROOTFS}"
-            sudo losetup -D
+            dismantle
             exit -1
         fi
     else
         echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
-        sudo umount "${TARGET_ROOTFS}"
-        sudo losetup -D
+        dismantle
         exit -1
     fi
 
@@ -312,29 +332,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
 fi
 
 # Umount the filesyste and the loopback device
-sudo umount "${TARGET_ROOTFS}"
-sudo losetup -D
-
-# Write the bootloader to the image
-if [ ! -z "${IMAGE_FILE_PATH}" ]; then
-    LOOPBACK_OUTPUT=$(sudo losetup -P -f --show "${IMAGE_FILE_PATH}")
-    LOOPBACK_RESULT=$?
-    if [ $LOOPBACK_RESULT -eq 0 ]; then
-        if [ -f "${BUILD_DIR}/boot-imx" ]; then
-            echo "Writing the bootloader..."
-            if ! sudo dd if="${BUILD_DIR}/boot-imx" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
-                echo "ERROR: Could not write boot-imx to image"
-                sudo losetup -D
-                exit -1
-            fi
-        fi
-    else
-        echo "ERROR: Cannot setup loop device for file '$IMAGE_FILE_PATH'"
-        exit -1
-    fi
-
-    sudo losetup -D
-fi
+dismantle
 
 sync
 
