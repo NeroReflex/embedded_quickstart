@@ -107,6 +107,8 @@ else
     exit -1
 fi
 
+sync
+
 export LOOPBACK_DEV_PART="${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}"
 if ! mkfs.btrfs -f "${LOOPBACK_DEV_PART}" -L rootfs; then
     echo "ERROR: Could not format loopback device partition '${LOOPBACK_DEV_PART}'"
@@ -335,4 +337,6 @@ dismantle
 
 sync
 
+echo ""
+echo ""
 echo "Image generated successfully!"
