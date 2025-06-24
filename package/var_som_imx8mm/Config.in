@@ -1,6 +1,7 @@
 config BR2_PACKAGE_VAR_SOM_IMX8MM
 	bool "Variscite SoM i-MX8M Mini"
     select BR2_PACKAGE_VARISCITE
+	select BR2_PACKAGE_HOST_IMX_MKIMAGE_POST
 	depends on BR2_PACKAGE_SYSTEMD
 	help
 		Enable features specific to the Variscite i.MX8M Mini SoM
