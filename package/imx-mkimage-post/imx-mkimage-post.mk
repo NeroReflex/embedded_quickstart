@@ -28,7 +28,7 @@ endef
 
 # Define the install commands
 define HOST_IMX_MKIMAGE_POST_INSTALL_CMDS
-    $(shell cp $(@D)/$(BR2_EQ_IMX_MKIMAGE_POST_SOC_DIR)/flash.bin $(BINARIES_DIR)/boot-imx) \
+    $(shell cp $(@D)/$(BR2_EQ_IMX_MKIMAGE_POST_SOC_DIR)/flash.bin $(BINARIES_DIR)/imx-boot) \
     $(INSTALL) -D -m 0755 mkimage_imx8 $(HOST_DIR)/usr/bin/mkimage_imx8
 endef
 

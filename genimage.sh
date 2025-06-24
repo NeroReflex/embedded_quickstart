@@ -91,12 +91,12 @@ else
     exit -1
 fi
 
-if [ -f "${BINARIES_DIR}/boot-imx" ]; then
+if [ -f "${BINARIES_DIR}/imx-boot" ]; then
     parted -s "${LOOPBACK_OUTPUT}" mklabel msdos
     parted -s "${LOOPBACK_OUTPUT}" --script mkpart primary btrfs 8MiB 100%
     echo "Writing the bootloader..."
-    if ! dd if="${BINARIES_DIR}/boot-imx" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
-        echo "ERROR: Could not write boot-imx to image"
+    if ! dd if="${BINARIES_DIR}/imx-boot" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
+        echo "ERROR: Could not write imx-boot to image"
         dismantle
         exit -1
     fi
