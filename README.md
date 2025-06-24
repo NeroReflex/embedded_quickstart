@@ -7,6 +7,23 @@ capabilities for remote support.
 Minimal yocto support is also in-development: this is used to create a disk image in
 a way that the updater of choice can use.
 
+## Yocto
+
+To use yocto you will need to ensure the bootloader and the kernel are both compiled with btrfs
+support, and in case of the kernel such support is linked inside the kernel (__BTRFS_FS__ is *y* and not *m*).
+
+Once the rootfs and additional booting files have been generated you have to call this script like this:
+
+```sh
+sudo bash ./genimage.sh /path/to/yocto/build-imx8mm-var-dart/tmp/deploy/images/imx8mm-var-dart/ factory
+```
+
+And a disk_image.img will be generated. The hardware type is deducted from the presence of files in the build
+result, so if you see *Unsupported hardware.* you will need to add support for your hardware.
+
+To add support to a new hardware add partitions in a way the hardware will boot and as the last partition on the
+disk put the rootfs.
+
 ## Usage
 
 Configure buildroot initially with
