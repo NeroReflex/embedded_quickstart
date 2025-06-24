@@ -225,11 +225,15 @@ echo "----------------------------------------------------------"
 # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
 # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
 
+echo "------------------ Autologin ----------------------------"
+
 if ! btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
     echo "Error setting the autologin user's data subvolume"
     dismantle
     exit -1
 fi
+
+echo "----------------------------------------------------------"
 
 # if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then
