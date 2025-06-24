@@ -25,10 +25,22 @@ echo "----------------- Script arguments -----------------------"
 # store arguments in a special array 
 args=("$@") 
 # get number of elements 
-ELEMENTS=${#args[@]} 
+ELEMENTS=${#args[@]}
+
+if [ $ELEMENTS -lt 2 ]; then
+    echo "Too few arguments provided."
+    exit 1
+fi
+
 for (( i=0;i<$ELEMENTS;i++)); do 
     echo "$i: ${args[${i}]}" 
 done
+
+if [ -z "$BINARIES_DIR" ]; then
+    echo "Not building as buildroot step: using the first argument as output directory"
+    export BINARIES_DIR="${args[0]}"
+fi
+
 echo "----------------------------------------------------------"
 
 # WARNING: this script will work mounting /mnt if not ruunning in buildroot
@@ -118,10 +130,12 @@ if [ ! -d "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" ]; then
     sudo btrfs subvolume create "${EXTRACTED_ROOTFS_HOST_PATH}"
 fi
 
-if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
-    sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
+echo "Searching for the rootfs..."
+readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | head -n 1)
+if [ -f "${ROOTFS_TAR_FILE}" ]; then
+    sudo tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
-    echo "No tar rootfs found in '${BINARIES_DIR}/rootfs.tar'"
+    echo "No tar rootfs found."
     sudo umount "${TARGET_ROOTFS}"
     sudo losetup -D
     exit -1
