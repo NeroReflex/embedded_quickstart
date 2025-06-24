@@ -133,6 +133,7 @@ fi
 echo "Searching for the rootfs..."
 readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | head -n 1)
 if [ -f "${ROOTFS_TAR_FILE}" ]; then
+    echo "Unpacking the rootfs inside the deployment subvolume..."
     sudo tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
     echo "No tar rootfs found."
