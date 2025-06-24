@@ -4,6 +4,9 @@ This is a collection of buildroot utilities used to quickly bootstrap linux embe
 applications, featuring a full-wayland embedded session with remote administration
 capabilities for remote support.
 
+Minimal yocto support is also in-development: this is used to create a disk image in
+a way that the updater of choice can use.
+
 ## Usage
 
 Configure buildroot initially with
@@ -84,7 +87,7 @@ You can read more about winpr-makecert [here](https://manpages.debian.org/testin
 You can use this command to flash the resulting image after uploading it to a website:
 
 ```sh
-curl http://192.168.0.93:8080/sd.img > /dev/mmcblk2
+curl http://192.168.0.93:8080/disk_image.img > /dev/mmcblk2
 ```
 
 then, to update the image upload the .btrfs.xz file to a website and then:
@@ -98,6 +101,12 @@ btrfs subvolume set-default $subvolid /mnt
 
 __WARNING__: This method of updating skips every check and can install everything, therefore it is suitable __ONLY__
 for a quick testing. Use mender_modules instead and configure mender appropriately for updating production devices.
+
+## Adding support for a device
+
+To add support for a new (family) of device(s) edit post_rootfs.sh and create a specific case catching your required disk layout.
+
+Search for 'Unsupported hardware.' in the source code.
 
 ## Additional Notes
 
