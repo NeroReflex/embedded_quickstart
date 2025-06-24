@@ -42,4 +42,4 @@ fi
 
 echo "----------------------------------------------------------"
 
-sudo bash "${CURRENT_SCRIPT_DIR}/genimage.sh" $args
+sudo bash "${CURRENT_SCRIPT_DIR}/genimage.sh" $@
