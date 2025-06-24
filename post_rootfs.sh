@@ -110,8 +110,14 @@ echo "----------------------------------------------------------"
 
 # Get the UUID of the partition
 readonly partuuid=$("${CURRENT_SCRIPT_DIR}/utils/get_uuid.sh" "${TARGET_ROOTFS}")
+readonly REALPATH_EXTRACTED_ROOTFS_HOST_PATH=$(realpath -s "${EXTRACTED_ROOTFS_HOST_PATH}")
+readonly REALPATH_SNAPSHOT=$(realpath -s "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
 
 echo "---------------- Filesystem ------------------------------"
+if [ ! -d "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" ]; then
+    sudo btrfs subvolume create "${EXTRACTED_ROOTFS_HOST_PATH}"
+fi
+
 if [ -f "${BINARIES_DIR}/rootfs.tar" ]; then
     sudo tar xpf "${BINARIES_DIR}/rootfs.tar" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
@@ -248,8 +254,8 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
     # Generate the deployment snapshot
-    export REALPATH_EXTRACTED_ROOTFS_HOST_PATH=$(realpath -s "${EXTRACTED_ROOTFS_HOST_PATH}")
-    export REALPATH_SNAPSHOT=$(realpath -s "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+    readonly REALPATH_EXTRACTED_ROOTFS_HOST_PATH=$(realpath -s "${EXTRACTED_ROOTFS_HOST_PATH}")
+    readonly REALPATH_SNAPSHOT=$(realpath -s "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
     if [[ "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" != "$REALPATH_SNAPSHOT" ]]; then
         sudo btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
     fi
