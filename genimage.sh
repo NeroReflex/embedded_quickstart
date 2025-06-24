@@ -235,102 +235,103 @@ fi
 
 echo "----------------------------------------------------------"
 
-# if we are creating a mender-compatible deployment create a ro filesystem and mount required things appropriately
-if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]; then
-    echo "------------------- /etc/fstab ---------------------------"
+echo "------------------- /etc/fstab ---------------------------"
 
-    # write /etc/fstab with mountpoints
-    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
-        echo "LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-        echo "LABEL=rootfs /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd 0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    else
-        echo "/dev/root /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd       0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-        echo "/dev/root /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    fi
+# write /etc/fstab with mountpoints
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
+    echo "LABEL=rootfs /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "LABEL=rootfs /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd 0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+else
+    echo "/dev/root /home btrfs   rw,noatime,subvol=/${HOME_SUBVOL_NAME},skip_balance,compress=zstd       0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+    echo "/dev/root /mnt btrfs   remount,rw,noatime,x-initrd.mount,subvol=/,skip_balance,compress=zstd    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+fi
 
-    # [1] following two lines makes systemd believe it's running in degraded mode because even if ro is specified the work directory is being created (and thus that fails)
-    #echo "overlay /usr  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null                              0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    #echo "overlay /opt  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null                              0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    echo "overlay /root overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/root,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null 0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    echo "overlay /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/etc,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
-    echo "overlay /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/var,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+# [1] following two lines makes systemd believe it's running in degraded mode because even if ro is specified the work directory is being created (and thus that fails)
+#echo "overlay /usr  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null                              0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+#echo "overlay /opt  overlay ro,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null                              0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+echo "overlay /root overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/root,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null 0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+echo "overlay /etc  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/etc,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
+echo "overlay /var  overlay remount,rw,noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/var,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null    0  0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/fstab"
 
-    # since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
-    # if it is available then configure atomrootfsinit to pre-mount /etc and /var
-    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
-        # kernel auto-mounts /dev
-        #echo "dev                   /mnt/dev  devtmpfs rw 0 0" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+echo "----------------------------------------------------------"
 
-        echo "dev     /mnt/dev  devtmpfs rw 0 0" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "proc    /mnt/proc proc     rw 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "sys     /mnt/sys  sysfs    rw 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "rootdev /mnt/mnt  btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "overlay /mnt/root overlay  rw,noatime,lowerdir=/mnt/root,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "overlay /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-        echo "overlay /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
-    fi
+# since systemd wants to write /etc/machine-id before mounting things in /etc/fstab and missing /etc/machine-id means dbus-broker breaking
+# if it is available then configure atomrootfsinit to pre-mount /etc and /var
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
+    # kernel auto-mounts /dev
+    #echo "dev                   /mnt/dev  devtmpfs rw 0 0" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
 
-    # see [1]
-    #echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
-    #echo "btrfs property set -fts /mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay ro false" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
-    #echo "btrfs property set -fts /mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay ro false" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
-    #echo "mount -t overlay -o remount,rw,noatime,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null overlay /usr" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
-    #echo "mount -t overlay -o remount,rw,noatime,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null overlay /opt" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
+    echo "dev     /mnt/dev  devtmpfs rw 0 0" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "proc    /mnt/proc proc     rw 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "sys     /mnt/sys  sysfs    rw 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "rootdev /mnt/mnt  btrfs    rw,noatime,subvol=/,skip_balance,compress=zstd 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "overlay /mnt/root overlay  rw,noatime,lowerdir=/mnt/root,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off 0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "overlay /mnt/etc  overlay  rw,noatime,lowerdir=/mnt/etc,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/etc_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+    echo "overlay /mnt/var  overlay  rw,noatime,lowerdir=/mnt/var,upperdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/upperdir,workdir=/mnt/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off    0 0" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdtab"
+fi
 
-    #echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
+# see [1]
+#echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
+#echo "btrfs property set -fts /mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay ro false" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
+#echo "btrfs property set -fts /mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay ro false" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
+#echo "mount -t overlay -o remount,rw,noatime,lowerdir=/usr,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null overlay /usr" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
+#echo "mount -t overlay -o remount,rw,noatime,lowerdir=/opt,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/opt_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null overlay /opt" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
 
-    # prapare the deployment snapshot
-    mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
-    echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
+#echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
-    install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/install"
-    install -D -m 755 "${CURRENT_SCRIPT_DIR}/uninstall.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/uninstall"
+# prapare the deployment snapshot
+mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
+echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
 
-    # Seal the roofs
-    echo "Sealing the BTRFS subvolume containing the rootfs"
-    btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
+install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/install"
+install -D -m 755 "${CURRENT_SCRIPT_DIR}/uninstall.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/uninstall"
 
-    echo "Sealing the main subvolume"
-    btrfs property set -fts "${TARGET_ROOTFS}" ro true
+echo "--------------------- BTRFS ------------------------------"
 
-    # Generate the deployment snapshot
-    if [[ "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" != "$REALPATH_SNAPSHOT" ]]; then
-        btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
-    fi
-    
-    btrfs send "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}" > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs"
-    cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
+# Seal the roofs
+echo "Sealing the BTRFS subvolume containing the rootfs"
+btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
-    # Change the default subvolid so that the written deployment will get booted
-    readonly ROOTFS_DEFAULT_SUBVOLID=$("${CURRENT_SCRIPT_DIR}/utils/btrfs_get_subvolid.sh" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
-    readonly ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
+echo "Sealing the main subvolume"
+btrfs property set -fts "${TARGET_ROOTFS}" ro true
 
-    if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
-        if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
-            echo "ERROR: Invalid subvolid for the rootfs subvolume"
-            dismantle
-            exit -1
-        elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
-            echo "ERROR: Couldn't identify the correct subvolid of the deployment"
-            dismantle
-            exit -1
-        fi
+# Generate the deployment snapshot
+if [[ "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" != "$REALPATH_SNAPSHOT" ]]; then
+    btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
+fi
 
-        if btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
-            echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
-        else
-            echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
-            dismantle
-            exit -1
-        fi
-    else
-        echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
+btrfs send "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}" > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs"
+cat "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs" | xz -9e --memory=95% -T0 > "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
+
+# Change the default subvolid so that the written deployment will get booted
+readonly ROOTFS_DEFAULT_SUBVOLID=$("${CURRENT_SCRIPT_DIR}/utils/btrfs_get_subvolid.sh" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
+readonly ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT=$?
+
+if [ $ROOTFS_DEFAULT_SUBVOLID_FETCH_RESULT -eq 0 ]; then
+    if [ "${ROOTFS_DEFAULT_SUBVOLID}" = "5" ]; then
+        echo "ERROR: Invalid subvolid for the rootfs subvolume"
+        dismantle
+        exit -1
+    elif [ -z "${ROOTFS_DEFAULT_SUBVOLID}" ]; then
+        echo "ERROR: Couldn't identify the correct subvolid of the deployment"
         dismantle
         exit -1
     fi
 
-    echo "----------------------------------------------------------"
+    if btrfs subvolume set-default "${ROOTFS_DEFAULT_SUBVOLID}" "${TARGET_ROOTFS}"; then
+        echo "Default subvolume for rootfs set to $ROOTFS_DEFAULT_SUBVOLID"
+    else
+        echo "ERROR: Could not change the default subvolid of '${TARGET_ROOTFS}' to subvolid=$ROOTFS_DEFAULT_SUBVOLID"
+        dismantle
+        exit -1
+    fi
+else
+    echo "ERROR: Unable to identify the subvolid for the rootfs subvolume"
+    dismantle
+    exit -1
 fi
+
+echo "----------------------------------------------------------"
 
 # Umount the filesyste and the loopback device
 dismantle
