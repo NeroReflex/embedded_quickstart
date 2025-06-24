@@ -254,8 +254,6 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/mender/modules/v3/deployment" ]
     sudo btrfs property set -fts "${EXTRACTED_ROOTFS_HOST_PATH}" ro true
 
     # Generate the deployment snapshot
-    readonly REALPATH_EXTRACTED_ROOTFS_HOST_PATH=$(realpath -s "${EXTRACTED_ROOTFS_HOST_PATH}")
-    readonly REALPATH_SNAPSHOT=$(realpath -s "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}")
     if [[ "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" != "$REALPATH_SNAPSHOT" ]]; then
         sudo btrfs subvolume snapshot -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
     fi
