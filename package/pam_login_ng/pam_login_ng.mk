@@ -1,8 +1,8 @@
-PAM_LOGIN_NG_VERSION = $(LOGIN_NG_VERSION)
+PAM_LOGIN_NG_VERSION = 0.7.0
 PAM_LOGIN_NG_LICENSE = GPL-2.0-or-later
-PAM_LOGIN_NG_SITE = $(call github,NeroReflex,login-ng,$(PAM_LOGIN_NG_VERSION))
+PAM_LOGIN_NG_SITE = $(call github,NeroReflex,pam_login_ng,$(PAM_LOGIN_NG_VERSION))
 PAM_LOGIN_NG_DEPENDENCIES = host-rustc
-PAM_LOGIN_NG_SUBDIR = pam_login_ng
+#PAM_LOGIN_NG_SUBDIR = pam_login_ng
 PAM_LOGIN_NG_INSTALL_STAGING = YES
 
 # ls -lah /usr say this: lib64 -> lib

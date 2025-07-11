@@ -1,9 +1,9 @@
 LOGIN_NG_CTL_VERSION = $(LOGIN_NG_VERSION)
 LOGIN_NG_CTL_LICENSE = GPL-2.0-or-later
-LOGIN_NG_CTL_SITE = $(call github,NeroReflex,login-ng,$(LOGIN_NG_CTL_VERSION))
+LOGIN_NG_CTL_SITE = $(call github,NeroReflex,login_ng,$(LOGIN_NG_CTL_VERSION))
 LOGIN_NG_CTL_DEPENDENCIES = host-rustc
 LOGIN_NG_CTL_INSTALL_STAGING = YES
-LOGIN_NG_CTL_SUBDIR = login_ng-ctl
+#LOGIN_NG_CTL_SUBDIR = login_ng-ctl
 LOGIN_NG_CTL_CARGO_BUILD_OPTS = --all-features
 LOGIN_NG_CTL_CARGO_INSTALL_OPTS = --all-features
 
