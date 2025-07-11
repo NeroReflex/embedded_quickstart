@@ -12,7 +12,7 @@ SRCREV = "a72a37b56f6869ef6eaa1cfeb78dbf048c494980"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "login_ng-session"
 
-INHERIT += "no-checksum"
+BB_STRICT_CHECKSUM = "0"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched

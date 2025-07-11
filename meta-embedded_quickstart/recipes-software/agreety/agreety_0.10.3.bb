@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "agreety"
 PV:append = ".AUTOINC+827c90d053"
 
-INHERIT += "no-checksum"
+BB_STRICT_CHECKSUM = "0"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched
