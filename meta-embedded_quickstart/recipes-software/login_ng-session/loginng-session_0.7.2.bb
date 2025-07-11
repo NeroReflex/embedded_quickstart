@@ -7,7 +7,7 @@ inherit cargo
 
 # how to get login_ng-session could be as easy as but default to a git checkout:
 # SRC_URI += "crate://crates.io/login_ng-session/0.7.2"
-SRC_URI += "git://git@github.com/NeroReflex/login_ng-session.git;protocol=ssh;nobranch=1;branch=main"
+SRC_URI += "git://github.com/NeroReflex/login_ng-session.git;protocol=https;nobranch=1;branch=main"
 SRCREV = "a72a37b56f6869ef6eaa1cfeb78dbf048c494980"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "login_ng-session"

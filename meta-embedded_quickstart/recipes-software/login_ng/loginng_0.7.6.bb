@@ -5,13 +5,13 @@ inherit cargo
 # If this is git based prefer versioned ones if they exist
 # DEFAULT_PREFERENCE = "-1"
 
-# how to get pam_login_ng could be as easy as but default to a git checkout:
-# SRC_URI += "crate://crates.io/pam_login_ng/0.7.1"
-SRC_URI += "git://git@github.com/NeroReflex/pam_login_ng.git;protocol=ssh;nobranch=1;branch=main"
-SRCREV = "e51a8b79d43fa1b5b7b7cf0946b1a889d2cca6b4"
+# how to get login_ng could be as easy as but default to a git checkout:
+# SRC_URI += "crate://crates.io/login_ng/0.7.6"
+SRC_URI += "git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;branch=main"
+SRCREV = "832309dff2b99035192ebe3d5e0bd258cd987462"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
-
+PV:append = ".AUTOINC+832309dff2"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched
@@ -244,28 +244,23 @@ SRC_URI += " \
     crate://crates.io/zvariant/5.6.0 \
     crate://crates.io/zvariant_derive/5.6.0 \
     crate://crates.io/zvariant_utils/3.2.0 \
-    git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;name=login_ng;destsuffix=login_ng \
     git://github.com/NeroReflex/pam-rs.git;protocol=https;nobranch=1;name=pam;destsuffix=pam \
 "
 
-SRCREV_FORMAT .= "_login_ng"
-SRCREV_login_ng = "d42d3cd30b91868d63ea5cf1ec67f6565cba26a3"
-EXTRA_OECARGO_PATHS += "${WORKDIR}/login_ng"
 SRCREV_FORMAT .= "_pam"
 SRCREV_pam = "668eef5be397993489cdeddce64ded072fb330ff"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/pam"
 
-# FIXME: update generateme with the real MD5 of the license file
 LIC_FILES_CHKSUM = " \
     file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
 "
 
-SUMMARY = "Additional pam module and service to login the user."
+SUMMARY = "A set of software and utilities for managing every aspect of user login."
 HOMEPAGE = "https://github.com/NeroReflex/login_ng"
 LICENSE = "LICENSE.md"
 
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
 # what cargo-bitbake generates.
-include pam_login_ng-${PV}.inc
-include pam_login_ng.inc
+include login_ng-${PV}.inc
+include login_ng.inc
