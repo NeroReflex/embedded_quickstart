@@ -12,6 +12,7 @@ SRCREV = "e51a8b79d43fa1b5b7b7cf0946b1a889d2cca6b4"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
+INHERIT += "no-checksum"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched
