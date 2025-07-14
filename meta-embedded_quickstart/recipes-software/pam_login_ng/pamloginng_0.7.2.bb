@@ -8,11 +8,17 @@ inherit cargo
 # how to get pam_login_ng could be as easy as but default to a git checkout:
 # SRC_URI += "crate://crates.io/pam_login_ng/0.7.1"
 SRC_URI += "git://github.com/NeroReflex/pam_login_ng.git;protocol=https;nobranch=1;branch=main"
-SRCREV = "e51a8b79d43fa1b5b7b7cf0946b1a889d2cca6b4"
+SRCREV = "4afb8d1ca8627538786c8e92f69260fbd39fbae2"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
+PV:append = ".AUTOINC+4afb8d1ca8"
 
 BB_STRICT_CHECKSUM = "0"
+
+DEPENDS = "libpam"
+
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "pam"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched
