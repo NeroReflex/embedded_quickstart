@@ -6,12 +6,10 @@ inherit cargo
 # DEFAULT_PREFERENCE = "-1"
 
 # how to get login_ng could be as easy as but default to a git checkout:
-# SRC_URI += "crate://crates.io/login_ng/0.7.6"
 SRC_URI += "git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;branch=main"
-SRCREV = "52ca72f044bb67d7f6eb28746aef4359ace155e8"
+SRCREV = "0.7.7"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
-PV:append = ".AUTOINC+832309dff2"
 
 DEPENDS = "libpam"
 
