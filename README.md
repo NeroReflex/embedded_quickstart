@@ -132,3 +132,4 @@ Other versions known to work are:
   - [2024.11.2](https://buildroot.org/downloads/buildroot-2024.11.2.tar.gz)
   - [2025.02.3](https://buildroot.org/downloads/buildroot-2025.02.3.tar.gz)
   - [2025.02.3](https://buildroot.org/downloads/buildroot-2025.05.tar.gz)
+  - __655300a1be9957694ec68267ebfcf2c9187687ce__
