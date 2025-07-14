@@ -254,10 +254,10 @@ SRC_URI += " \
 "
 
 SRCREV_FORMAT .= "_login_ng"
-SRCREV_login_ng = "d42d3cd30b91868d63ea5cf1ec67f6565cba26a3"
+SRCREV_login_ng = "0.7.7"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/login_ng"
 SRCREV_FORMAT .= "_pam"
-SRCREV_pam = "668eef5be397993489cdeddce64ded072fb330ff"
+SRCREV_pam = "df1af6e748da8b271bba06bb4f744b5ebd229815"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/pam"
 
 # FIXME: update generateme with the real MD5 of the license file

@@ -482,7 +482,7 @@ SRC_URI[zvariant_derive-5.6.0.sha256sum] = "3a8c68501be459a8dbfffbe5d792acdd23b4
 SRC_URI[zvariant_utils-3.2.0.sha256sum] = "e16edfee43e5d7b553b77872d99bc36afdda75c223ca7ad5e3fbecd82ca5fc34"
 
 SRCREV_FORMAT .= "_pam"
-SRCREV_pam = "668eef5be397993489cdeddce64ded072fb330ff"
+SRCREV_pam = "df1af6e748da8b271bba06bb4f744b5ebd229815"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/pam"
 
 LIC_FILES_CHKSUM = " \
