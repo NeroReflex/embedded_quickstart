@@ -13,6 +13,11 @@ S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "greetd"
 PV:append = ".AUTOINC+ba4fb04123"
 
+DEPENDS = "libpam"
+
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "pam"
+
 BB_STRICT_CHECKSUM = "0"
 
 # please note if you have entries that do not begin with crate://
