@@ -160,16 +160,14 @@ SRC_URI += " \
     crate://crates.io/zvariant_utils/3.2.0 \
 "
 
-
-
-# FIXME: update generateme with the real MD5 of the license file
-LIC_FILES_CHKSUM = " \
-    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
-"
+#LIC_FILES_CHKSUM = " \
+#    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
+#"
 
 SUMMARY = "A manager for user sessions."
-HOMEPAGE = "https://github.com/NeroReflex/login_ng"
-LICENSE = "LICENSE.md"
+HOMEPAGE = "https://github.com/NeroReflex/login_ng-session"
+#LICENSE = "LICENSE.md"
+LICENSE = "CLOSED"
 
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
