@@ -80,15 +80,14 @@ SRC_URI += " \
     crate://crates.io/windows_x86_64_msvc/0.52.5 \
 "
 
-
-
-LIC_FILES_CHKSUM = " \
-    file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464 \
-"
+#LIC_FILES_CHKSUM = " \
+#    file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464 \
+#"
 
 SUMMARY = "greetd"
 HOMEPAGE = "https://kl.wtf/projects/greetd"
-LICENSE = "LICENSE.md"
+#LICENSE = "LICENSE.md"
+LICENSE = "CLOSED"
 
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from

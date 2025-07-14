@@ -485,13 +485,14 @@ SRCREV_FORMAT .= "_pam"
 SRCREV_pam = "df1af6e748da8b271bba06bb4f744b5ebd229815"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/pam"
 
-LIC_FILES_CHKSUM = " \
-    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
-"
+#LIC_FILES_CHKSUM = " \
+#    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
+#"
 
 SUMMARY = "A set of software and utilities for managing every aspect of user login."
 HOMEPAGE = "https://github.com/NeroReflex/login_ng"
-LICENSE = "LICENSE.md"
+#LICENSE = "LICENSE.md"
+LICENSE = "CLOSED"
 
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
