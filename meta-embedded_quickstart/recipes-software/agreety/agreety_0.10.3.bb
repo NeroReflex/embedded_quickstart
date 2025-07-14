@@ -7,11 +7,11 @@ inherit cargo
 
 # how to get agreety could be as easy as but default to a git checkout:
 # SRC_URI += "crate://crates.io/agreety/0.10.3"
-SRC_URI += "git://git.sr.ht/~kennylevinsen/greetd;protocol=https;nobranch=1"
-SRCREV = "827c90d05332bf929391ef5e4533189027ab289b"
+SRC_URI += "git://github.com/Mitec-Elettronica-Srl/greetd.git;protocol=https;nobranch=1"
+SRCREV = "ba4fb041235b72a62ef6baeafaf2a8b671d13677"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "agreety"
-PV:append = ".AUTOINC+827c90d053"
+PV:append = ".AUTOINC+ba4fb04123"
 
 BB_STRICT_CHECKSUM = "0"
 
