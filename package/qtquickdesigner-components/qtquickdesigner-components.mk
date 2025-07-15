@@ -1,6 +1,6 @@
 QTQUICKDESIGNER_COMPONENTS_LICENSE = GPL-3.0
 QTQUICKDESIGNER_COMPONENTS_VERSION = 4.7
-QTQUICKDESIGNER_COMPONENTS_SITE = https://github.com/qt-labs/qtquickdesigner-components/archive/refs/tags/
+QTQUICKDESIGNER_COMPONENTS_SITE = https://github.com/qt-labs/qtquickdesigner-components/archive/refs/tags
 QTQUICKDESIGNER_COMPONENTS_SOURCE = qds-dev-4.7.tar.gz
 QTQUICKDESIGNER_COMPONENTS_DEPENDENCIES = qt6base qt6declarative host-pkgconf
 QTQUICKDESIGNER_COMPONENTS_INSTALL_STAGING = YES
