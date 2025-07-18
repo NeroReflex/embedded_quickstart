@@ -7,16 +7,10 @@ LOGIN_NG_CLI_INSTALL_STAGING = YES
 LOGIN_NG_CLI_CARGO_BUILD_OPTS = --all-features
 LOGIN_NG_CLI_CARGO_INSTALL_OPTS = --all-features
 
-define LOGIN_NG_CLI_FIX_STAGING_GREETD_CONFIG
-	$(SED) 's|agreety --cmd /bin/sh|/usr/bin/login_ng-cli --autologin true|' $(TARGET_DIR)/etc/greetd/config.toml
-endef
-
 define LOGIN_NG_CLI_POST_INSTALL
 	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login_ng-cli/login_ng.pam $(TARGET_DIR)/etc/pam.d/login_ng
 	$(INSTALL) -D -m 644 $(BR2_EXTERNAL_EMBEDDED_QUICKSTART_PATH)/package/login_ng-cli/login_ng-autologin.pam $(TARGET_DIR)/etc/pam.d/login_ng-autologin
 endef
-
-LOGIN_NG_CLI_POST_INSTALL_STAGING_HOOKS += LOGIN_NG_CLI_FIX_STAGING_GREETD_CONFIG
 
 LOGIN_NG_CLI_POST_INSTALL_TARGET_HOOKS += LOGIN_NG_CLI_POST_INSTALL
 

@@ -220,11 +220,19 @@ fi
 
 echo "----------------------------------------------------------"
 
+echo "-------------------- login_ng ----------------------------"
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml" ] && [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-cli" ]; then
+    sed -i 's|agreety --cmd /bin/sh|/usr/bin/login_ng-cli --autologin true|' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+fi
+
+echo "----------------------------------------------------------"
+
 # TODO: symlink '/home/user/.config/systemd/user/dbus.service' → '/usr/lib/systemd/user/dbus-broker.service'
 # TODO: symlink '/home/user/.config/systemd/user/pipewire-session-manager.service' → '/usr/lib/systemd/user/wireplumber.service'.
 # TODO: symlink '/home/user/.config/systemd/user/pipewire.service.wants/wireplumber.service' → '/usr/lib/systemd/user/wireplumber.service'.
 
-echo "------------------ Autologin ----------------------------"
+echo "-------------------- Autologin ---------------------------"
 
 if ! btrfs subvol create "${TARGET_ROOTFS}/user_data"; then
     echo "Error setting the autologin user's data subvolume"
