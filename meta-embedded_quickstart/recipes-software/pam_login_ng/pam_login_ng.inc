@@ -18,7 +18,7 @@ do_install:append () {
             ${D}${datadir}/dbus-1/system.d/org.neroreflex.login_ng_session.conf
 
     install -d ${D}${systemd_unitdir}/system
-    install -Dm644 ${S}/rootfs/usr/lib/systemd/system/pam_login_ng.service ${systemd_unitdir}/system/pam_login_ng.service
+    install -Dm644 ${S}/rootfs/usr/lib/systemd/system/pam_login_ng.service ${D}${systemd_unitdir}/system/pam_login_ng.service
 
     install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
     ln -sf ${systemd_unitdir}/system/pam_login_ng.service \
