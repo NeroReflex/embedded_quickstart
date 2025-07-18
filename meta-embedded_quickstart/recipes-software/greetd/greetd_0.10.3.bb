@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "greetd"
 PV:append = ".AUTOINC+ba4fb04123"
 
-DEPENDS = "libpam"
+DEPENDS = "libpam seatd"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
