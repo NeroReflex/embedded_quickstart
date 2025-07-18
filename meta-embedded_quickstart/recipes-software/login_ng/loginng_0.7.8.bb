@@ -7,16 +7,14 @@ inherit cargo
 
 # how to get login_ng could be as easy as but default to a git checkout:
 SRC_URI += "git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;branch=main"
-SRCREV = "0.7.7"
+SRCREV = "0.7.8"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-DEPENDS = "libpam"
+DEPENDS = "libpam greetd"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
-
-BB_STRICT_CHECKSUM = "0"
 
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched

@@ -18,8 +18,6 @@ DEPENDS = "libpam seatd"
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-BB_STRICT_CHECKSUM = "0"
-
 # please note if you have entries that do not begin with crate://
 # you must change them to how that package can be fetched
 SRC_URI += " \
