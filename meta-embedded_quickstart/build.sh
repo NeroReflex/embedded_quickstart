@@ -18,3 +18,6 @@ if [ -z "$CURRENT_SCRIPT_DIR" ]; then
 fi
 
 sudo bash "$CURRENT_SCRIPT_DIR/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/" "factory"
+
+rm -f disk_image.img
+ln -sf "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/disk_image.img" "disk_image.img"
