@@ -11,8 +11,6 @@ SRCREV = "0.7.4"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-BB_STRICT_CHECKSUM = "0"
-
 DEPENDS = "libpam"
 
 inherit features_check
