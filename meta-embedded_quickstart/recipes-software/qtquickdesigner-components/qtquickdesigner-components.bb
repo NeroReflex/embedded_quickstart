@@ -1,7 +1,7 @@
 SUMMARY = "QtQuickDesigner Studio components"
 LICENSE = "CLOSED"
 
-inherit cmake
+inherit qt6-cmake
 
 DEPENDS += "qtbase qtdeclarative"
 
