@@ -10,5 +10,7 @@ do_install:append () {
 			${D}${sysconfdir}/systemd/system/multi-user.target.wants/seatd.service
 }
 
+FILES:${PN} += "${systemd_unitdir}/system/seatd.service ${sysconfdir}/greetd/config.toml"
+
 USERADD_PACKAGES = "greeter"
 GROUPADD_PARAM:greeter = "-r seat audio video"
