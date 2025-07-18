@@ -13,6 +13,8 @@ fi
 
 source setup-environment.sh && bitbake meta-b2qt-embedded-qbsp
 
-pwd
+if [ -z "$CURRENT_SCRIPT_DIR" ]; then
+    CURRENT_SCRIPT_DIR="."
+fi
 
-#sudo bash "$CURRENT_SCRIPT_DIR/../genimage.sh" "$CURRENT_SCRIPT_DIR/../genimage.sh" 
+sudo bash "$CURRENT_SCRIPT_DIR/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/" "factory"
