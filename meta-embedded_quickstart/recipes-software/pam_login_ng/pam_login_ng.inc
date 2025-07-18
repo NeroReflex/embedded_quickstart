@@ -8,6 +8,7 @@ do_compile:append () {
 }
 
 do_install:append () {
+    install -d ${D}/${libdir}/security/
     install ${B}/target/${CARGO_TARGET_SUBDIR}/libpam_login_ng.so ${D}/${libdir}/security/pam_login_ng.so
 
     install -d ${D}/usr/share/dbus-1/system.d/
