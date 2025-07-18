@@ -1,0 +1,10 @@
+SUMMARY = "QtQuickDesigner Studio components"
+LICENSE = "CLOSED"
+
+inherit cmake
+
+DEPENDS += "qtbase qtquick qtdeclarative"
+
+SRC_URI += "git://github.com/qt-labs/qtquickdesigner-components.git;protocol=https;nobranch=1;branch=main"
+SRCREV = "qds-dev-4.7"
+S = "${WORKDIR}/git"
