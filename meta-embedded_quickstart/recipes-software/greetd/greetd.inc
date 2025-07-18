@@ -1,5 +1,5 @@
 do_install:append () {
-    install -d ${D}${systemd_unitdir}/greetd
+    install -d ${D}${sysconfdir}/greetd
     install -Dm644 ${S}/config.toml ${D}${sysconfdir}/greetd/config.toml
 
     install -d ${D}${systemd_unitdir}/system
