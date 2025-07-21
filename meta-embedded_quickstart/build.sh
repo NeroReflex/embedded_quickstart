@@ -17,6 +17,8 @@ if [ -z "$CURRENT_SCRIPT_DIR" ]; then
     CURRENT_SCRIPT_DIR="."
 fi
 
+dir=$(dirname $pwd)
+echo "Running genimage.sh from $dir/sources/embedded_quickstart/genimage.sh"
 sudo bash "$CURRENT_SCRIPT_DIR/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/" "factory"
 
 rm -f disk_image.img
