@@ -221,10 +221,14 @@ echo "------------------ Device Trees --------------------------"
 
 mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/boot"
 
-for file in "${BINARIES_DIR}"/*.dtb; do
+for dtb_file_path in "${BINARIES_DIR}"/*.dtb; do
     # Check if the file exists to avoid errors if no .dtb files are found
-    if [ -e "$file" ]; then
-        cp -v "$file" "${EXTRACTED_ROOTFS_HOST_PATH}/boot"
+    if [ -e "$dtb_file_path" ]; then
+        dtb_file_name=$(basename $dtb_file_path)
+        if [ ! -f "$dtb_file_path" ]; then
+            echo "DTB: ${dtb_file_name}"
+            cp "$dtb_file_path" "${EXTRACTED_ROOTFS_HOST_PATH}/boot/${dtb_file_name}"
+        fi
     else
         echo "No .dtb files found in $SOURCE_DIR"
         break
