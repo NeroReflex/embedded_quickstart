@@ -226,8 +226,10 @@ for dtb_file_path in "${BINARIES_DIR}"/*.dtb; do
     if [ -e "$dtb_file_path" ]; then
         dtb_file_name=$(basename $dtb_file_path)
         if [ ! -f "$dtb_file_path" ]; then
-            echo "DTB: ${dtb_file_name}"
+            echo "DTB[Y]: ${dtb_file_name}"
             cp "$dtb_file_path" "${EXTRACTED_ROOTFS_HOST_PATH}/boot/${dtb_file_name}"
+        else
+            echo "DTB[N]: ${dtb_file_name}"
         fi
     else
         echo "No .dtb files found in $SOURCE_DIR"
