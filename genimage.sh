@@ -73,12 +73,17 @@ echo "----------------------------------------------------------"
 echo "----------------- Creating Image -------------------------"
 readonly IMAGE_FILE_PATH="${BINARIES_DIR}/disk_image.img"
 
-if [ ! -f "${IMAGE_FILE_PATH}" ]; then
-    echo "Image Disk file not found: creating a new one"
-    if ! fallocate -l 1G "${IMAGE_FILE_PATH}"; then
-        echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
-        exit -1
+if [ -d "${BINARIES_DIR}" ]; then
+    if [ ! -f "${IMAGE_FILE_PATH}" ]; then
+        echo "Image Disk file not found: creating a new one"
+        if ! fallocate -l 1G "${IMAGE_FILE_PATH}"; then
+            echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
+            exit -1
+        fi
     fi
+else
+    echo "ERROR: Directory ${BINARIES_DIR} does not exists"
+    exit -5
 fi
 
 readonly LOOPBACK_OUTPUT=$(losetup -P -f --show "${IMAGE_FILE_PATH}")

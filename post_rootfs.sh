@@ -11,13 +11,4 @@
 
 CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
-readonly IMAGE_FILE_PATH="${BINARIES_DIR}/disk_image.img"
-if [ ! -f "${IMAGE_FILE_PATH}" ]; then
-    echo "Image Disk file not found: creating a new one"
-    if ! fallocate -l 1G "${IMAGE_FILE_PATH}"; then
-        echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
-        exit -1
-    fi
-fi
-
 sudo bash "${CURRENT_SCRIPT_DIR}/genimage.sh" $@
