@@ -2,7 +2,8 @@
 
 set -e
 
-CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
+readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
+readonly CURRENT_SCRIPT_DIRNAME=$(dirname "$CURRENT_SCRIPT_DIR")
 
 echo "Running from $CURRENT_SCRIPT_DIR"
 
@@ -17,9 +18,8 @@ if [ -z "$CURRENT_SCRIPT_DIR" ]; then
     CURRENT_SCRIPT_DIR="."
 fi
 
-dir=$(dirname $pwd)
-echo "Running genimage.sh from $dir/sources/embedded_quickstart/genimage.sh"
-sudo bash "$CURRENT_SCRIPT_DIR/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/" "factory"
+echo "Running genimage.sh from $CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh"
+sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/" "factory"
 
 rm -f disk_image.img
 ln -sf "$CURRENT_SCRIPT_DIR/build-$MACHINE/tmp/deploy/images/$MACHINE/disk_image.img" "disk_image.img"
