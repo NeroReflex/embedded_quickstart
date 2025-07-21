@@ -3,7 +3,7 @@
 set -e
 
 readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
-readonly CURRENT_SCRIPT_DIRNAME=$(dirname "$CURRENT_SCRIPT_DIR")
+readonly CURRENT_SCRIPT_DIRNAME=$(realpath "$CURRENT_SCRIPT_DIR")
 
 echo "Running from $CURRENT_SCRIPT_DIR"
 
