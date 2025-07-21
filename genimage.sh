@@ -215,6 +215,24 @@ else
     echo "Neither stuPID1 nor atomrootfsinit have been found: not touching /sbin/init"
 fi
 
+echo "----------------------------------------------------------"
+
+echo "------------------ Device Trees --------------------------"
+
+mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/boot"
+
+for file in "${BINARIES_DIR}"/*.dtb; do
+    # Check if the file exists to avoid errors if no .dtb files are found
+    if [ -e "$file" ]; then
+        cp -v "$file" "${EXTRACTED_ROOTFS_HOST_PATH}/boot"
+    else
+        echo "No .dtb files found in $SOURCE_DIR"
+        break
+    fi
+done
+
+echo "----------------------------------------------------------"
+
 echo "------------------ PAM Module ----------------------------"
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
