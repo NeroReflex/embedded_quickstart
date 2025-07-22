@@ -272,7 +272,7 @@ fi
 
 echo "----------------------------------------------------------"
 
-echo "-------------------- Session ---------------------------"
+echo "---------------------- Session ---------------------------"
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-session" ]; then
     mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session"
