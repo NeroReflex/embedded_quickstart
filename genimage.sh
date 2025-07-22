@@ -246,9 +246,9 @@ echo "----------------------------------------------------------"
 echo "------------------ PAM Module ----------------------------"
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
-    sed -i '/^[-]auth\s\+sufficient\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
-    sed -i '/^[-]account\s\+required\s\+pam_nologin.so/a -account  sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
-    sed -i '/^[-]session\s\+optional\s\+pam_loginuid.so/a -session  optional   pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+    sed -i '/^-\?auth\s\+\(required\|sufficient\|optional\)\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+    sed -i '/^-\?account\s\+\(required\|sufficient\|optional\)\s\+pam_unix.so/a -account  sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+    sed -i '/^-\?session\s\+\(required\|sufficient\|optional\)\s\+pam_unix.so/a -session  optional   pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
 fi
 
 echo "----------------------------------------------------------"
