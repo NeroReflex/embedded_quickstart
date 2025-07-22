@@ -178,6 +178,9 @@ mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/var"
 echo "----------------------------------------------------------"
 
 echo "---------------- Boot Process ----------------------------"
+
+# TODO: rdtab -> /usr/lib/systemd/systemd
+
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
     echo "stuPID1 has been found: setting it as the default init program."
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
