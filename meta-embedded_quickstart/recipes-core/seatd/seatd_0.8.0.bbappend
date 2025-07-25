@@ -6,6 +6,6 @@ do_install:append() {
             ${D}${sysconfdir}/systemd/system/multi-user.target.wants/seatd.service
 }
 
-GROUPADD_PARAM_${PN} = “seat"
+GROUPADD_PARAM:${PN} = “--system seat"
 
 FILES:${PN} += "${systemd_unitdir}/system/seatd.service"
