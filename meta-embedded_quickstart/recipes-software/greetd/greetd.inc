@@ -25,3 +25,5 @@ FILES:${PN} += " \
 
 USERADD_PACKAGES = "greeter"
 GROUPADD_PARAM:greeter = "-r seat audio video"
+
+inherit useradd
