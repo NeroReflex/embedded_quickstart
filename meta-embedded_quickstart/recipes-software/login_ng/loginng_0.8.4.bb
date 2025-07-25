@@ -11,7 +11,8 @@ SRCREV = "0.8.4"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-DEPENDS = "libpam greetd"
+DEPENDS = "libpam"
+RDEPENDS = "greetd"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"

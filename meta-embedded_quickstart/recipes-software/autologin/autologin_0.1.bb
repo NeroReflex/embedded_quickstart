@@ -7,8 +7,8 @@ SRC_URI += " \
     file://autologin-setup.service \
 "
 
-RDEPENDS:${PN} = "bash"
-DEPENDS = "greetd loginng pamloginng loginng-session"
+RDEPENDS:${PN} = "bash greetd loginng pamloginng loginng-session"
+#DEPENDS = ""
 
 do_install:append () {
     install -d ${D}${systemd_unitdir}/system
