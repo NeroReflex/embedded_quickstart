@@ -5,13 +5,13 @@ inherit cargo
 # If this is git based prefer versioned ones if they exist
 # DEFAULT_PREFERENCE = "-1"
 
-# how to get login_ng could be as easy as but default to a git checkout:
-SRC_URI += "git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;branch=main"
-SRCREV = "0.7.8"
+# how to get pam_login_ng could be as easy as but default to a git checkout:
+SRC_URI += "git://github.com/NeroReflex/pam_login_ng.git;protocol=https;nobranch=1;branch=main"
+SRCREV = "0.8.0"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-DEPENDS = "libpam greetd"
+DEPENDS = "libpam"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
@@ -247,6 +247,7 @@ SRC_URI += " \
     crate://crates.io/zvariant/5.6.0 \
     crate://crates.io/zvariant_derive/5.6.0 \
     crate://crates.io/zvariant_utils/3.2.0 \
+    git://github.com/NeroReflex/login_ng.git;protocol=https;nobranch=1;name=login_ng;destsuffix=login_ng \
     git://github.com/NeroReflex/pam-rs.git;protocol=https;nobranch=1;name=pam;destsuffix=pam \
 "
 
@@ -479,15 +480,19 @@ SRC_URI[zvariant-5.6.0.sha256sum] = "d91b3680bb339216abd84714172b5138a4edac677e6
 SRC_URI[zvariant_derive-5.6.0.sha256sum] = "3a8c68501be459a8dbfffbe5d792acdd23b4959940fc87785fb013b32edbc208"
 SRC_URI[zvariant_utils-3.2.0.sha256sum] = "e16edfee43e5d7b553b77872d99bc36afdda75c223ca7ad5e3fbecd82ca5fc34"
 
+
+SRCREV_FORMAT .= "_login_ng"
+SRCREV_login_ng = "0.8.4"
+EXTRA_OECARGO_PATHS += "${WORKDIR}/login_ng"
 SRCREV_FORMAT .= "_pam"
-SRCREV_pam = "37b533020a8cfbf4c1936fd12c7d400777d1e7b7"
+SRCREV_pam = "7e2d531db8f8b274e30121d1f65ca5aac6912adc"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/pam"
 
 #LIC_FILES_CHKSUM = " \
 #    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
 #"
 
-SUMMARY = "A set of software and utilities for managing every aspect of user login."
+SUMMARY = "Additional pam module and service to login the user."
 HOMEPAGE = "https://github.com/NeroReflex/login_ng"
 #LICENSE = "LICENSE.md"
 LICENSE = "CLOSED"
@@ -495,5 +500,5 @@ LICENSE = "CLOSED"
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
 # what cargo-bitbake generates.
-include login_ng-${PV}.inc
-include login_ng.inc
+include pam_login_ng-${PV}.inc
+include pam_login_ng.inc
