@@ -6,6 +6,9 @@ do_install:append() {
             ${D}${sysconfdir}/systemd/system/multi-user.target.wants/seatd.service
 }
 
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "--system seat"
 
 FILES:${PN} += "${systemd_unitdir}/system/seatd.service"
