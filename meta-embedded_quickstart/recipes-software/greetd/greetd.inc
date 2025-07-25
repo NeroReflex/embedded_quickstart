@@ -3,13 +3,13 @@ SRC_URI += " \
 "
 
 do_install:append () {
-    install -d ${D}${sysconfdir}/pam.d
+    install -d ${D}/${sysconfdir}/pam.d
     install -Dm644 ${WORKDIR}/greetd.pam ${D}/${sysconfdir}//pam.d/greetd
 
-    install -d ${D}${sysconfdir}/greetd
+    install -d ${D}/${sysconfdir}/greetd
     install -Dm644 ${S}/config.toml ${D}/${sysconfdir}/greetd/config.toml
 
-    install -d ${D}${systemd_unitdir}/system
+    install -d ${D}/${systemd_unitdir}/system
     install -Dm644 ${S}/greetd.service ${D}/${systemd_unitdir}/system/greetd.service
 
     install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
