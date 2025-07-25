@@ -10,16 +10,16 @@ do_install:append () {
     install -Dm644 ${S}/config.toml ${D}/${sysconfdir}/greetd/config.toml
 
     install -d ${D}${systemd_unitdir}/system
-    install -Dm644 ${S}/greetd.service ${D}/${systemd_unitdir}/system/seatd.service
+    install -Dm644 ${S}/greetd.service ${D}/${systemd_unitdir}/system/greetd.service
 
     install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
-    ln -sf ${systemd_unitdir}/system/seatd.service \
-			${D}${sysconfdir}/systemd/system/multi-user.target.wants/seatd.service
+    ln -sf ${systemd_unitdir}/system/greetd.service \
+			${D}${sysconfdir}/systemd/system/multi-user.target.wants/greetd.service
 }
 
 FILES:${PN} += " \
     ${sysconfdir}/pam.d/greetd \
-    ${systemd_unitdir}/system/seatd.service \
+    ${systemd_unitdir}/system/greetd.service \
     ${sysconfdir}/greetd/config.toml \
 "
 
