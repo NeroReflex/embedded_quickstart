@@ -3,7 +3,7 @@ SRC_URI += " \
 "
 
 do_install:append () {
-    install -Dm644 ${WORKDIR}/greetd.pam $(sysconfdir)/pam.d/greetd
+    install -Dm644 ${WORKDIR}/greetd.pam ${D}$(sysconfdir)/pam.d/greetd
 
     install -d ${D}${sysconfdir}/greetd
     install -Dm644 ${S}/config.toml ${D}${sysconfdir}/greetd/config.toml
