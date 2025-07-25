@@ -11,7 +11,7 @@ SRC_URI += "git://github.com/Mitec-Elettronica-Srl/greetd.git;protocol=https;nob
 SRCREV = "ba4fb041235b72a62ef6baeafaf2a8b671d13677"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "greetd"
-PV:append = ".AUTOINC+ba4fb04123"
+PV:append = "."
 
 DEPENDS = "libpam seatd"
 
