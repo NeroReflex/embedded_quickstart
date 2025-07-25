@@ -179,13 +179,11 @@ echo "----------------------------------------------------------"
 
 echo "---------------- Boot Process ----------------------------"
 
-# TODO: rdtab -> /usr/lib/systemd/systemd
-
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
     echo "stuPID1 has been found: setting it as the default init program."
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
         echo "/sbin/init found: removing default one"
-        rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+        mv "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init_stage2"
     fi
 
     if ! ln -sf "/usr/bin/stupid1" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"; then
@@ -205,7 +203,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/stupid1" ]; then
 elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
     if [ -L "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" ]; then
         echo "/sbin/init found: removing default one"
-        rm "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init"
+        mv "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init" "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init_stage2"
     fi
     
     echo "atomrootfsinit has been found: setting it as first stage."
@@ -216,6 +214,12 @@ elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/atomrootfsinit" ]; then
     fi
 else
     echo "Neither stuPID1 nor atomrootfsinit have been found: not touching /sbin/init"
+fi
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init_stage2" ]; then
+    echo '/sbin/init_stage2' > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdexec"
+elif [-f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd"]; then
+    echo '/usr/lib/systemd/systemd' > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdexec"
 fi
 
 echo "----------------------------------------------------------"
