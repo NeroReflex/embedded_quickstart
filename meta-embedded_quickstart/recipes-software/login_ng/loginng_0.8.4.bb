@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
 DEPENDS = "libpam"
-RDEPENDS = "greetd"
+RDEPENDS:${PN} = "greetd"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
