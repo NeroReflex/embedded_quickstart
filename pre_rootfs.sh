@@ -1,8 +1,10 @@
 #!/bin/bash
 
+readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
+
 if [ -f "${TARGET_DIR}/usr/share/factory/etc/pam.d/system-auth" ] && [ ! -f "${TARGET_DIR}/etc/pam.d/system-auth" ]; then
     # I have absolutely no idea why this should be even needed... But it is. ffs.
-    cp "${TARGET_DIR}/usr/share/factory/etc/pam.d/system-auth" "${TARGET_DIR}/etc/pam.d/system-auth"
+    cp "${CURRENT_SCRIPT_DIR}/pam_example/system-auth" "${TARGET_DIR}/etc/pam.d/system-auth"
 fi
 
 for file in /etc/pam.d/*; do

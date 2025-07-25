@@ -21,7 +21,7 @@ error_handler() {
 # Set the trap to call the error_handler function on ERR
 trap 'error_handler' ERR
 
-CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
+readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
 source "${CURRENT_SCRIPT_DIR}/utils/btrfs_utils.sh"
 
