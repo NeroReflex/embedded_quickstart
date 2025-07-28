@@ -26,6 +26,7 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system \
                        --shell /bin/false \
                        --groups audio,video,render,seat,input \
+                       --no-user-group \
                         greeter "
 
 #GROUPADD_PARAM:${PN} = "--system greeter"
