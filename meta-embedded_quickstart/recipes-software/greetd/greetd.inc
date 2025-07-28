@@ -29,8 +29,6 @@ USERADD_PARAM:${PN} = "--system \
                        --user-group greeter \
                     "
 
-GROUPADD_PARAM:${PN} = "--system greeter"
-
 FILES:${PN} += " \
     ${sysconfdir}/pam.d/greetd \
     ${systemd_unitdir}/system/greetd.service \
