@@ -218,7 +218,7 @@ fi
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/sbin/init_stage2" ]; then
     echo '/sbin/init_stage2' > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdexec"
-elif [-f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd"]; then
+elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/systemd/systemd" ]; then
     echo '/usr/lib/systemd/systemd' > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdexec"
 fi
 
