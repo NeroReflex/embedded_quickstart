@@ -285,14 +285,18 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-session" ]; then
     mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session"
 
     if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service" ]; then
-        echo '{' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "kind": "service",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "cmd": "weston",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "args": [ "--config=/etc/weston.ini" ],' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "max_restarts": 0,' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "restart_delay_secs": 5,' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '    "dependencies": [  ]' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
-        echo '}' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+        if [ -f "/usr/bin/startupscreen" ]; then
+            echo '{' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "kind": "service",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "cmd": "/usr/bin/startupscreen",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "args": [  ],' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "max_restarts": 0,' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "restart_delay_secs": 5,' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '    "dependencies": [  ]' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+            echo '}' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
+        else
+            echo 'No autostart software found: default software will use fallback'
+        fi
     fi
 
     if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini" ]; then
