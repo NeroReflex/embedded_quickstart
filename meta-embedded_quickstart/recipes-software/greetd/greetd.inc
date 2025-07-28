@@ -25,10 +25,10 @@ inherit useradd
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system \
                        --shell /bin/false \
-                       --groups audio,video,render,seat,input,greeter \
+                       --groups audio,video,render,seat,input \
                         greeter "
 
-GROUPADD_PARAM:${PN} = "--system greeter"
+#GROUPADD_PARAM:${PN} = "--system greeter"
 
 FILES:${PN} += " \
     ${sysconfdir}/pam.d/greetd \
