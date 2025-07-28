@@ -29,10 +29,6 @@ useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
-# add more permissions to the greeter user
-usermod -aG render greeter
-usermod -aG seat greeter
-usermod -aG input greeter
 
 # add groups to be able to render the GUI application
 usermod -aG render $AUTOLOGIN_USERNAME

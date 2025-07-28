@@ -17,13 +17,19 @@ do_install:append () {
 			${D}${sysconfdir}/systemd/system/multi-user.target.wants/greetd.service
 }
 
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "--system \
+                       --shell /bin/false \
+                       --groups audio,video,render,seat,input \
+                       --user-group greeter
+                    "
+
+GROUPADD_PARAM:${PN} = "--system greeter"
+
 FILES:${PN} += " \
     ${sysconfdir}/pam.d/greetd \
     ${systemd_unitdir}/system/greetd.service \
     ${sysconfdir}/greetd/config.toml \
 "
-
-USERADD_PACKAGES = "greeter"
-GROUPADD_PARAM:greeter = "-r seat audio video"
-
-inherit useradd

@@ -249,6 +249,31 @@ echo "----------------------------------------------------------"
 
 echo "------------------ PAM Module ----------------------------"
 
+if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
+    # I have absolutely no idea why this should be even needed... But it is. ffs.
+    cp "${CURRENT_SCRIPT_DIR}/pam_example/system-auth" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
+
+    echo "Copied system-auth PAM configuuration file"
+fi
+
+for file in $EXTRACTED_ROOTFS_HOST_PATH/etc/pam.d/*; do
+    pam_selinux_location=$(find "${EXTRACTED_ROOTFS_HOST_PATH}/usr" -name "pam_selinux.so")
+    if [ -z "$pam_selinux_location" ]; then
+        if [ -f "$file" ]; then
+            sed -i '/pam_selinux.so/s/^/#/' "$file"
+        fi
+    fi
+
+    pam_console_location=$(find "${EXTRACTED_ROOTFS_HOST_PATH}/usr" -name "pam_console.so")
+    if [ -z "$pam_console_location" ]; then
+        if [ -f "$file" ]; then
+            sed -i '/pam_console.so/s/^/#/' "$file"
+        fi
+    fi
+done
+
+touch "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam_debug"
+
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
     sed -i '/^-\?auth\s\+\(required\|sufficient\|optional\)\s\+pam_unix.so/a -auth     sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
     sed -i '/^-\?account\s\+\(required\|sufficient\|optional\)\s\+pam_unix.so/a -account  sufficient pam_login_ng.so' "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
@@ -285,7 +310,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-session" ]; then
     mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session"
 
     if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service" ]; then
-        if [ -f "/usr/bin/startupscreen" ]; then
+        if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/startupscreen" ]; then
             echo '{' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
             echo '    "kind": "service",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
             echo '    "cmd": "/usr/bin/startupscreen",' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng-session/default.service"
