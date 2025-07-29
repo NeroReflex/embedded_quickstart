@@ -29,6 +29,18 @@ useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
+# Write weston.ini file
+mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config/"
+readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
+echo '# weston configuration generated from autologin-firstboot.sh' >> "${WESTON_INI}"
+echo '[core]' >> "${WESTON_INI}"
+echo 'shell=kiosk' >> "${WESTON_INI}"
+echo 'backend=drm' >> "${WESTON_INI}"
+echo 'idle-time=0' >> "${WESTON_INI}"
+echo '' >> "${WESTON_INI}"
+echo '[autolaunch]' >> "${WESTON_INI}"
+echo 'path=/usr/bin/start-login_ng-session' >> "${WESTON_INI}"
+echo 'watch=true' >> "${WESTON_INI}"
 
 # add groups to be able to render the GUI application
 usermod -aG render $AUTOLOGIN_USERNAME
@@ -86,6 +98,11 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         exit -1
     fi
 
+    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-session --cmd "$AUTOLOGIN_CMD"; then
+        echo "Error setting the user session command"
+        exit -1
+    fi
+
     # Create the service directory
     if ! mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
         echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
@@ -126,7 +143,7 @@ chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
 # set the default autologin command
 if [ -f "/etc/autologin/user_autologin_cmd" ]; then
     AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
-    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -c '${AUTOLOGIN_CMD}' -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
 fi
 
 rm -rf "/etc/autologin"

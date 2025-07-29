@@ -1,6 +1,0 @@
-#/bin/bash
-if [ -f /etc/weston.ini ]; then
-    weston --config=/etc/weston.ini -- start-login_ng-session
-else
-    weston -- start-login_ng-session
-fi

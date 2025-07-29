@@ -3,7 +3,6 @@ DESCRIPTION = "Setup autologin service"
 LICENSE = "CLOSED"
 
 SRC_URI += " \
-    file://kiosk \
     file://autologin-firstboot.sh \
     file://autologin-setup.service \
     file://user_autologin_cmd \
@@ -30,7 +29,6 @@ do_install:append () {
     install -Dm644 ${WORKDIR}/autologin-setup.service ${D}/${systemd_unitdir}/system/autologin-setup.service
 
     install -d ${D}/${bindir}
-    install -Dm755 ${WORKDIR}/kiosk ${D}${bindir}/kiosk
     install -Dm755 ${WORKDIR}/autologin-firstboot.sh ${D}${bindir}/autologin-firstboot.sh
 
     install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
@@ -40,7 +38,6 @@ do_install:append () {
 }
 
 FILES:${PN} += " \
-    ${bindir}/kiosk \
     ${bindir}/autologin-firstboot.sh \
     ${systemd_unitdir}/system/autologin-setup.service \
     ${sysconfdir}/autologin/user_autologin_cmd \
