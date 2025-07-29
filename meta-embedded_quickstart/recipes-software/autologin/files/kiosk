@@ -1,6 +1,12 @@
 #/bin/bash
-if [ -f /etc/weston.ini ]; then
-    weston --config=/etc/weston.ini -- start-login_ng-session
-else
-    weston -- start-login_ng-session
+WESON_PARAMS=""
+
+if [ -d "$HOME" ]; then
+    WESTON_PARAMS="$WESTON_PARAMS --log=$HOME/weston.log"
 fi
+
+if [ -f /etc/weston.ini ]; then
+    WESTON_PARAMS="$WESTON_PARAMS --config=/etc/weston.ini"
+fi
+
+weston $WESTON_PARAMS -- start-login_ng-session
