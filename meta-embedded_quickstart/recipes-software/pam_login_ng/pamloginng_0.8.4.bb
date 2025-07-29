@@ -7,7 +7,7 @@ inherit cargo
 
 # how to get pam_login_ng could be as easy as but default to a git checkout:
 SRC_URI += "git://github.com/NeroReflex/pam_login_ng.git;protocol=https;nobranch=1;branch=main"
-SRCREV = "0.8.3"
+SRCREV = "0.8.4"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
@@ -482,7 +482,7 @@ SRC_URI[zvariant_utils-3.2.0.sha256sum] = "e16edfee43e5d7b553b77872d99bc36afdda7
 
 
 SRCREV_FORMAT .= "_login_ng"
-SRCREV_login_ng = "0.8.6"
+SRCREV_login_ng = "0.8.7"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/login_ng"
 SRCREV_FORMAT .= "_pam"
 SRCREV_pam = "7e2d531db8f8b274e30121d1f65ca5aac6912adc"
