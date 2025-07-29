@@ -325,9 +325,15 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/login_ng-session" ]; then
     fi
 
     if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini" ]; then
+        echo '# weston configuration generated from genimage.sh' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
         echo '[core]' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
+        echo 'shell=kiosk' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
         echo 'backend=drm' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
         echo 'idle-time=0' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
+        echo '' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
+        echo '[autolaunch]' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
+        echo 'path=/usr/bin/start-login_ng-session' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
+        echo 'watch=true' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/weston.ini"
     fi
 
 fi
