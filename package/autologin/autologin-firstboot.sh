@@ -98,11 +98,6 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         exit -1
     fi
 
-    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-session --cmd "$AUTOLOGIN_CMD"; then
-        echo "Error setting the user session command"
-        exit -1
-    fi
-
     # Create the service directory
     if ! mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
         echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
@@ -141,9 +136,14 @@ fi
 chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
 
 # set the default autologin command
-if [ -f "/etc/autologin/user_autologin_cmd" ]; then
-    AUTOLOGIN_CMD=$(cat "/etc/autologin/user_autologin_cmd")
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd" ]; then
+    AUTOLOGIN_CMD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd")
     sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+
+    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-session --cmd "$AUTOLOGIN_CMD"; then
+        echo "Error setting the user session command"
+        exit -1
+    fi
 fi
 
 rm -rf "/etc/autologin"
