@@ -2,7 +2,7 @@ SRC_URI += " \
     file://greetd.pam \
 "
 
-DEPENDS = "libpam seatd systemd"
+DEPENDS = " libpam seatd systemd"
 RDEPENDS:${PN} = "seatd systemd"
 
 do_install:append () {

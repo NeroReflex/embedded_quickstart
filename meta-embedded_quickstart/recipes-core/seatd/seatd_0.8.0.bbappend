@@ -1,3 +1,9 @@
+DEPENDS = " systemd"
+RDEPENDS:${PN} = "\
+    systemd \
+    base-files \
+"
+
 do_install:append() {
     install -d ${D}/${systemd_unitdir}/system
     install -Dm755 ${S}/contrib/systemd/seatd.service ${D}/${systemd_unitdir}/system/seatd.service
