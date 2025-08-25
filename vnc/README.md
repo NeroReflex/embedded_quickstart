@@ -1,3 +1,11 @@
+# Istruzioni
+
+## Disclaimer
+
+Molto importante: NON far caricare al weston VNC un fili .ini in cui è presente screen-share!!!
+
+## PAM
+
 mettere il file di configurazione in un posto non standard e lanciare la sessione con --config=/etc/cose/weston.ini
 create le chiavi con wayland_keygen.sh
 mettere il file /etc/pam.d/weston-remote-access
@@ -21,3 +29,4 @@ session         required        pam_loginuid.so
 ```
 
 (che sarebbe la copia di system-auth)
+
