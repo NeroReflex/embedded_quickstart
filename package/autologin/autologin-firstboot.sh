@@ -29,16 +29,6 @@ useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
-openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/tls.key" 2048
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.key"
-chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
-openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/tls.key" -out "$AUTOLOGIN_USER_HOME_DIR/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
-openssl x509 -req -days 36500 -signkey "$AUTOLOGIN_USER_HOME_DIR/tls.key" -in "$AUTOLOGIN_USER_HOME_DIR/tls.csr" -out "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
-
 # Write weston.ini file
 readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
 echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_INI}"
@@ -67,8 +57,17 @@ echo 'idle-time=0' >> "${WESTON_VNC_INI}"
 echo '' >> "${WESTON_VNC_INI}"
 echo '[vnc]' >> "${WESTON_VNC_INI}"
 echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
-echo "tls-key=${$AUTOLOGIN_USER_HOME_DIR}/tls.key" >> "${WESTON_VNC_INI}"
-echo "tls-cert=${$AUTOLOGIN_USER_HOME_DIR}/tls.crt" >> "${WESTON_VNC_INI}"
+echo "tls-key=${$AUTOLOGIN_USER_HOME_DIR}/.config/tls.key" >> "${WESTON_VNC_INI}"
+echo "tls-cert=${$AUTOLOGIN_USER_HOME_DIR}/.config/tls.crt" >> "${WESTON_VNC_INI}"
+
+mount -t overlay -o lowerdir=$AUTOLOGIN_USER_HOME_DIR,upperdir=/mnt/user_data/upperdir,workdir=/mnt/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off overlay "$AUTOLOGIN_USER_HOME_DIR"
+
+sudo -u $AUTOLOGIN_USERNAME openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" 2048
+sudo -u $AUTOLOGIN_USERNAME openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
+sudo -u $AUTOLOGIN_USERNAME openssl x509 -req -days 36500 -signkey "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" -in "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr" -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.crt"
+rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
+
+umount $AUTOLOGIN_USER_HOME_DIR
 
 # add groups to be able to render the GUI application
 usermod -aG render $AUTOLOGIN_USERNAME
