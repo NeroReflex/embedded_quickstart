@@ -71,7 +71,7 @@ mount -t overlay -o lowerdir=$AUTOLOGIN_USER_HOME_DIR,upperdir=${TARGET_ROOTFS}/
 sudo -u $AUTOLOGIN_USERNAME openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" 2048
 sudo -u $AUTOLOGIN_USERNAME openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
 sudo -u $AUTOLOGIN_USERNAME openssl x509 -req -days 36500 -signkey "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" -in "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr" -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.crt"
-rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
+rm "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr"
 
 umount $AUTOLOGIN_USER_HOME_DIR
 
