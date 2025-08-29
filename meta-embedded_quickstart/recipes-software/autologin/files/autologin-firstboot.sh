@@ -39,15 +39,16 @@ echo 'backend=drm' >> "${WESTON_VNC_INI}"
 echo 'idle-time=0' >> "${WESTON_VNC_INI}"
 echo '' >> "${WESTON_VNC_INI}"
 
-openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/tls.key" 2048
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.key"
-chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
-openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/tls.key" -out "$AUTOLOGIN_USER_HOME_DIR/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
-openssl x509 -req -days 36500 -signkey "$AUTOLOGIN_USER_HOME_DIR/tls.key" -in "$AUTOLOGIN_USER_HOME_DIR/tls.csr" -out "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
-rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
+readonly OVERLAY_UPPERDIR="${TARGET_ROOTFS}/user_data/upperdir"
+openssl genrsa -out "$OVERLAY_UPPERDIR/tls.key" 2048
+chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$OVERLAY_UPPERDIR/tls.key"
+chmod 600 "$OVERLAY_UPPERDIR/tls.key"
+openssl req -new -key "$OVERLAY_UPPERDIR/tls.key" -out "$OVERLAY_UPPERDIR/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
+chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$OVERLAY_UPPERDIR/tls.csr"
+openssl x509 -req -days 36500 -signkey "$OVERLAY_UPPERDIR/tls.key" -in "$OVERLAY_UPPERDIR/tls.csr" -out "$OVERLAY_UPPERDIR/tls.crt"
+chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$OVERLAY_UPPERDIR/tls.crt"
+chmod 600 "$OVERLAY_UPPERDIR/tls.key"
+rm "$OVERLAY_UPPERDIR/tls.csr"
 
 # Write weston.ini file
 readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
