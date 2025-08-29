@@ -29,16 +29,6 @@ useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
-# Write weston-vnc.ini file
-mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config/"
-readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
-echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
-echo '[core]' >> "${WESTON_VNC_INI}"
-echo 'shell=kiosk' >> "${WESTON_VNC_INI}"
-echo 'backend=drm' >> "${WESTON_VNC_INI}"
-echo 'idle-time=0' >> "${WESTON_VNC_INI}"
-echo '' >> "${WESTON_VNC_INI}"
-
 openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/tls.key" 2048
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.key"
 chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
@@ -46,7 +36,7 @@ openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/tls.key" -out "$AUTOLOGIN_USER_H
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
 openssl x509 -req -days 36500 -signkey "$AUTOLOGIN_USER_HOME_DIR/tls.key" -in "$AUTOLOGIN_USER_HOME_DIR/tls.csr" -out "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
-chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
+chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
 rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
 
 # Write weston.ini file
@@ -59,13 +49,26 @@ echo 'backend=drm' >> "${WESTON_INI}"
 echo 'idle-time=0' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[screen-share]' >> "${WESTON_INI}"
-echo "command=/usr/bin/weston --config=$WESTON_VNC_INI --backend=vnc-backend.so --vnc-tls-cert=$AUTOLOGIN_USER_HOME_DIR/tls.crt --vnc-tls-key=$AUTOLOGIN_USER_HOME_DIR/tls.key --shell=fullscreen-shell.so" >> "${WESTON_INI}"
+echo "command=/usr/bin/weston --config=$WESTON_VNC_INI" >> "${WESTON_INI}"
 echo 'start-on-startup=true' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[autolaunch]' >> "${WESTON_INI}"
 echo 'path=/usr/bin/start-login_ng-session' >> "${WESTON_INI}"
 echo 'watch=true' >> "${WESTON_INI}"
 
+# Write weston-vnc.ini file
+mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config/"
+readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
+echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
+echo '[core]' >> "${WESTON_VNC_INI}"
+echo 'shell=fullscreen' >> "${WESTON_VNC_INI}"
+echo 'backend=vnc' >> "${WESTON_VNC_INI}"
+echo 'idle-time=0' >> "${WESTON_VNC_INI}"
+echo '' >> "${WESTON_VNC_INI}"
+echo '[vnc]' >> "${WESTON_VNC_INI}"
+echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
+echo "tls-key=${$AUTOLOGIN_USER_HOME_DIR}/tls.key" >> "${WESTON_VNC_INI}"
+echo "tls-cert=${$AUTOLOGIN_USER_HOME_DIR}/tls.crt" >> "${WESTON_VNC_INI}"
 
 # add groups to be able to render the GUI application
 usermod -aG render $AUTOLOGIN_USERNAME
