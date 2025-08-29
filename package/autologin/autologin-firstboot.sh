@@ -32,6 +32,19 @@ echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config"
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/.config"
 
+# Write weston-vnc.ini file
+readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
+echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
+echo '[core]' >> "${WESTON_VNC_INI}"
+echo 'shell=fullscreen' >> "${WESTON_VNC_INI}"
+echo 'backend=vnc' >> "${WESTON_VNC_INI}"
+echo 'idle-time=0' >> "${WESTON_VNC_INI}"
+echo '' >> "${WESTON_VNC_INI}"
+echo '[vnc]' >> "${WESTON_VNC_INI}"
+echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
+echo "tls-key=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.key" >> "${WESTON_VNC_INI}"
+echo "tls-cert=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.crt" >> "${WESTON_VNC_INI}"
+
 # Write weston.ini file
 readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
 echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_INI}"
@@ -48,19 +61,6 @@ echo '' >> "${WESTON_INI}"
 echo '[autolaunch]' >> "${WESTON_INI}"
 echo 'path=/usr/bin/start-login_ng-session' >> "${WESTON_INI}"
 echo 'watch=true' >> "${WESTON_INI}"
-
-# Write weston-vnc.ini file
-readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
-echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
-echo '[core]' >> "${WESTON_VNC_INI}"
-echo 'shell=fullscreen' >> "${WESTON_VNC_INI}"
-echo 'backend=vnc' >> "${WESTON_VNC_INI}"
-echo 'idle-time=0' >> "${WESTON_VNC_INI}"
-echo '' >> "${WESTON_VNC_INI}"
-echo '[vnc]' >> "${WESTON_VNC_INI}"
-echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
-echo "tls-key=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.key" >> "${WESTON_VNC_INI}"
-echo "tls-cert=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.crt" >> "${WESTON_VNC_INI}"
 
 mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
 mkdir -p "${TARGET_ROOTFS}/user_data/workdir"
