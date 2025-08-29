@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eE -o functrace
+
 dismantle() {
     # umount the loopback partition
     if [ ! -z "${MOUNTED_LOOPBACK_PART}" ]; then
@@ -21,7 +23,7 @@ error_handler() {
 }
 
 # Set the trap to call the error_handler function on ERR
-trap 'error_handler' ERR
+trap 'error_handler ${LINENO} "$BASH_COMMAND"' ERR
 
 readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
 
