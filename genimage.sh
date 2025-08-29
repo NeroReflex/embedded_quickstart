@@ -14,7 +14,9 @@ dismantle() {
 
 # Function to handle errors
 error_handler() {
-    echo "Error occurred at line: $LINENO"
+    local lineno=$1
+    local msg=$2
+    echo "Error occurred at line ${lineno}: ${msg}"
     dismantle
 }
 
@@ -253,7 +255,7 @@ if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth" ]; then
     # I have absolutely no idea why this should be even needed... But it is. ffs.
     cp "${CURRENT_SCRIPT_DIR}/pam_example/system-auth" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/pam.d/system-auth"
 
-    echo "Copied system-auth PAM configuuration file"
+    echo "Copied system-auth PAM configuration file"
 fi
 
 for file in $EXTRACTED_ROOTFS_HOST_PATH/etc/pam.d/*; do
