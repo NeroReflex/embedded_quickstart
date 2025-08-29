@@ -29,10 +29,10 @@ useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
-# Write weston.ini file
+# Write weston-vnc.ini file
 mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config/"
 readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
-echo '# weston configuration generated from autologin-firstboot.sh' >> "${WESTON_VNC_INI}"
+echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
 echo '[core]' >> "${WESTON_VNC_INI}"
 echo 'shell=kiosk' >> "${WESTON_VNC_INI}"
 echo 'backend=drm' >> "${WESTON_VNC_INI}"
@@ -49,21 +49,23 @@ chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/tls.crt"
 chmod 600 "$AUTOLOGIN_USER_HOME_DIR/tls.key"
 rm "$AUTOLOGIN_USER_HOME_DIR/tls.csr"
 
+# Write weston.ini file
 readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
-echo '# weston configuration generated from autologin-firstboot.sh' >> "${WESTON_INI}"
-echo '[core]'
-echo 'shell=kiosk'
-echo 'modules=screen-share.so'
-echo 'backend=drm'
-echo 'idle-time=0'
-echo ''
-echo '[screen-share]'
-echo "command=/usr/bin/weston --config=$WESTON_VNC_INI --backend=vnc-backend.so --vnc-tls-cert=$AUTOLOGIN_USER_HOME_DIR/tls.crt --vnc-tls-key=$AUTOLOGIN_USER_HOME_DIR/tls.key --shell=fullscreen-shell.so"
-echo 'start-on-startup=true'
-echo ''
-echo '[autolaunch]'
-echo 'path=/usr/bin/start-login_ng-session'
-echo 'watch=true'
+echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_INI}"
+echo '[core]' >> "${WESTON_INI}"
+echo 'shell=kiosk' >> "${WESTON_INI}"
+echo 'modules=screen-share.so' >> "${WESTON_INI}"
+echo 'backend=drm' >> "${WESTON_INI}"
+echo 'idle-time=0' >> "${WESTON_INI}"
+echo '' >> "${WESTON_INI}"
+echo '[screen-share]' >> "${WESTON_INI}"
+echo "command=/usr/bin/weston --config=$WESTON_VNC_INI --backend=vnc-backend.so --vnc-tls-cert=$AUTOLOGIN_USER_HOME_DIR/tls.crt --vnc-tls-key=$AUTOLOGIN_USER_HOME_DIR/tls.key --shell=fullscreen-shell.so" >> "${WESTON_INI}"
+echo 'start-on-startup=true' >> "${WESTON_INI}"
+echo '' >> "${WESTON_INI}"
+echo '[autolaunch]' >> "${WESTON_INI}"
+echo 'path=/usr/bin/start-login_ng-session' >> "${WESTON_INI}"
+echo 'watch=true' >> "${WESTON_INI}"
+
 
 # add groups to be able to render the GUI application
 usermod -aG render $AUTOLOGIN_USERNAME
