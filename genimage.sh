@@ -163,7 +163,7 @@ if [ ! -d "$REALPATH_EXTRACTED_ROOTFS_HOST_PATH" ]; then
 fi
 
 echo "Searching for the rootfs..."
-readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | head -n 1)
+readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | grep -v ".spdx" | head -n 1)
 if [ -f "${ROOTFS_TAR_FILE}" ]; then
     echo "Unpacking '${ROOTFS_TAR_FILE}' on the deployment subvolume..."
     tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
