@@ -61,7 +61,11 @@ echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
 echo "tls-key=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.key" >> "${WESTON_VNC_INI}"
 echo "tls-cert=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.crt" >> "${WESTON_VNC_INI}"
 
-mount -t overlay -o lowerdir=$AUTOLOGIN_USER_HOME_DIR,upperdir=/mnt/user_data/upperdir,workdir=/mnt/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off overlay "$AUTOLOGIN_USER_HOME_DIR"
+mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
+mkdir -p "${TARGET_ROOTFS}/user_data/workdir"
+chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/upperdir"
+chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/workdir"
+mount -t overlay -o lowerdir=$AUTOLOGIN_USER_HOME_DIR,upperdir=${TARGET_ROOTFS}/user_data/upperdir,workdir=${TARGET_ROOTFS}/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off overlay "$AUTOLOGIN_USER_HOME_DIR"
 
 sudo -u $AUTOLOGIN_USERNAME openssl genrsa -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" 2048
 sudo -u $AUTOLOGIN_USERNAME openssl req -new -key "$AUTOLOGIN_USER_HOME_DIR/.config/tls.key" -out "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr" -subj "/C=IT/ST=Veneto/L=Mestrino/O=MITEC Elettronica s.r.l./OU=SE/CN=mitec.it"
@@ -115,11 +119,6 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
             exit -1
         fi
     fi
-
-    mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
-    mkdir -p "${TARGET_ROOTFS}/user_data/workdir"
-    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/upperdir"
-    chown ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${TARGET_ROOTFS}/user_data/workdir"
 
     if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=${TARGET_ROOTFS}/user_data/upperdir,workdir=${TARGET_ROOTFS}/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
         echo "Error setting the user home mount"
