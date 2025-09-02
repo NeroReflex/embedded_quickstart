@@ -7,7 +7,6 @@ error_handler() {
     local lineno=$1
     local msg=$2
     echo "Error occurred at line ${lineno}: ${msg}"
-    dismantle
 }
 
 # Set the trap to call the error_handler function on ERR
@@ -41,9 +40,8 @@ readonly part_number=$(echo "${subcmd: -1}")
 readonly disk=$(echo "$subcmd" | sed 's/p[0-9]*$//')
 readonly filtered_uuid=$(echo "${possible_uuid}" | grep -E '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}')
 
-
-# Grow the partition
-parted --script "${disk}" resizepart "${part_number}" 100%
+# Grow the partition: exclude --script and use yes |
+yes | parted  "${disk}" resizepart "${subcmd}" 100%FREE
 
 # Grow the main btrfs filesystem
 btrfs filesystem resize max /mnt

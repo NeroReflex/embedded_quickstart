@@ -7,7 +7,6 @@ error_handler() {
     local lineno=$1
     local msg=$2
     echo "Error occurred at line ${lineno}: ${msg}"
-    dismantle
 }
 
 # Set the trap to call the error_handler function on ERR
