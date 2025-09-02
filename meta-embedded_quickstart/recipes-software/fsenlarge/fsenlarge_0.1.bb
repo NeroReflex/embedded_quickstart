@@ -22,7 +22,6 @@ do_install:append () {
     install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
     ln -sf ${systemd_unitdir}/system/autoresize-setup.service \
         ${D}/${sysconfdir}/systemd/system/multi-user.target.wants/autoresize-setup.service
-
 }
 
 FILES:${PN} += " \
