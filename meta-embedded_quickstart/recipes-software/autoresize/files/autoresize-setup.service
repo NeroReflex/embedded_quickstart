@@ -1,0 +1,12 @@
+[Unit]
+Description=Prepare autoresize at first boot
+After=local-fs.target
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/autoresize-firstboot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

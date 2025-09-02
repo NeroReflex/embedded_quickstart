@@ -2,6 +2,22 @@
 
 set -e
 
+# Function to handle errors
+error_handler() {
+    local lineno=$1
+    local msg=$2
+    echo "Error occurred at line ${lineno}: ${msg}"
+    dismantle
+}
+
+# Set the trap to call the error_handler function on ERR
+trap 'error_handler ${LINENO} "$BASH_COMMAND"' ERR
+
+if [ "$EUID" -ne 0 ]
+    then echo "This script MUST be run as root"
+    exit
+fi
+
 export TARGET_ROOTFS="/mnt"
 export EXTRACTED_ROOTFS_HOST_PATH=""
 
@@ -9,7 +25,7 @@ LNG_CTL="login_ng-ctl"
 
 if [ ! -d "/etc/autologin" ]; then
     echo "No autologin data to be applied"
-    exit 0
+    exit -1
 fi
 
 if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" ]; then
