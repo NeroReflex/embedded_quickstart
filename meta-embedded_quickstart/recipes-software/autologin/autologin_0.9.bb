@@ -13,7 +13,7 @@ SRC_URI += " \
     file://user_autologin_username \
 "
 
-RDEPENDS:${PN} = "sudo bash greetd loginng pamloginng loginng-session"
+RDEPENDS:${PN} = "sudo bash greetd loginng pamloginng loginng-session weston weston-xwayland"
 #DEPENDS = ""
 
 do_install:append () {
