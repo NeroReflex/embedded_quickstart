@@ -41,8 +41,6 @@ readonly disk=$(echo "$subcmd" | sed 's/p[0-9]*$//')
 readonly filtered_uuid=$(echo "${possible_uuid}" | grep -E '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}')
 
 # Grow the partition: exclude --script and use yes |
-yes | parted  "${disk}" resizepart "${part_number}" 100%FREE
-
 echo -e "resizepart\n${part_number}\nYes\n100%\nprint free\nquit" | parted "${disk}" ---pretend-input-tty
 
 # Grow the main btrfs filesystem
