@@ -40,7 +40,7 @@ do_install:append() {
                 ln -s ${target} ${D}/${libdir}/libyuv.so
             else
                 mv ${D}/${libdir}/libyuv.so ${D}/${libdir}/libyuv.so.1
-                ln -s ${D}/${libdir}/libyuv.so.1 ${D}/${libdir}/libyuv.so
+                ln -s libyuv.so.1 ${D}/${libdir}/libyuv.so
             fi
         fi
     fi
