@@ -9,6 +9,9 @@ SRC_URI = "git://chromium.googlesource.com/libyuv/libyuv;protocol=https;branch=m
 
 S = "${WORKDIR}/git"
 
+# Skip the sanity check about .so not being versioned
+INSANE_SKIP_${PN}-dev += "dev-elf"
+
 inherit cmake pkgconfig
 
 #DEPENDS = " nasm-native"
