@@ -39,9 +39,8 @@ do_install:append() {
                 rm -f ${D}/${libdir}/libyuv.so
                 ln -s ${target} ${D}/${libdir}/libyuv.so
             else
-                # if nothing versioned exists, move the file to -static or remove it depending on policy
-                # here we remove it to avoid QA failure (only do this if acceptable)
-                rm -f ${D}/${libdir}/libyuv.so
+                mv ${D}/${libdir}/libyuv.so ${D}/${libdir}/libyuv.so.1
+                ln -s ${D}/${libdir}/libyuv.so.1 ${D}/${libdir}/libyuv.so
             fi
         fi
     fi
