@@ -22,9 +22,15 @@ PACKAGECONFIG[float-approx] = "--enable-float-approx,,"
 EXTRA_OECONF = " \
     --with-NE10-includes=${STAGING_DIR_TARGET}${includedir} \
     --with-NE10-libraries=${STAGING_DIR_TARGET}${libdir} \
+    --enable-shared \
+    --enable-static \
     --enable-asm \
     --enable-intrinsics \
     --enable-custom-modes \
+"
+
+EXTRA_OECMAKE = " \
+    -DOPUS_BUILD_SHARED_LIBRARY=ON \
 "
 
 # ne10 is available only for armv7a, armv7ve and aarch64
