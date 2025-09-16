@@ -1,3 +1,5 @@
-EXTRA_OECONF += " \
+
+PACKAGECONFIG = "
     --enable-static \
+    --enable-shared \
 "
