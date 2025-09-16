@@ -14,15 +14,6 @@ INSANE_SKIP_${PN}-dev += "dev-elf"
 
 inherit cmake pkgconfig
 
-#DEPENDS = " nasm-native"
-#
-#EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=1 -DENABLE_TESTS=0 \
-#                 -DPERL_EXECUTABLE=${HOSTTOOLS_DIR}/perl \
-#                "
-#CMAKE_VERBOSE = "VERBOSE=1"
-#CFLAGS:append:libc-musl = " -D_GNU_SOURCE"
-#EXTRA_OECMAKE:append:arm = " -DENABLE_NEON=OFF"
-
 do_install:append() {
     # If library installs /usr/lib/libyuv.so as a real file, replace it with a symlink
     if [ -f ${D}/${libdir}/libyuv.so ] && [ ! -L ${D}/${libdir}/libyuv.so ]; then
