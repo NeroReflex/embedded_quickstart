@@ -26,4 +26,5 @@ FILES:${PN} += " \
     ${datadir}/embuer/ \
 "
 
+inherit cargo
 include dependencies.inc
