@@ -6,8 +6,8 @@ SRC_URI += "git://github.com/NeroReflex/embuer.git;protocol=https;nobranch=1"
 SRCREV = "d50cdcf4f9b506a8f0b4b9cf5ca360e61861a912"
 S = "${WORKDIR}/git"
 
-DEPENDS += " bindgen-cli-native clang-native pkgconfig-native "
-RDEPENDS:${PN} += " systemd "
+DEPENDS += " bindgen-cli-native clang-native pkgconfig-native openssl "
+RDEPENDS:${PN} += " openssl systemd "
 
 do_install:append () {
     install -d ${D}/${datadir}/embuer
