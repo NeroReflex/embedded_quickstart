@@ -11,7 +11,6 @@ RDEPENDS:${PN} += " openssl systemd "
 
 do_install:append () {
     install -d ${D}/${datadir}/embuer
-    install -Dm600 ${WORKDIR}/user_autologin_cmd ${D}/${sysconfdir}/autologin/user_autologin_cmd
 
     install -d ${D}/${systemd_unitdir}/system
     install -Dm644 ${S}/rootfs/usr/lib/systemd/system/embuer.service ${D}/${systemd_unitdir}/system/
