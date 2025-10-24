@@ -9,22 +9,17 @@ error_handler() {
 # Set the trap to call the error_handler function on ERR
 trap 'error_handler' ERR
 
-readonly CURRENT_SCRIPT_DIR="${BASH_SOURCE%/*}"
-
 # this is the place where the subvolid=5 is mounted
-readonly MAIN_SUBVOL_PATH="/mnt"
-
-readonly DEPLOYMENTS_DIR="deployments"
+readonly MAIN_SUBVOL_PATH=$1
+readonly DEPLOYMENTS_DIR=$2
 readonly DEPLOYMENTS_DATA_DIR="deployments_data"
+readonly DEPLOYMENT_NAME=$3
+readonly CURRENT_DEPLOYMENT_NAME=$4
 
-# Here it is assumed the script is located at /usr/lib/embedded_quickstart
-readonly DEPLOYMENT_NAME=$(cat "$CURRENT_SCRIPT_DIR/version")
 readonly SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$DEPLOYMENT_NAME"
+readonly OLD_SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$CURRENT_DEPLOYMENT_NAME"
 
-if [ -f "/usr/lib/embedded_quickstart/version" ]; then
-    readonly CURRENT_DEPLOYMENT_NAME=$(cat "/usr/lib/embedded_quickstart/version")
-    readonly OLD_SUBVOL_DATA="$MAIN_SUBVOL_PATH/$DEPLOYMENTS_DATA_DIR/$CURRENT_DEPLOYMENT_NAME"
-
+if [ ! -z "${CURRENT_DEPLOYMENT_NAME}" ]; then
     # here clone the /etc, /var overlay subvolumes:
     # these are the overlays with modifications that have to be kept
     # across updates.

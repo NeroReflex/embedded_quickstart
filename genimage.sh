@@ -396,11 +396,34 @@ echo "----------------------------------------------------------"
 #echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/rdname"
 
 # prapare the deployment snapshot
-mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart"
-echo "${DEPLOYMENT_SUBVOL_NAME}" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/version"
+mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer"
 
-install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/install"
-install -D -m 755 "${CURRENT_SCRIPT_DIR}/uninstall.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/embedded_quickstart/uninstall"
+echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "  \"version\": \"${DEPLOYMENT_SUBVOL_NAME}\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "  \"readonly\": true," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "  \"date\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "  \"install_script\": \"/usr/share/embedded_quickstart/install\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "  \"uninstall_script\": \"$/usr/share/embedded_quickstart/uninstall\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+
+echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"update_url\": \"http://10.0.0.33:8080/factory.btrfs.xz\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"auto_install_updates\": false," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"rootfs_dir\": \"/mnt\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"public_key_pem\": \"/usr/share/embuer/public_key_pkcs1.pem\"" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+
+if [ ! -f "private_key.pem" ]; then
+    openssl genrsa -out private_key.pem 2048
+    openssl rsa -in private_key.pem -pubout -outform PEM -RSAPublicKey_out -out public_key_pkcs1.pem
+fi
+
+mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart"
+cp public_key_pkcs1.pem "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/public_key.pem"
+install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/install"
+install -D -m 755 "${CURRENT_SCRIPT_DIR}/uninstall.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/uninstall"
 
 echo "--------------------- BTRFS ------------------------------"
 
