@@ -472,7 +472,7 @@ fi
 
 echo "----------------------------------------------------------"
 
-# Umount the filesyste and the loopback device
+# Umount the filesystem and the loopback device
 dismantle
 
 sync
@@ -480,3 +480,12 @@ sync
 echo ""
 echo ""
 echo "Image generated successfully!"
+
+echo "Generating the update package..."
+
+echo 'Version 1.2.0' > "${BINARIES_DIR}/CHANGELOG"
+echo '' >> "${BINARIES_DIR}/CHANGELOG"
+echo '- Initial release.' >> "${BINARIES_DIR}/CHANGELOG"  
+echo '' >> "${BINARIES_DIR}/CHANGELOG"
+
+tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" CHANGELOG "${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
