@@ -412,7 +412,7 @@ echo "  \"auto_install_updates\": false," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/
 echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "  \"rootfs_dir\": \"/mnt\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
-echo "  \"public_key_pem\": \"/usr/share/embuer/public_key_pkcs1.pem\"" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"public_key_pem\": \"/usr/share/embedded_quickstart/public_key_pkcs1.pem\"" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 
 if [ ! -f "private_key.pem" ]; then
@@ -421,7 +421,7 @@ if [ ! -f "private_key.pem" ]; then
 fi
 
 mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart"
-cp public_key_pkcs1.pem "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/public_key.pem"
+cp public_key_pkcs1.pem "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/"
 install -D -m 755 "${CURRENT_SCRIPT_DIR}/install.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/install"
 install -D -m 755 "${CURRENT_SCRIPT_DIR}/uninstall.sh" "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embedded_quickstart/uninstall"
 
