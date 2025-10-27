@@ -26,6 +26,7 @@ do_install:append () {
 FILES:${PN} += " \
     ${systemd_unitdir}/system/embuer.service \
     ${datadir}/embuer/ \
+    ${datadir}/dbus-1/system.d/org.neroreflex.embuer.conf \
 "
 
 inherit cargo
