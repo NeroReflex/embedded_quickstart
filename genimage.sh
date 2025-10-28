@@ -407,7 +407,7 @@ echo "  \"uninstall_script\": \"$/usr/share/embedded_quickstart/uninstall\"," >>
 echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 
 echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
-echo "  \"update_url\": \"http://http://65.21.79.97/update_package.tar\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"update_url\": \"http://65.21.79.97/update_package.tar\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "  \"auto_install_updates\": false," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "  \"rootfs_dir\": \"/mnt\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
