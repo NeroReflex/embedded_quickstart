@@ -488,4 +488,6 @@ echo '' >> "${BINARIES_DIR}/CHANGELOG"
 echo '- Initial release.' >> "${BINARIES_DIR}/CHANGELOG"  
 echo '' >> "${BINARIES_DIR}/CHANGELOG"
 
-tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" CHANGELOG "${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz"
+cp "${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "update.btrfs.xz"
+tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" CHANGELOG "update.btrfs.xz"
+rm "update.btrfs.xz"
