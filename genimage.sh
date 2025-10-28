@@ -407,7 +407,7 @@ echo "  \"uninstall_script\": \"$/usr/share/embedded_quickstart/uninstall\"," >>
 echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 
 echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
-echo "  \"update_url\": \"http://10.0.0.33:8080/factory.btrfs.xz\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
+echo "  \"update_url\": \"http://http://65.21.79.97/update_package.tar\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "  \"auto_install_updates\": false," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
 echo "  \"rootfs_dir\": \"/mnt\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
@@ -488,6 +488,6 @@ echo '' >> "${BINARIES_DIR}/CHANGELOG"
 echo '- Initial release.' >> "${BINARIES_DIR}/CHANGELOG"  
 echo '' >> "${BINARIES_DIR}/CHANGELOG"
 
-cp "${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "update.btrfs.xz"
+cp "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "${BINARIES_DIR}/update.btrfs.xz"
 tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" CHANGELOG "update.btrfs.xz"
 rm "update.btrfs.xz"
