@@ -491,10 +491,10 @@ echo '- Initial release.' >> "${BINARIES_DIR}/CHANGELOG"
 echo '' >> "${BINARIES_DIR}/CHANGELOG"
 
 # Generate the signature
-openssl dgst -sha512 -sign private_key.pem -out update.signature update.btrfs.xz
+openssl dgst -sha512 -sign private_key.pem -out "${BINARIES_DIR}/update.signature" "${BINARIES_DIR}/update.btrfs.xz"
 
 # Check the signature
-openssl dgst -sha512 -verify public_key_pkcs1.pem -signature update.signature update.btrfs.xz
+openssl dgst -sha512 -verify public_key_pkcs1.pem -signature "${BINARIES_DIR}/update.signature" "${BINARIES_DIR}/update.btrfs.xz"
 
 cp "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "${BINARIES_DIR}/update.btrfs.xz"
 tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" "CHANGELOG" "update.signature" "update.btrfs.xz"
