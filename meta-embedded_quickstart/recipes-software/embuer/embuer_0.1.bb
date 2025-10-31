@@ -3,7 +3,7 @@ DESCRIPTION = "Updater service with a DBus interface"
 LICENSE = "CLOSED"
 
 SRC_URI += "git://github.com/NeroReflex/embuer.git;protocol=https;nobranch=1"
-SRCREV = "b1b68171de31d81d00738f76208fb2ce59d4f380"
+SRCREV = "9c80c7dd5620def9e03db5703c859631bc071efa"
 S = "${WORKDIR}/git"
 
 DEPENDS += " bindgen-cli-native clang-native pkgconfig-native openssl "
