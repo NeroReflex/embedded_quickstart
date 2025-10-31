@@ -401,9 +401,11 @@ mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer"
 echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 echo "  \"version\": \"${DEPLOYMENT_SUBVOL_NAME}\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 echo "  \"readonly\": true," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
-echo "  \"date\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 echo "  \"install_script\": \"/usr/share/embedded_quickstart/install\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 echo "  \"uninstall_script\": \"$/usr/share/embedded_quickstart/uninstall\"," >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
+
+# mind absence of comma at the end of the last line
+echo "  \"date\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 echo "}" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/manifest.json"
 
 echo "{" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/embuer/config.json"
