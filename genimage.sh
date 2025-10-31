@@ -490,12 +490,17 @@ echo '' >> "${BINARIES_DIR}/CHANGELOG"
 echo '- Initial release.' >> "${BINARIES_DIR}/CHANGELOG"  
 echo '' >> "${BINARIES_DIR}/CHANGELOG"
 
+# Copy deployment data into final destination
+cp "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "${BINARIES_DIR}/update.btrfs.xz"
+
 # Generate the signature
 openssl dgst -sha512 -sign private_key.pem -out "${BINARIES_DIR}/update.signature" "${BINARIES_DIR}/update.btrfs.xz"
 
 # Check the signature
 openssl dgst -sha512 -verify public_key_pkcs1.pem -signature "${BINARIES_DIR}/update.signature" "${BINARIES_DIR}/update.btrfs.xz"
 
-cp "${BINARIES_DIR}/${DEPLOYMENT_SUBVOL_NAME}.btrfs.xz" "${BINARIES_DIR}/update.btrfs.xz"
+# Create the update tar package compatible with embuer
 tar cf "${BINARIES_DIR}/update_package.tar" -C "${BINARIES_DIR}" "CHANGELOG" "update.signature" "update.btrfs.xz"
+
+# Remove copy of deployment data
 rm "${BINARIES_DIR}/update.btrfs.xz"
