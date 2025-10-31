@@ -12,6 +12,11 @@ if [ -z "${MACHINE}" ]; then
     exit 1
 fi
 
+if [ -z "${VERSION}" ]; then
+    echo "No VERSION defined. Stop."
+    exit 1
+fi
+
 source setup-environment.sh && bitbake meta-b2qt-embedded-qbsp
 
 if [ -z "$CURRENT_SCRIPT_DIR" ]; then
@@ -19,7 +24,7 @@ if [ -z "$CURRENT_SCRIPT_DIR" ]; then
 fi
 
 echo "Running genimage.sh from $CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh"
-sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIRNAME/build-$MACHINE/tmp/deploy/images/$MACHINE" "factory"
+sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIRNAME/build-$MACHINE/tmp/deploy/images/$MACHINE" "${VERSION}"
 
 readonly DISK_IMAGE_LINK="$CURRENT_SCRIPT_DIRNAME/disk_image_$MACHINE.img"
 
