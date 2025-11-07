@@ -138,6 +138,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
 
     readonly REFIND_NAME="refind-bin-0.14.2"
+    rm -rf "${CURRENT_SCRIPT_DIR}/refind_temp"
     unzip "${CURRENT_SCRIPT_DIR}/${REFIND_NAME}.zip" -d "${CURRENT_SCRIPT_DIR}/refind_temp"
 
     echo "Writing the EFI bootloader ${REFIND_NAME}..."
@@ -145,7 +146,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     mount "${LOOPBACK_OUTPUT}p1" "${TARGET_ROOTFS}"
     mkdir -p "${TARGET_ROOTFS}/EFI/BOOT"
 
-    "${CURRENT_SCRIPT_DIR}/refind_temp/${REFIND_NAME}/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI"
+    cp "${CURRENT_SCRIPT_DIR}/refind_temp/${REFIND_NAME}/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI"
     cp -a "${CURRENT_SCRIPT_DIR}/refind_temp/${REFIND_NAME}/refind" "${TARGET_ROOTFS}/EFI/"
     rm "${TARGET_ROOTFS}/EFI/refind/refind.conf-sample"
 
