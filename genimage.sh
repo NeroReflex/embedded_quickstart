@@ -101,6 +101,8 @@ else
 fi
 
 if [ -f "${BINARIES_DIR}/imx-boot" ]; then
+    export IMAGE_PART_NUMBER="1"
+    
     parted -s "${LOOPBACK_OUTPUT}" mklabel msdos
     parted -s "${LOOPBACK_OUTPUT}" --script mkpart primary btrfs 8MiB 100%
     echo "Writing the bootloader..."
@@ -109,8 +111,9 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
         dismantle
         exit -1
     fi
-    export IMAGE_PART_NUMBER="1"
 elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
+    export IMAGE_PART_NUMBER="2"
+
     readonly BOOT_SIZE_MIB=100
     parted --script "${LOOPBACK_OUTPUT}" mklabel gpt
     parted --script "${LOOPBACK_OUTPUT}" \
@@ -120,7 +123,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
 
     parted --script "${BINARIES_DIR}" \
         mkpart primary btrfs ${BOOT_SIZE_MIB}MiB 100% \
-        type $ROOT_PART_NUMBER "4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709"
+        type $IMAGE_PART_NUMBER "4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709"
 
     mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
 
@@ -139,8 +142,6 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
 
     sync
     umount "${TARGET_ROOTFS}"
-
-    export IMAGE_PART_NUMBER="2"
 
     echo "Debug NOW"
     exit 0
