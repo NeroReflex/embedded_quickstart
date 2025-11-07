@@ -120,19 +120,19 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
 elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     export IMAGE_PART_NUMBER="2"
 
+    parted -s "${LOOPBACK_OUTPUT}" mklabel gpt
+
     echo "Creating EFI System Partition..."
 
-    readonly BOOT_SIZE_MIB=100
-    parted -s "${LOOPBACK_OUTPUT}" mklabel gpt
     parted --script "${LOOPBACK_OUTPUT}" \
-		mkpart primary fat32 1MiB ${BOOT_SIZE_MIB}MiB \
+		mkpart primary fat32 1MiB 100MiB \
 		type 1 "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" \
 		set 1 esp on
 
     echo "Creating the rootfs partition..."
 
-    parted --script "${BINARIES_DIR}" \
-        mkpart primary btrfs ${BOOT_SIZE_MIB}MiB 100% \
+    parted --script "${LOOPBACK_OUTPUT}" \
+        mkpart primary btrfs 100MiB 100% \
         type $IMAGE_PART_NUMBER "4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709"
 
     mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
