@@ -125,21 +125,25 @@ if [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
 
     local REFIND_NAME="refind-bin-0.14.2"
-    unzip "${REFIND_NAME}.zip" -d refind_temp
+    unzip "${CURRENT_SCRIPT_DIR}/${REFIND_NAME}.zip" -d "${CURRENT_SCRIPT_DIR}/refind_temp"
 
     echo "Writing the EFI bootloader..."
 
     mount "${LOOPBACK_OUTPUT}p1" "${TARGET_ROOTFS}"
     mkdir -p "${TARGET_ROOTFS}/EFI/BOOT"
 
-    cp "refind_temp/${REFIND_NAME}/refind/bootx64.efi" "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI"
-    cp -a "refind_temp/${REFIND_NAME}/refind" "${TARGET_ROOTFS}/EFI/"
-    mv "${TARGET_ROOTFS}/EFI/refind/refind.conf-sample" "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+    cp "${CURRENT_SCRIPT_DIR}/refind_temp/${REFIND_NAME}/refind/bootx64.efi" "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI"
+    cp -a "${CURRENT_SCRIPT_DIR}/refind_temp/${REFIND_NAME}/refind" "${TARGET_ROOTFS}/EFI/"
+    rm "${TARGET_ROOTFS}/EFI/refind/refind.conf-sample"
+    cp "${CURRENT_SCRIPT_DIR}/refind.conf" "${TARGET_ROOTFS}/EFI/refind/"
 
     sync
     umount "${TARGET_ROOTFS}"
 
     export IMAGE_PART_NUMBER="2"
+
+    echo "Debug NOW"
+    exit 0
 else
     echo "Unsupported hardware."
     dismantle
