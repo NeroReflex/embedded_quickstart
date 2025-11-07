@@ -111,7 +111,7 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
     fi
     export IMAGE_PART_NUMBER="1"
 elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
-    local BOOT_SIZE_MIB=100
+    readonly BOOT_SIZE_MIB=100
     parted --script "${LOOPBACK_OUTPUT}" mklabel gpt
     parted --script "${LOOPBACK_OUTPUT}" \
 		mkpart primary fat32 1MiB ${BOOT_SIZE_MIB}MiB \
@@ -124,7 +124,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
 
     mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
 
-    local REFIND_NAME="refind-bin-0.14.2"
+    readonly REFIND_NAME="refind-bin-0.14.2"
     unzip "${CURRENT_SCRIPT_DIR}/${REFIND_NAME}.zip" -d "${CURRENT_SCRIPT_DIR}/refind_temp"
 
     echo "Writing the EFI bootloader..."
