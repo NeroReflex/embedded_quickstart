@@ -100,11 +100,17 @@ else
     exit -1
 fi
 
+echo "Prepared loopback device: '${LOOPBACK_OUTPUT}'"
+
 if [ -f "${BINARIES_DIR}/imx-boot" ]; then
     export IMAGE_PART_NUMBER="1"
     
     parted -s "${LOOPBACK_OUTPUT}" mklabel msdos
+
+    echo "Creating the rootfs partition..."
+
     parted -s "${LOOPBACK_OUTPUT}" --script mkpart primary btrfs 8MiB 100%
+
     echo "Writing the bootloader..."
     if ! dd if="${BINARIES_DIR}/imx-boot" of="${LOOPBACK_OUTPUT}" bs=1K seek=33 conv=fsync ; then
         echo "ERROR: Could not write imx-boot to image"
@@ -114,12 +120,16 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
 elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     export IMAGE_PART_NUMBER="2"
 
+    echo "Creating EFI System Partition..."
+
     readonly BOOT_SIZE_MIB=100
-    parted --script "${LOOPBACK_OUTPUT}" mklabel gpt
+    parted -s "${LOOPBACK_OUTPUT}" mklabel gpt
     parted --script "${LOOPBACK_OUTPUT}" \
 		mkpart primary fat32 1MiB ${BOOT_SIZE_MIB}MiB \
 		type 1 "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" \
 		set 1 esp on
+
+    echo "Creating the rootfs partition..."
 
     parted --script "${BINARIES_DIR}" \
         mkpart primary btrfs ${BOOT_SIZE_MIB}MiB 100% \
