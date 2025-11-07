@@ -110,6 +110,36 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
         exit -1
     fi
     export IMAGE_PART_NUMBER="1"
+if [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
+    local BOOT_SIZE_MIB=100
+    parted --script "${LOOPBACK_OUTPUT}" mklabel gpt
+    parted --script "${LOOPBACK_OUTPUT}" \
+		mkpart primary fat32 1MiB ${BOOT_SIZE_MIB}MiB \
+		type 1 "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" \
+		set 1 esp on
+
+    parted --script "${BINARIES_DIR}" \
+        mkpart primary btrfs ${BOOT_SIZE_MIB}MiB 100% \
+        type $ROOT_PART_NUMBER "4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709"
+
+    mkfs.vfat -F32 "${LOOPBACK_OUTPUT}p1" -n BOOTEFI
+
+    local REFIND_NAME="refind-bin-0.14.2"
+    unzip "${REFIND_NAME}.zip" -d refind_temp
+
+    echo "Writing the EFI bootloader..."
+
+    mount "${LOOPBACK_OUTPUT}p1" "${TARGET_ROOTFS}"
+    mkdir -p "${TARGET_ROOTFS}/EFI/BOOT"
+
+    cp "refind_temp/${REFIND_NAME}/refind/bootx64.efi" "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI"
+    cp -a "refind_temp/${REFIND_NAME}/refind" "${TARGET_ROOTFS}/EFI/"
+    mv "${TARGET_ROOTFS}/EFI/refind/refind.conf-sample" "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+
+    sync
+    umount "${TARGET_ROOTFS}"
+
+    export IMAGE_PART_NUMBER="2"
 else
     echo "Unsupported hardware."
     dismantle
