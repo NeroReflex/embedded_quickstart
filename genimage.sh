@@ -110,7 +110,7 @@ if [ -f "${BINARIES_DIR}/imx-boot" ]; then
         exit -1
     fi
     export IMAGE_PART_NUMBER="1"
-if [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
+elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     local BOOT_SIZE_MIB=100
     parted --script "${LOOPBACK_OUTPUT}" mklabel gpt
     parted --script "${LOOPBACK_OUTPUT}" \
