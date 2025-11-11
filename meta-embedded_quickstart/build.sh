@@ -17,7 +17,7 @@ if [ -z "${VERSION}" ]; then
     exit 1
 fi
 
-source setup-environment.sh && bitbake meta-b2qt-embedded-qbsp
+source setup-environment.sh
 
 if [ -z "$CURRENT_SCRIPT_DIR" ]; then
     CURRENT_SCRIPT_DIR="."
@@ -29,6 +29,7 @@ if [ ! -d "$CURRENT_SCRIPT_DIR/downloads" ]; then
     ln -s "../downloads" "$CURRENT_SCRIPT_DIR/downloads"
 fi
 
+bitbake meta-b2qt-embedded-qbsp
 
 echo "Running genimage.sh from $CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh"
 sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIRNAME/build-$MACHINE/tmp/deploy/images/$MACHINE" "${VERSION}"
