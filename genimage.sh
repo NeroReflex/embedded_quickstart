@@ -159,7 +159,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
 
         echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    volume PARTUUID=$ROOTFS_PARTUUID" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    loader /@/boot/vmlinuz-5.15.0-custom" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    loader /boot/bzImage" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs \"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    icon /EFI/refind/icons/os_linux.png" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "}" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
