@@ -23,6 +23,13 @@ if [ -z "$CURRENT_SCRIPT_DIR" ]; then
     CURRENT_SCRIPT_DIR="."
 fi
 
+if [ ! -d "$CURRENT_SCRIPT_DIR/downloads" ]; then
+    echo "Creating symlink to downloads directory"
+    mkdir -p "$CURRENT_SCRIPT_DIR/../downloads"
+    ln -s "../downloads" "$CURRENT_SCRIPT_DIR/downloads"
+fi
+
+
 echo "Running genimage.sh from $CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh"
 sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIRNAME/build-$MACHINE/tmp/deploy/images/$MACHINE" "${VERSION}"
 
