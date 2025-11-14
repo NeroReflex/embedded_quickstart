@@ -153,6 +153,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     cp "${CURRENT_SCRIPT_DIR}/refind.conf" "${TARGET_ROOTFS}/EFI/refind/"
 
     readonly ROOTFS_PARTUUID=$(blkid -s PARTUUID -o value "${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}")
+    readonly ROOTFS_UUID=$(blkid -s UUID -o value "${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}")
     readonly ROOTFS_PARTUUID_RESULT=$?
     if [ $ROOTFS_PARTUUID_RESULT -eq 0 ]; then
         echo "Configuring rEFInd to start: '${ROOTFS_PARTUUID}'"
@@ -160,7 +161,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    volume PARTUUID=$ROOTFS_PARTUUID" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    loader /boot/bzImage" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs \"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    options \"root=UUID=$ROOTFS_UUID rw rootfstype=btrfs \"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    icon /EFI/refind/icons/os_linux.png" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "}" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
 
