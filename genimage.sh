@@ -159,11 +159,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         echo "Configuring rEFInd to start: '${ROOTFS_PARTUUID}'"
 
         echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    volume PARTUUID=$ROOTFS_PARTUUID" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    loader /boot/bzImage" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo '    volume "rootfs"' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo '    loader /boot/bzImage' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    options \"root=UUID=$ROOTFS_UUID rw rootfstype=btrfs \"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    icon /EFI/refind/icons/os_linux.png" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "}" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo '    icon /EFI/refind/icons/os_linux.png' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo '}' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
 
     else
         echo "ERROR: Could not fetch the PARTUUID of the rootfs partition"
