@@ -161,7 +161,9 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    volume "rootfs"' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    loader /boot/bzImage' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    options \"root=UUID=$ROOTFS_UUID rw rootfstype=btrfs \"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    #options \"root=PARTUUID=$ROOTFS_UUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    #options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    options \"root=PARTLABEL=rootfs rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    icon /EFI/refind/icons/os_linux.png' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '}' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
 
