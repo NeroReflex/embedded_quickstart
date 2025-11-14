@@ -104,7 +104,7 @@ echo "Prepared loopback device: '${LOOPBACK_OUTPUT}'"
 
 if [ -f "${BINARIES_DIR}/imx-boot" ]; then
     export IMAGE_PART_NUMBER="1"
-    
+
     parted -s "${LOOPBACK_OUTPUT}" mklabel msdos
 
     echo "Creating the rootfs partition..."
