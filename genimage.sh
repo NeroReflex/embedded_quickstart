@@ -80,7 +80,7 @@ readonly IMAGE_FILE_PATH="${BINARIES_DIR}/disk_image.img"
 if [ -d "${BINARIES_DIR}" ]; then
     if [ ! -f "${IMAGE_FILE_PATH}" ]; then
         echo "Image Disk file not found: creating a new one"
-        if ! fallocate -l 2G "${IMAGE_FILE_PATH}"; then
+        if ! fallocate -l 1G "${IMAGE_FILE_PATH}"; then
             echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
             exit -1
         fi
