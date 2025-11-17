@@ -154,20 +154,17 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     cp "${CURRENT_SCRIPT_DIR}/refind.conf" "${TARGET_ROOTFS}/EFI/refind/"
 
     readonly ROOTFS_PARTUUID=$(blkid -s PARTUUID -o value "${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}")
-    readonly ROOTFS_UUID=$(blkid -s UUID -o value "${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER}")
     readonly ROOTFS_PARTUUID_RESULT=$?
     if [ $ROOTFS_PARTUUID_RESULT -eq 0 ]; then
-        echo "Configuring rEFInd to start: '${ROOTFS_PARTUUID}'"
+        echo "Configuring rEFInd to start: rootfs on PARTUUID='${ROOTFS_PARTUUID}'"
 
         echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    volume "rootfs"' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    loader /boot/bzImage' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    #options \"root=PARTUUID=$ROOTFS_UUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    #options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    options \"root=PARTLABEL=rootfs rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    #options \"root=PARTLABEL=rootfs rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    icon /EFI/refind/icons/os_linux.png' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '}' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-
     else
         echo "ERROR: Could not fetch the PARTUUID of the rootfs partition"
         dismantle
