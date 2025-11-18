@@ -6,17 +6,12 @@ inherit cargo
 DEFAULT_PREFERENCE = "-1"
 
 SRC_URI += "git://github.com/NeroReflex/atomrootfsinit.git;protocol=https;nobranch=1;branch=main"
-SRC_URI[libc-0.2.173.sha256sum] = "d8cfeafaffdbc32176b64fb251369d52ea9f0a8fbc6f8759edffef7b525d64bb"
-SRCREV = "0.6.13"
+SRCREV = "${PV}"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
-
-# please note if you have entries that do not begin with crate://
-# you must change them to how that package can be fetched
-SRC_URI += " \
-    crate://crates.io/libc/0.2.173 \
-"
+SRC_URI += " crate://crates.io/libc/0.2.177 "
+SRC_URI[libc-0.2.177.sha256sum] = "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976"
 
 #LIC_FILES_CHKSUM = " \
 #    file://GPL-2.0-or-later;md5=9e7997fcb3ca1892479c156fe720975d \
