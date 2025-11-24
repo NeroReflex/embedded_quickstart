@@ -179,6 +179,9 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     mkdir -p "${CURRENT_SCRIPT_DIR}/shim_install"
     make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\\\refind_x64.efi' install
 
+    # Install shim
+    cp -r "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT" "${TARGET_ROOTFS}/EFI/"
+
     sync
     umount "${TARGET_ROOTFS}"
 else
