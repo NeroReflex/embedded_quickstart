@@ -176,7 +176,8 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && git checkout 16.1 && git submodule update --init"
 
     # For this to work install libelf-dev
-    make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim"
+    mkdir -p "${CURRENT_SCRIPT_DIR}/shim_install"
+    make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\\\refind_x64.efi' install
 
     sync
     umount "${TARGET_ROOTFS}"
