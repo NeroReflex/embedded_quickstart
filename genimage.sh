@@ -172,7 +172,7 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     fi
 
     git clone https://github.com/rhboot/shim.git "${CURRENT_SCRIPT_DIR}/shim"
-    bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && checkout 16.1"
+    bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && git checkout 16.1"
 
     make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim"
 
