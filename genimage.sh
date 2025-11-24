@@ -171,6 +171,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         exit -1
     fi
 
+    git clone https://github.com/rhboot/shim.git "${CURRENT_SCRIPT_DIR}/shim"
+    bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && checkout 16.1"
+
+    make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim"
+
     sync
     umount "${TARGET_ROOTFS}"
 else
