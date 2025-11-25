@@ -174,7 +174,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
 
     rm -rf "${CURRENT_SCRIPT_DIR}/shim"
     git clone https://github.com/rhboot/shim.git "${CURRENT_SCRIPT_DIR}/shim"
-    bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && git checkout 16.1 && git submodule update --init"
+    if ! bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && git checkout 16.1 && git submodule update --init"; then
+        echo "ERROR: Could not checkout shim"
+        dismantle
+        exit -1
+    fi
 
     mkdir -p "${CURRENT_SCRIPT_DIR}/secure_boot"
     if ! bash -i -c "cd ${CURRENT_SCRIPT_DIR}/secure_boot && ${CURRENT_SCRIPT_DIR}/create_efi_key.sh"; then
@@ -186,13 +190,17 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     # For this to work install libelf-dev
     rm -rf "${CURRENT_SCRIPT_DIR}/shim_install"
     mkdir "${CURRENT_SCRIPT_DIR}/shim_install"
-    make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\\\refind_x64.efi' OSLABEL=refind ENABLE_SHIM_CERT=y install
+    if ! make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\\\refind_x64.efi' OSLABEL=refind ENABLE_SHIM_CERT=y install; then
+        echo "ERROR: Could not sign build shim"
+        dismantle
+        exit -1
+    fi
 
     # Install shim
     cp -r "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT" "${TARGET_ROOTFS}/EFI/"
 
-    SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/shim_install/db.crt"
-    SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/shim_install/db.key"
+    SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/secure_boot/db.crt"
+    SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/secure_boot/db.key"
 
     # sign the bootloader
     if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
