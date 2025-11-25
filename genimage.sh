@@ -216,14 +216,16 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         echo "ERROR: Could not sign mmx64.efi"
         dismantle
         exit -1
+    else
+        cp "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${TARGET_ROOTFS}/EFI/refind/mmx64.efi"
     fi
 
-    # Install fbx64.efi
-    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/fbx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/fbx64.efi"; then
-        echo "ERROR: Could not sign mmx64.efi"
-        dismantle
-        exit -1
-    fi
+    ## Install fbx64.efi
+    #if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/fbx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/fbx64.efi"; then
+    #    echo "ERROR: Could not sign fbx64.efi"
+    #    dismantle
+    #    exit -1
+    #fi
 
     # sign the bootloader
     if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
@@ -297,13 +299,21 @@ if [ -f "${ROOTFS_TAR_FILE}" ]; then
     echo "Unpacking '${ROOTFS_TAR_FILE}' on the deployment subvolume..."
     tar xpf "${ROOTFS_TAR_FILE}" -C "${EXTRACTED_ROOTFS_HOST_PATH}"
 else
-    echo "No tar rootfs found."
+    echo "ERROR: No tar rootfs found."
     dismantle
     exit -1
 fi
 
-if [ ! -z "$SECURE_BOOT_KEY" ]; then
-    sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage" "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage"
+if [ -f "$SECURE_BOOT_KEY" ] && [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage" ]; then
+    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage" "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage"; then
+        echo "ERROR: could not sign kernel for secure boot."
+        dismantle
+        exit -1
+    else
+        echo "bzImage signed successfully"
+    fi
+else
+    echo "Secure boot key not found: kernel won't be signed"
 fi
 
 # Avoid failing due to fstab not finding these
