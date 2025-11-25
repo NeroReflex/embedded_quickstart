@@ -159,13 +159,15 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     if [ $ROOTFS_PARTUUID_RESULT -eq 0 ]; then
         echo "Configuring rEFInd to start: rootfs on PARTUUID='${ROOTFS_PARTUUID}'"
 
-        echo 'menuentry "Linux (no initramfs)" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo 'menuentry "Embedded Linux" {' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    volume "rootfs"' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    loader /boot/bzImage' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
-        echo "    options \"root=PARTUUID=$ROOTFS_PARTUUID rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo "    options \"root=PARTUUID=$ROOTFS_PARTUUID ro rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\" add_efi_memmap" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo "    #options \"root=PARTLABEL=rootfs rw rootfstype=btrfs rootdelay=5 video=efifb:1920x1080\"" >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '    icon /EFI/refind/icons/os_linux.png' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
         echo '}' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo '' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
+        echo 'default_selection "Embedded Linux"' >> "${TARGET_ROOTFS}/EFI/refind/refind.conf"
     else
         echo "ERROR: Could not fetch the PARTUUID of the rootfs partition"
         dismantle
@@ -209,6 +211,20 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         exit -1
     fi
 
+    # Install mmx64.efi
+    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/mmx64.efi"; then
+        echo "ERROR: Could not sign mmx64.efi"
+        dismantle
+        exit -1
+    fi
+
+    # Install fbx64.efi
+    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/fbx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/fbx64.efi"; then
+        echo "ERROR: Could not sign mmx64.efi"
+        dismantle
+        exit -1
+    fi
+
     # sign the bootloader
     if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
         echo "ERROR: Could not sign refind for secure boot"
@@ -216,7 +232,12 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         exit -1
     fi
 
-    sync
+    mkdir -p "${TARGET_ROOTFS}/keys/"
+    cp "${CURRENT_SCRIPT_DIR}/secure_boot/old_dbx.esl" "${TARGET_ROOTFS}/keys/dbx.esl"
+    cp "${CURRENT_SCRIPT_DIR}/secure_boot/db.esl" "${TARGET_ROOTFS}/keys/"
+    cp "${CURRENT_SCRIPT_DIR}/secure_boot/KEK.esl" "${TARGET_ROOTFS}/keys/"
+    cp "${CURRENT_SCRIPT_DIR}/secure_boot/PK.esl" "${TARGET_ROOTFS}/keys/"
+
     umount "${TARGET_ROOTFS}"
 else
     echo "Unsupported hardware."
