@@ -103,6 +103,7 @@ fi
 
 echo "Prepared loopback device: '${LOOPBACK_OUTPUT}'"
 
+SECURE_BOOT_KEY=""
 if [ -f "${BINARIES_DIR}/imx-boot" ]; then
     export IMAGE_PART_NUMBER="1"
 
@@ -190,8 +191,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     # Install shim
     cp -r "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT" "${TARGET_ROOTFS}/EFI/"
 
+    SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/shim_install/db.crt"
+    SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/shim_install/db.key"
+
     # sign the bootloader
-    if ! sbsign --key "${CURRENT_SCRIPT_DIR}/shim_install/db.key" --cert "${CURRENT_SCRIPT_DIR}/shim_install/db.crt" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
+    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
         echo "ERROR: Could not sign refind for secure boot"
         dismantle
         exit -1
@@ -260,6 +264,10 @@ else
     echo "No tar rootfs found."
     dismantle
     exit -1
+fi
+
+if [ ! -z "$SECURE_BOOT_KEY" ]; then
+    sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage" "${EXTRACTED_ROOTFS_HOST_PATH}/boot/bzImage"
 fi
 
 # Avoid failing due to fstab not finding these
