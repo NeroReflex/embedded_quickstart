@@ -180,11 +180,13 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         exit -1
     fi
 
-    mkdir -p "${CURRENT_SCRIPT_DIR}/secure_boot"
-    if ! bash -i -c "cd ${CURRENT_SCRIPT_DIR}/secure_boot && ${CURRENT_SCRIPT_DIR}/create_efi_key.sh"; then
-        echo "ERROR: Could not prepare secure boot keys"
-        dismantle
-        exit -1
+    if [ ! -d "${CURRENT_SCRIPT_DIR}/secure_boot" ]; then
+        mkdir -p "${CURRENT_SCRIPT_DIR}/secure_boot"
+        if ! bash -i -c "cd ${CURRENT_SCRIPT_DIR}/secure_boot && ${CURRENT_SCRIPT_DIR}/create_efi_key.sh"; then
+            echo "ERROR: Could not prepare secure boot keys"
+            dismantle
+            exit -1
+        fi
     fi
 
     # For this to work install libelf-dev
