@@ -211,14 +211,23 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         exit -1
     fi
 
-    # Install mmx64.efi
-    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/mmx64.efi"; then
-        echo "ERROR: Could not sign mmx64.efi"
-        dismantle
-        exit -1
-    else
-        cp "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${TARGET_ROOTFS}/EFI/refind/mmx64.efi"
-    fi
+    # Sign refind if it was installed
+    if [ -f "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" ]; then
+        # sign the bootloader
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
+            echo "ERROR: Could not sign refind for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # Install mmx64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/mmx64.efi"; then
+            echo "ERROR: Could not sign mmx64.efi"
+            dismantle
+            exit -1
+        else
+            cp "${TARGET_ROOTFS}/EFI/BOOT/mmx64.efi" "${TARGET_ROOTFS}/EFI/refind/mmx64.efi"
+        fi
 
     ## Install fbx64.efi
     #if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/fbx64.efi" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/fbx64.efi"; then
@@ -227,11 +236,48 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     #    exit -1
     #fi
 
-    # sign the bootloader
-    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
-        echo "ERROR: Could not sign refind for secure boot"
-        dismantle
-        exit -1
+        # sign btrfs_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/btrfs_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/btrfs_x64.efi"; then
+            echo "ERROR: Could not sign btrfs_x64.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # sign ext4_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/ext4_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/ext4_x64.efi"; then
+            echo "ERROR: Could not sign ext4_x64.efi.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # sign ext2_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/ext2_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/ext2_x64.efi"; then
+            echo "ERROR: Could not sign ext2_x64.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # sign iso9660_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/iso9660_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/iso9660_x64.efi"; then
+            echo "ERROR: Could not sign iso9660_x64.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # sign reiserfs_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/reiserfs_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/reiserfs_x64.efi"; then
+            echo "ERROR: Could not sign reiserfs_x64.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
+        # sign hfs_x64.efi
+        if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/drivers_x64/hfs_x64.efi" "${TARGET_ROOTFS}/EFI/refind/drivers_x64/hfs_x64.efi"; then
+            echo "ERROR: Could not sign hfs_x64.efi for secure boot"
+            dismantle
+            exit -1
+        fi
+
     fi
 
     mkdir -p "${TARGET_ROOTFS}/keys/"
