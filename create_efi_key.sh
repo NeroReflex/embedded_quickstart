@@ -6,7 +6,7 @@ openssl req -new -x509 -newkey rsa:2048 -subj "/CN=tutorial's kernel-signing key
 
 chmod -v 400 *.key
 
-# From now on efitools are needed
+# From now on efitools and libnss3-tools are needed
 
 # this needs uuid-runtime
 echo "Creating a GUID for owner identification"

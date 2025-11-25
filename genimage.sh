@@ -176,7 +176,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     bash -i -c "cd ${CURRENT_SCRIPT_DIR}/shim && git checkout 16.1 && git submodule update --init"
 
     mkdir -p "${CURRENT_SCRIPT_DIR}/secure_boot"
-    bash -i -c "cd ${CURRENT_SCRIPT_DIR}/secure_boot && ${CURRENT_SCRIPT_DIR}/create_efi_key.sh"
+    if ! bash -i -c "cd ${CURRENT_SCRIPT_DIR}/secure_boot && ${CURRENT_SCRIPT_DIR}/create_efi_key.sh"; then
+        echo "ERROR: Could not prepare secure boot keys"
+        dismantle
+        exit -1
+    fi
 
     # For this to work install libelf-dev
     rm -rf "${CURRENT_SCRIPT_DIR}/shim_install"
@@ -187,7 +191,11 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     cp -r "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT" "${TARGET_ROOTFS}/EFI/"
 
     # sign the bootloader
-    sbsign --key "${CURRENT_SCRIPT_DIR}/shim_install/db.key" --cert "${CURRENT_SCRIPT_DIR}/shim_install/db.crt" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"
+    if ! sbsign --key "${CURRENT_SCRIPT_DIR}/shim_install/db.key" --cert "${CURRENT_SCRIPT_DIR}/shim_install/db.crt" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
+        echo "ERROR: Could not sign refind for secure boot"
+        dismantle
+        exit -1
+    fi
 
     sync
     umount "${TARGET_ROOTFS}"
