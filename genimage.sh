@@ -190,14 +190,19 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
     # For this to work install libelf-dev
     rm -rf "${CURRENT_SCRIPT_DIR}/shim_install"
     mkdir "${CURRENT_SCRIPT_DIR}/shim_install"
-    if ! make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\\\refind_x64.efi' OSLABEL=refind ENABLE_SHIM_CERT=y install; then
-        echo "ERROR: Could not sign build shim"
+    if ! make EFIDIR="${TARGET_ROOTFS}" -C "${CURRENT_SCRIPT_DIR}/shim" DESTDIR="${CURRENT_SCRIPT_DIR}/shim_install" DEFAULT_LOADER='\\EFI\\refind\\refind_x64.efi' OSLABEL=refind ENABLE_SHIM_CERT=y install; then
+        echo "ERROR: Could not build shim"
         dismantle
         exit -1
     fi
 
     # Install shim
-    cp -r "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT" "${TARGET_ROOTFS}/EFI/"
+    mkdir -p "${TARGET_ROOTFS}/EFI/BOOT"
+    if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/BOOT/BOOTX64.EFI" "${CURRENT_SCRIPT_DIR}/shim_install/boot/efi/EFI/BOOT/BOOTX64.EFI"; then
+        echo "ERROR: Could not sign shim"
+        dismantle
+        exit -1
+    fi
 
     SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/secure_boot/db.crt"
     SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/secure_boot/db.key"
