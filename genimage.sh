@@ -189,6 +189,9 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         fi
     fi
 
+    SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/secure_boot/db.crt"
+    SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/secure_boot/db.key"
+
     # For this to work install libelf-dev
     rm -rf "${CURRENT_SCRIPT_DIR}/shim_install"
     mkdir "${CURRENT_SCRIPT_DIR}/shim_install"
@@ -205,9 +208,6 @@ elif [ -f "${BINARIES_DIR}/grub-efi-bootx64.efi" ]; then
         dismantle
         exit -1
     fi
-
-    SECURE_BOOT_CRT="${CURRENT_SCRIPT_DIR}/secure_boot/db.crt"
-    SECURE_BOOT_KEY="${CURRENT_SCRIPT_DIR}/secure_boot/db.key"
 
     # sign the bootloader
     if ! sbsign --key "$SECURE_BOOT_KEY" --cert "$SECURE_BOOT_CRT" --output "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi" "${TARGET_ROOTFS}/EFI/refind/refind_x64.efi"; then
