@@ -1,8 +1,13 @@
 SUMMARY = "Autologin setup service for firstboot"
 DESCRIPTION = "Setup autologin service"
-LICENSE = "CLOSED"
+
+LICENSE = "GPL-2.0-or-later"
+LIC_FILES_CHKSUM = " \
+    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
+"
 
 SRC_URI += " \
+    file://LICENSE.md \
     file://autologin-firstboot.sh \
     file://autologin-setup.service \
     file://user_autologin_cmd \
@@ -13,16 +18,16 @@ SRC_URI += " \
     file://user_autologin_username \
 "
 
-RDEPENDS:${PN} = "sudo bash greetd loginng pamloginng loginng-session weston"
+RDEPENDS:${PN} = "sudo bash greetd loginng polyauth loginng-session weston"
 #DEPENDS = ""
 
 do_install:append () {
     install -d ${D}/${sysconfdir}/autologin
     install -Dm600 ${WORKDIR}/user_autologin_cmd ${D}/${sysconfdir}/autologin/user_autologin_cmd
+    install -Dm600 ${WORKDIR}/user_autologin_uid ${D}/${sysconfdir}/autologin/user_autologin_uid
     install -Dm600 ${WORKDIR}/user_autologin_gid ${D}/${sysconfdir}/autologin/user_autologin_gid
     install -Dm600 ${WORKDIR}/user_autologin_intermediate_key ${D}/${sysconfdir}/autologin/user_autologin_intermediate_key
     install -Dm600 ${WORKDIR}/user_autologin_main_password ${D}/${sysconfdir}/autologin/user_autologin_main_password
-    install -Dm600 ${WORKDIR}/user_autologin_uid ${D}/${sysconfdir}/autologin/user_autologin_uid
     install -Dm600 ${WORKDIR}/user_autologin_username ${D}/${sysconfdir}/autologin/user_autologin_username
 
     install -d ${D}/${systemd_unitdir}/system
@@ -40,9 +45,9 @@ FILES:${PN} += " \
     ${bindir}/autologin-firstboot.sh \
     ${systemd_unitdir}/system/autologin-setup.service \
     ${sysconfdir}/autologin/user_autologin_cmd \
+    ${sysconfdir}/autologin/user_autologin_uid \
     ${sysconfdir}/autologin/user_autologin_gid \
     ${sysconfdir}/autologin/user_autologin_intermediate_key \
     ${sysconfdir}/autologin/user_autologin_main_password \
-    ${sysconfdir}/autologin/user_autologin_uid \
     ${sysconfdir}/autologin/user_autologin_username \
 "
