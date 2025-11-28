@@ -3,7 +3,7 @@ DESCRIPTION = "Setup autologin service"
 
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = " \
-    file://LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
+    file://../LICENSE.md;md5=83ea31b4ebf7c17dcd4f18612a0b1df4 \
 "
 
 SRC_URI += " \
