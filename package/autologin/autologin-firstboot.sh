@@ -20,7 +20,7 @@ fi
 export TARGET_ROOTFS="/mnt"
 export EXTRACTED_ROOTFS_HOST_PATH=""
 
-LNG_CTL="login_ng-ctl"
+LNG_CTL="polyauthctl"
 
 if [ ! -d "/etc/autologin" ]; then
     echo "No autologin data to be applied"
@@ -143,8 +143,9 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
     fi
 
     # Create the service directory
-    if ! mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"; then
-        echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/"
+    readonly LOGIN_CFG_DIR="etc/polyauth"
+    if ! mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}"; then
+        echo "Error in creating ${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/"
         exit -1
     fi
 
@@ -155,13 +156,13 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         echo ""
         echo ""
         echo "---------------- Authorized Mounts -----------------------"
-        echo "{" | tee "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "    \"authorizations\": {" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "        \"${AUTOLOGIN_USERNAME}\": [" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "            \"${AUTOLOGIN_USER_MOUNTS_HASH}\"" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "        ]" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "    }" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
-        echo "}" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/login_ng/authorized_mounts.json"
+        echo "{" | tee "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "    \"authorizations\": {" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "        \"${AUTOLOGIN_USERNAME}\": [" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "            \"${AUTOLOGIN_USER_MOUNTS_HASH}\"" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "        ]" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "    }" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
+        echo "}" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/${LOGIN_CFG_DIR}/authorized_mounts.json"
         echo "----------------------------------------------------------"
         echo ""
         echo ""
