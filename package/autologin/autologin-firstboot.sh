@@ -99,8 +99,8 @@ usermod -aG seat $AUTOLOGIN_USERNAME
 usermod -aG input $AUTOLOGIN_USERNAME
 usermod -aG tty $AUTOLOGIN_USERNAME
 
-if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
-    if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
+if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
+    if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
         echo "------------------ Autologin User ------------------------"
         echo "Username: ${AUTOLOGIN_USERNAME}"
         echo "Main Password: ${AUTOLOGIN_MAIN_PASSWORD}"
@@ -137,7 +137,7 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         fi
     fi
 
-    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=${TARGET_ROOTFS}/user_data/upperdir,workdir=${TARGET_ROOTFS}/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
+    if ! "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" set-home-mount --device "overlay" --fstype "overlay" --flags "lowerdir=/home/user,upperdir=${TARGET_ROOTFS}/user_data/upperdir,workdir=${TARGET_ROOTFS}/user_data/workdir,index=off,metacopy=off,xino=off,redirect_dir=off"; then
         echo "Error setting the user home mount"
         exit -1
     fi
@@ -150,7 +150,7 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
     fi
 
     # Authorize the mount
-    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect | awk '/hash:/ {print $2}')
+    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" inspect | awk '/hash:/ {print $2}')
     AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
     if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
         echo ""
@@ -167,7 +167,7 @@ if "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" -p "${AUTOLOGIN_MAIN_PASSWORD}" 
         echo ""
         echo ""
         echo "----------------- Autologin Review -----------------------"
-        "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" inspect
+        "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" inspect
         echo "----------------------------------------------------------"
     else
         echo "Error fetching autologin user's mounts"
@@ -185,7 +185,7 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd" ]; then
     AUTOLOGIN_CMD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd")
     sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
 
-    if ! "${LNG_CTL}" -d "${AUTOLOGIN_USER_HOME_DIR}" set-session --cmd "$AUTOLOGIN_CMD"; then
+    if ! "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" set-session --cmd "$AUTOLOGIN_CMD"; then
         echo "Error setting the user session command"
         exit -1
     fi
