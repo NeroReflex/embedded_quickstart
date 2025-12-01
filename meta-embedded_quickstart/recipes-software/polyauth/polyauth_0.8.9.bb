@@ -6,8 +6,7 @@ inherit cargo
 # DEFAULT_PREFERENCE = "-1"
 
 SRC_URI += "git://github.com/NeroReflex/pam_polyauth.git;protocol=https;nobranch=1;branch=main"
-#SRCREV = "${PV}"
-SRCREV = "a9689545d914eb0f6297c78d29eab98254531bd5"
+SRCREV = "${PV}"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
 
