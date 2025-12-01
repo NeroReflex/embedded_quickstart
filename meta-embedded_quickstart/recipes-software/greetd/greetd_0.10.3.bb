@@ -31,7 +31,7 @@ RDEPENDS:${PN} = "seatd systemd"
 
 do_install:append () {
     install -d ${D}/${sysconfdir}/pam.d
-    install -Dm644 ${WORKDIR}/greetd.pam ${D}/${sysconfdir}//pam.d/greetd
+    install -Dm644 ${WORKDIR}/greetd.pam ${D}/${sysconfdir}/pam.d/greetd
 
     install -d ${D}/${sysconfdir}/greetd
     install -Dm644 ${S}/config.toml ${D}/${sysconfdir}/greetd/config.toml
@@ -39,6 +39,7 @@ do_install:append () {
     install -d ${D}/${systemd_unitdir}/system
     install -Dm644 ${S}/greetd.service ${D}/${systemd_unitdir}/system/greetd.service
 
+    install -d ${D}/${sysconfdir}/greetd/home_dir/
     touch ${D}/${sysconfdir}/greetd/home_dir/.placeholder
 
     install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
