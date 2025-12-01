@@ -34,7 +34,7 @@ do_compile:append () {
 
 do_install:append () {
     install -d ${D}/${libdir}/security/
-    install ${B}/target/${CARGO_TARGET_SUBDIR}/libpam_polyauth.so ${D}/${libdir}/security/libpam_polyauth.so
+    install ${B}/target/${CARGO_TARGET_SUBDIR}/libpam_polyauth.so ${D}/${libdir}/security/pam_polyauth.so
 
     install -d ${D}/usr/share/dbus-1/system.d/
     install -D -m 644 ${S}/rootfs/usr/share/dbus-1/system.d/org.neroreflex.polyauth_mount.conf \
@@ -54,7 +54,7 @@ do_install:append () {
 }
 
 FILES:${PN} += " \
-    ${libdir}/security/libpam_polyauth.so \
+    ${libdir}/security/pam_polyauth.so \
     ${datadir}/dbus-1/system.d/org.neroreflex.polyauth_mount.conf \
     ${datadir}/dbus-1/system.d/org.neroreflex.polyauth_session.conf \
     ${systemd_unitdir}/system/pam_polyauth.service \
