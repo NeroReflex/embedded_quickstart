@@ -1,0 +1,25 @@
+From ba4fb041235b72a62ef6baeafaf2a8b671d13677 Mon Sep 17 00:00:00 2001
+From: "benato.denis96@gmail.com" <benato.denis96@gmail.com>
+Date: Mon, 14 Jul 2025 15:41:18 +0200
+Subject: [PATCH] Exclude a problematic switch
+
+---
+ Cargo.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 6ce029c..ebc7b3d 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,9 +1,9 @@
+ [profile.dev]
+-panic = "abort"
++#panic = "abort"
+ 
+ [profile.release]
+ lto = "fat"
+-panic = "abort"
++#panic = "abort"
+ opt-level = 'z'
+ incremental = false
+ codegen-units = 1

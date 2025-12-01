@@ -6,7 +6,8 @@ inherit cargo
 # DEFAULT_PREFERENCE = "-1"
 
 SRC_URI += " \
-    git://github.com/Mitec-Elettronica-Srl/greetd.git;protocol=https;nobranch=1 \
+    git://github.com/kennylevinsen/greetd.git;protocol=https;nobranch=1 \
+    file://fix_compilation.patch \
     file://greetd.pam \
 "
 
