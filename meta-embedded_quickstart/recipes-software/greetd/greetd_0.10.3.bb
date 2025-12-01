@@ -10,10 +10,9 @@ SRC_URI += " \
     file://greetd.pam \
 "
 
-SRCREV = "ba4fb041235b72a62ef6baeafaf2a8b671d13677"
+SRCREV = "${PV}"
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = "greetd"
-PV:append = "."
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
@@ -66,10 +65,11 @@ FILES:${PN} += " \
     ${sysconfdir}/greetd/home_dir/.placeholder \
 "
 
+include dependencies.inc
+include dependencies_${PV}.inc
+
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
 # what cargo-bitbake generates.
 include greetd-${PV}.inc
 include greetd.inc
-
-include dependencies_${PV}.inc
