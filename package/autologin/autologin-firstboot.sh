@@ -179,7 +179,7 @@ else
 fi
 
 # set the default autologin command
-sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME} -c \"$AUTOLOGIN_CMD\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME} -c $AUTOLOGIN_CMD|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
 
 # Change permissions to what is in home folder
 chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
