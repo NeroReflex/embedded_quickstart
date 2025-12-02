@@ -32,13 +32,13 @@ if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" 
     exit 0
 fi
 
-AUTOLOGIN_UID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_uid")
-AUTOLOGIN_GID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_gid")
-AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
-AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
-AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
-
-AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
+readonly AUTOLOGIN_UID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_uid")
+readonly AUTOLOGIN_GID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_gid")
+readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
+readonly AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
+readonly AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
+readonly AUTOLOGIN_CMD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd")
+readonly AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
 useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
 
@@ -150,7 +150,7 @@ if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup
     fi
 
     # Authorize the mount
-    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" inspect | awk '/hash:/ {print $2}')
+    AUTOLOGIN_USER_MOUNTS_HASH=$("${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" inspect | awk '/hash:/ {print $3}')
     AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT=$?
     if [ $AUTOLOGIN_USER_MOUNTS_HASH_GET_RESULT -eq 0 ]; then
         echo ""
@@ -178,19 +178,13 @@ else
     exit -1
 fi
 
+# set the default autologin command
+sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME} -c \"$AUTOLOGIN_CMD\"|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
+
+# Change permissions to what is in home folder
 chown -R ${AUTOLOGIN_UID}:${AUTOLOGIN_GID} "${AUTOLOGIN_USER_HOME_DIR}"
 
-# set the default autologin command
-if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd" ]; then
-    AUTOLOGIN_CMD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd")
-    sed -i -e "s|/usr/bin/login_ng-cli|/usr/bin/login_ng-cli -u ${AUTOLOGIN_USERNAME}|" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/greetd/config.toml"
-
-    if ! "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" set-session --cmd "$AUTOLOGIN_CMD"; then
-        echo "Error setting the user session command"
-        exit -1
-    fi
-fi
-
+# The script won't be re-run
 rm -rf "/etc/autologin"
 
 sync
