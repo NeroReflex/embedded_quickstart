@@ -37,7 +37,9 @@ readonly AUTOLOGIN_GID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_a
 readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
 readonly AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
 readonly AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
-readonly AUTOLOGIN_CMD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_cmd")
+
+readonly AUTOLOGIN_CMD="sessionrunner"
+
 readonly AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
 useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME

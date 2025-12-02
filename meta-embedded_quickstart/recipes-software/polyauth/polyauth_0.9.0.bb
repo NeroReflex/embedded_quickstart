@@ -64,8 +64,8 @@ FILES:${PN} += " \
 # includes this file if it exists but does not fail
 # this is useful for anything you may want to override from
 # what cargo-bitbake generates.
-include pam-polyauth-${PV}.inc
-include pam-polyauth.inc
+include ${PN}-${PV}.inc
+include ${PN}.inc
 
 # include cargo dependencies
 include dependencies.inc

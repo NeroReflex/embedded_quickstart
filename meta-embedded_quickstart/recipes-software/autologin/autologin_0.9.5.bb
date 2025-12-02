@@ -10,20 +10,18 @@ SRC_URI += " \
     file://LICENSE.md \
     file://autologin-firstboot.sh \
     file://autologin-setup.service \
-    file://user_autologin_cmd \
+    file://user_autologin_uid \
     file://user_autologin_gid \
     file://user_autologin_intermediate_key \
     file://user_autologin_main_password \
-    file://user_autologin_uid \
     file://user_autologin_username \
 "
 
-RDEPENDS:${PN} = "sudo bash greetd loginng polyauth loginng-session weston"
+RDEPENDS:${PN} = "sudo bash greetd loginng polyauth sessionrunner weston"
 #DEPENDS = ""
 
 do_install:append () {
     install -d ${D}/${sysconfdir}/autologin
-    install -Dm600 ${WORKDIR}/user_autologin_cmd ${D}/${sysconfdir}/autologin/user_autologin_cmd
     install -Dm600 ${WORKDIR}/user_autologin_uid ${D}/${sysconfdir}/autologin/user_autologin_uid
     install -Dm600 ${WORKDIR}/user_autologin_gid ${D}/${sysconfdir}/autologin/user_autologin_gid
     install -Dm600 ${WORKDIR}/user_autologin_intermediate_key ${D}/${sysconfdir}/autologin/user_autologin_intermediate_key
@@ -44,7 +42,6 @@ do_install:append () {
 FILES:${PN} += " \
     ${bindir}/autologin-firstboot.sh \
     ${systemd_unitdir}/system/autologin-setup.service \
-    ${sysconfdir}/autologin/user_autologin_cmd \
     ${sysconfdir}/autologin/user_autologin_uid \
     ${sysconfdir}/autologin/user_autologin_gid \
     ${sysconfdir}/autologin/user_autologin_intermediate_key \
