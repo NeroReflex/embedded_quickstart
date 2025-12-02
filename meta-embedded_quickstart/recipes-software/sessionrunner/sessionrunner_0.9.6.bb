@@ -16,11 +16,44 @@ LIC_FILES_CHKSUM = " \
 "
 
 do_install:append () {
-    install -Dm755 ${S}/rootfs/usr/bin/start-login_ng-session ${D}${bindir}/start-login_ng-session
+    install -d ${D}/usr/share/dbus-1/system.d/
+    install -D -m 644 ${S}/rootfs/usr/share/dbus-1/system.d/org.neroreflex.sessionrunner.conf \
+        ${D}${datadir}/dbus-1/system.d/org.neroreflex.sessionrunner.conf
+
+    install -d ${D}/usr/share/wayland-sessions/
+    install -D -m 644 ${S}/rootfs/usr/share/wayland-sessions/sessionrunner.desktop \
+        ${D}${datadir}/wayland-sessions/sessionrunner.desktop
+
+    install -d ${D}/usr/share/applications/
+    install -D -m 644 ${S}/rootfs/usr/share/applications/org.sessionexec.session-return.desktop \
+        ${D}${datadir}/applications/org.sessionexec.session-return.desktop
+
+    install -d ${D}/${libdir}
+    install -D -m 755 ${S}/rootfs/usr/lib/os-session-select \
+        ${D}/${libdir}/os-session-select
+
+    install -d ${D}/${libdir}/sessionexec
+    install -D -m 644 ${S}/rootfs/usr/lib/sessionexec/session-return.sh \
+        ${D}/${libdir}/sessionexec/session-return.sh
+    install -D -m 644 ${S}/rootfs/usr/lib/sessionexec/plasma-wayland.sh \
+        ${D}/${libdir}/sessionexec/plasma-wayland.sh
+
+    install -d ${D}/${libdir}/sessionrunner
+    install -D -m 644 ${S}/rootfs/usr/lib/sessionrunner/default.service \
+        ${D}/${libdir}/sessionrunner/default.service
+    install -D -m 644 ${S}/rootfs/usr/lib/sessionrunner/restart_session.service \
+        ${D}/${libdir}/sessionrunner/restart_session.service
 }
 
 FILES:${PN} += " \
-    ${bindir}/start-login_ng-session \
+    ${datadir}/dbus-1/system.d/org.neroreflex.sessionrunner.conf \
+    ${libdir}/os-session-select \
+    ${libdir}/sessionexec/session-return.sh \
+    ${libdir}/sessionexec/plasma-wayland.sh \
+    ${datadir}/wayland-sessions/sessionrunner.desktop \
+    ${datadir}/applications/org.sessionexec.session-return.desktop \
+    ${libdir}/sessionrunner/default.service \
+    ${libdir}/sessionrunner/restart_session.service \
 "
 
 # includes this file if it exists but does not fail

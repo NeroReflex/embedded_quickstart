@@ -38,7 +38,7 @@ readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/u
 readonly AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
 readonly AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
 
-readonly AUTOLOGIN_CMD="sessionrunner"
+readonly AUTOLOGIN_CMD="start-sessionrunner"
 
 readonly AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
@@ -77,7 +77,7 @@ echo "command=/usr/bin/weston --config=$WESTON_VNC_INI" >> "${WESTON_INI}"
 echo 'start-on-startup=true' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[autolaunch]' >> "${WESTON_INI}"
-echo 'path=/usr/bin/start-login_ng-session' >> "${WESTON_INI}"
+echo 'path=/usr/bin/b2qt' >> "${WESTON_INI}"
 echo 'watch=true' >> "${WESTON_INI}"
 
 mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
