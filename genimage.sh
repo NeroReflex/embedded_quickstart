@@ -561,6 +561,19 @@ echo "overlay /var  overlay rw${RDTAB_MOUNTED},noatime,x-initrd.mount,defaults,x
 
 echo "----------------------------------------------------------"
 
+echo "----------------- /etc/default/qt ------------------------"
+
+if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/weston" ]; then
+    echo "QT_IM_MODULE=qtvirtualkeyboard" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/default/qt"
+    echo "QTWEBENGINE_DISABLE_SANDBOX=1" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/default/qt"
+
+    echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "/usr/bin/appcontroller /usr/bin/startupscreen" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    chmod +x "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+fi
+
+echo "----------------------------------------------------------"
+
 # see [1]
 #echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
 #echo "btrfs property set -fts /mnt/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}/usr_overlay ro false" >> "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/remount_overlay.sh"
