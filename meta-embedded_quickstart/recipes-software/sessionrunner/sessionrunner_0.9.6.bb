@@ -7,6 +7,8 @@ SRC_URI += "git://github.com/NeroReflex/login_ng-session.git;protocol=https;nobr
 SRCREV = "${PV}"
 S = "${WORKDIR}/git"
 
+RDEPENDS:${PN} = " bash "
+
 SUMMARY = "A manager for user sessions."
 HOMEPAGE = "https://github.com/NeroReflex/sessionrunner"
 
