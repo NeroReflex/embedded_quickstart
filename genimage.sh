@@ -561,6 +561,22 @@ echo "overlay /var  overlay rw${RDTAB_MOUNTED},noatime,x-initrd.mount,defaults,x
 
 echo "----------------------------------------------------------"
 
+echo "---------------------- SElinux ---------------------------"
+
+if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux" ]; then
+    echo "Configuring SELinux to enforcing mode."
+    echo "# SElinux config" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "# SELINUX= can take one of these three values:" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "#       enforcing - SELinux security policy is enforced." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "#       permissive - SELinux prints warnings instead of enforcing." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "#       disabled - No SELinux policy is loaded." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "SELINUX=enforcing" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+else
+    echo "SELinux not found: skipping configuration."
+fi
+
+echo "----------------------------------------------------------"
+
 echo "----------------- /etc/default/qt ------------------------"
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/weston" ]; then
