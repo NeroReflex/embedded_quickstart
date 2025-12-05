@@ -41,6 +41,7 @@ mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 
 # Create read-only app subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/app"
+echo "" > "${TARGET_ROOTFS}/app/hmidaemon.env"
 btrfs property set -fts "${SUBVOL_DATA}/app" ro true
 mkdir -p "${TARGET_ROOTFS}/app_data"
 btrfs subvolume create "${TARGET_ROOTFS}/app_data/current"
