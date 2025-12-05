@@ -33,10 +33,6 @@ do_install:append () {
 
     install -d ${D}/${bindir}
     install -Dm755 ${WORKDIR}/autologin-firstboot.sh ${D}${bindir}/autologin-firstboot.sh
-
-    install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
-    ln -sf ${systemd_unitdir}/system/autologin-setup.service \
-        ${D}/${sysconfdir}/systemd/system/multi-user.target.wants/autologin-setup.service
 }
 
 FILES:${PN} += " \
@@ -48,3 +44,5 @@ FILES:${PN} += " \
     ${sysconfdir}/autologin/user_autologin_main_password \
     ${sysconfdir}/autologin/user_autologin_username \
 "
+
+SYSTEMD_SERVICE:${PN} = "autologin-setup.service"

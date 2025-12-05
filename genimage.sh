@@ -584,7 +584,15 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/weston" ]; then
     echo "QTWEBENGINE_DISABLE_SANDBOX=1" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/default/qt"
 
     echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
-    echo "/usr/bin/appcontroller /usr/bin/startupscreen" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "if [ -x \"/mnt/app/default\" ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "    readonly APPLICATION='/mnt/app/hmi'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "else" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "    readonly APPLICATION='/usr/bin/startupscreen'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "fi" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo '/usr/bin/appcontroller ${APPLICATION}' >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+
     chmod +x "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
 fi
 

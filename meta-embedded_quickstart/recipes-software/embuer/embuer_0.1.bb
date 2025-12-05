@@ -17,10 +17,6 @@ do_install:append () {
 
     install -d ${D}/${datadir}/dbus-1/system.d
     install -Dm644 ${S}/rootfs/usr/share/dbus-1/system.d/org.neroreflex.embuer.conf ${D}/${datadir}/dbus-1/system.d/
-
-    install -d ${D}/${sysconfdir}/systemd/system/multi-user.target.wants
-    ln -sf ${systemd_unitdir}/system/embuer.service \
-        ${D}/${sysconfdir}/systemd/system/multi-user.target.wants/embuer.service
 }
 
 FILES:${PN} += " \
@@ -28,6 +24,8 @@ FILES:${PN} += " \
     ${datadir}/embuer/ \
     ${datadir}/dbus-1/system.d/org.neroreflex.embuer.conf \
 "
+
+SYSTEMD_SERVICE:${PN} = "embuer.service"
 
 inherit cargo
 include dependencies.inc

@@ -39,5 +39,11 @@ btrfs subvol create "${SUBVOL_DATA}/opt_overlay"
 mkdir "${SUBVOL_DATA}/opt_overlay/upperdir"
 mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 
+# Create read-only app subvolume
+btrfs subvolume create "${TARGET_ROOTFS}/app"
+btrfs property set -fts "${SUBVOL_DATA}/app" ro true
+mkdir -p "${TARGET_ROOTFS}/app_data"
+btrfs subvolume create "${TARGET_ROOTFS}/app_data/current"
+
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 btrfs property set -fts "${SUBVOL_DATA}/opt_overlay" ro true
