@@ -5,6 +5,7 @@ ConditionPathExists=/mnt/app/hmi_daemon
 
 [Service]
 User=hmidaemon
+EnvironmentFile=/mnt/app/hmidaemon.env
 ExecStartPre=+chown -R hmidaemon:hmidaemon /mnt/app_data/current
 ExecStart=-/usr/bin/sh -c "/mnt/app/hmi_daemon"
 
