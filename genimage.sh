@@ -564,13 +564,20 @@ echo "----------------------------------------------------------"
 echo "---------------------- SElinux ---------------------------"
 
 if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux" ]; then
-    echo "Configuring SELinux to enforcing mode."
-    echo "# SElinux config" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "# SElinux configuration" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
     echo "# SELINUX= can take one of these three values:" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
     echo "#       enforcing - SELinux security policy is enforced." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
     echo "#       permissive - SELinux prints warnings instead of enforcing." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
     echo "#       disabled - No SELinux policy is loaded." >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
-    echo "SELINUX=enforcing" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+    echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+
+    if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/targeted" ]; then
+        echo "SELINUX=enforcing" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+        echo "Configured SELinux to enforcing mode."
+    else
+        echo "SELINUX=disabled" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+        echo "Configured SELinux to disabled mode."
+    fi
 else
     echo "SELinux not found: skipping configuration."
 fi
