@@ -51,8 +51,12 @@ else
     echo "User $AUTOLOGIN_USERNAME already exists, skipping creation"
 fi
 
-echo "Changing password for user $AUTOLOGIN_USERNAME"
-echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
+if ! [ -x "$(command -v chpasswd)" ]; then
+    echo "Changing password for user $AUTOLOGIN_USERNAME"
+    echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
+else
+    echo "chpasswd not found: password won't be changed for user $AUTOLOGIN_USERNAME"
+fi
 
 mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config"
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/.config"
