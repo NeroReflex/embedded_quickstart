@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE.txt;md5=cbf0e3161523f9a9315b6b915c5c4457 \
 "
 
-DEPENDS += "pkgconfig-native wayland-protocols alsa-lib mesa wayland dbus vulkan-headers "
+DEPENDS += "pkgconfig-native wayland-protocols alsa-lib wayland dbus vulkan-headers "
 RDEPENDS:${PN} += "pkgconfig-native hidapi libusb1"
 
 SRC_URI += "git://github.com/libsdl-org/SDL.git;protocol=https;nobranch=1;branch=release-2.32.x"
