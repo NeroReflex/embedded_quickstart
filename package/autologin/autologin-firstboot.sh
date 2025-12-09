@@ -50,15 +50,20 @@ readonly AUTOLOGIN_CMD="start-sessionrunner"
 readonly AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
 if [ "$add_user" -eq 1 ]; then
+    echo "Creating user $AUTOLOGIN_USERNAME with UID $AUTOLOGIN_UID and GID $AUTOLOGIN_GID"
     useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already exists, skipping creation"
 fi
 
+echo "Changing password for user $AUTOLOGIN_USERNAME"
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 
 mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config"
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/.config"
 
 # Write weston-vnc.ini file
+echo "Writing weston-vnc.ini file"
 readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
 echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
 echo '[core]' >> "${WESTON_VNC_INI}"
@@ -72,6 +77,7 @@ echo "tls-key=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.key" >> "${WESTON_VNC_INI}"
 echo "tls-cert=${AUTOLOGIN_USER_HOME_DIR}/.config/tls.crt" >> "${WESTON_VNC_INI}"
 
 # Write weston.ini file
+echo "Writing weston.ini file"
 readonly WESTON_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston.ini"
 echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_INI}"
 echo '[core]' >> "${WESTON_INI}"
