@@ -2,11 +2,14 @@
 
 # Function to handle errors
 error_handler() {
-    echo "Error occurred at line: $LINENO"
+    local lineno=$1
+    local msg=$2
+    echo "Error occurred at line ${lineno}: ${msg}"
+    exit 1
 }
 
 # Set the trap to call the error_handler function on ERR
-trap 'error_handler' ERR
+trap 'error_handler ${LINENO} "$BASH_COMMAND"' ERR
 
 source "${BASH_SOURCE%/*}/btrfs_utils.sh"
 
@@ -41,8 +44,8 @@ mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 
 # Create read-only app subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/app"
-echo "" > "${TARGET_ROOTFS}/app/hmidaemon.env"
-btrfs property set -fts "${SUBVOL_DATA}/app" ro true
+echo "" | tee "${TARGET_ROOTFS}/app/hmidaemon.env"
+btrfs property set -fts "${TARGET_ROOTFS}/app" ro true
 mkdir -p "${TARGET_ROOTFS}/app_data"
 btrfs subvolume create "${TARGET_ROOTFS}/app_data/current"
 
