@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = " \
 "
 
 DEPENDS += "pkgconfig-native wayland-protocols alsa-lib wayland dbus vulkan-headers "
-RDEPENDS:${PN} += "pkgconfig-native hidapi libusb1"
+RDEPENDS:${PN} += "hidapi libusb1"
 
 SRC_URI += "git://github.com/libsdl-org/SDL.git;protocol=https;nobranch=1;branch=release-2.32.x"
 SRCREV = "4478ad67d28bb7a586bf352c42c210f36fd03fc0"
