@@ -41,6 +41,9 @@ do_install:append () {
     touch ${D}/${sysconfdir}/greetd/home_dir/.placeholder
 }
 
+inherit systemd
+
+SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "greetd.service"
 
 inherit useradd

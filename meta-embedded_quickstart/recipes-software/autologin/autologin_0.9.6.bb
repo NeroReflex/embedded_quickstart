@@ -45,4 +45,7 @@ FILES:${PN} += " \
     ${sysconfdir}/autologin/user_autologin_username \
 "
 
+inherit systemd
+
+SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "autologin-setup.service"

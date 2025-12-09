@@ -23,6 +23,9 @@ do_install:append () {
     install -m 0755 ${WORKDIR}/hmidaemon.service ${D}${systemd_unitdir}/system/
 }
 
+inherit systemd
+
+SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "hmidaemon.service"
 
 inherit useradd

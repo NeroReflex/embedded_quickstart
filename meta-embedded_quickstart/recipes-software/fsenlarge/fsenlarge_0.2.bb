@@ -25,6 +25,9 @@ do_install:append () {
     install -Dm755 ${WORKDIR}/autoresize-firstboot.sh ${D}${bindir}/autoresize-firstboot.sh
 }
 
+inherit systemd
+
+SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "autoresize-setup.service"
 
 FILES:${PN} += " \

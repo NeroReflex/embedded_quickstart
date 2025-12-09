@@ -25,6 +25,9 @@ FILES:${PN} += " \
     ${datadir}/dbus-1/system.d/org.neroreflex.embuer.conf \
 "
 
+inherit systemd
+
+SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "embuer.service"
 
 inherit cargo
