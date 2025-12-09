@@ -14,7 +14,6 @@ SRC_URI += " \
     file://user_autologin_gid \
     file://user_autologin_intermediate_key \
     file://user_autologin_main_password \
-    file://user_autologin_username \
 "
 
 RDEPENDS:${PN} = "sudo bash greetd seatd loginng polyauth sessionrunner weston"
@@ -26,7 +25,6 @@ do_install:append () {
     install -Dm600 ${WORKDIR}/user_autologin_gid ${D}/${sysconfdir}/autologin/user_autologin_gid
     install -Dm600 ${WORKDIR}/user_autologin_intermediate_key ${D}/${sysconfdir}/autologin/user_autologin_intermediate_key
     install -Dm600 ${WORKDIR}/user_autologin_main_password ${D}/${sysconfdir}/autologin/user_autologin_main_password
-    install -Dm600 ${WORKDIR}/user_autologin_username ${D}/${sysconfdir}/autologin/user_autologin_username
 
     install -d ${D}/${systemd_unitdir}/system
     install -Dm644 ${WORKDIR}/autologin-setup.service ${D}/${systemd_unitdir}/system/autologin-setup.service
@@ -42,7 +40,6 @@ FILES:${PN} += " \
     ${sysconfdir}/autologin/user_autologin_gid \
     ${sysconfdir}/autologin/user_autologin_intermediate_key \
     ${sysconfdir}/autologin/user_autologin_main_password \
-    ${sysconfdir}/autologin/user_autologin_username \
 "
 
 inherit systemd
@@ -52,10 +49,12 @@ SYSTEMD_SERVICE:${PN} = "autologin-setup.service"
 
 inherit useradd
 
+GROUPADD_PARAM:${PN} = "-g 1002 user"
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "-s /bin/bash \
                        -d /home/autologin \
                        -m -e 2199-12-31 \
-                       --user-group \
+                       --no-user-group \
+                       -g 1002 -u 1002 \
                         user \
                     "

@@ -102,13 +102,38 @@ rm "$AUTOLOGIN_USER_HOME_DIR/.config/tls.csr"
 
 umount $AUTOLOGIN_USER_HOME_DIR
 
+# ============================== GROUPS ==================================
 # add groups to be able to render the GUI application
-usermod -aG render $AUTOLOGIN_USERNAME
-usermod -aG video $AUTOLOGIN_USERNAME
-usermod -aG audio $AUTOLOGIN_USERNAME
-usermod -aG seat $AUTOLOGIN_USERNAME
-usermod -aG input $AUTOLOGIN_USERNAME
-usermod -aG tty $AUTOLOGIN_USERNAME
+readonly render_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep render | head -n1)
+if [ -z "$render_presence" ]; then
+    usermod -aG render $AUTOLOGIN_USERNAME
+fi
+
+readonly video_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep video | head -n1)
+if [ -z "$video_presence" ]; then
+    usermod -aG video $AUTOLOGIN_USERNAME
+fi
+
+readonly audio_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep audio | head -n1)
+if [ -z "$audio_presence" ]; then
+    usermod -aG audio $AUTOLOGIN_USERNAME
+fi
+
+readonly seat_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep seat | head -n1)
+if [ -z "$seat_presence" ]; then
+    usermod -aG seat $AUTOLOGIN_USERNAME
+fi
+
+readonly input_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep input | head -n1)
+if [ -z "$input_presence" ]; then
+    usermod -aG input $AUTOLOGIN_USERNAME
+fi
+
+readonly tty_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep tty | head -n1)
+if [ -z "$tty_presence" ]; then
+    usermod -aG tty $AUTOLOGIN_USERNAME
+fi
+# ========================================================================
 
 if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
     if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" add --name "autologin" --intermediate "${AUTOLOGIN_INTERMEDIATE_KEY}" password --secondary-pw ""; then
@@ -124,13 +149,12 @@ if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup
         exit -1
     fi
 
-    readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
-
     if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
         echo "Error writing the /etc/passwd file"
         exit -1
     fi
 
+    readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
     if ! echo "${AUTOLOGIN_USERNAME}:${hashed_password}:18000:0:99999:7:-1:-1:" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/shadow"; then
         echo "Error writing the /etc/shadow file"
         exit -1
