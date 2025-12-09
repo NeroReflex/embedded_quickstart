@@ -32,9 +32,16 @@ if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" 
     exit 0
 fi
 
+# If user already exists avoid creating it again
+if [ -z "$1" ]; then
+    readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
+    readonly add_user=1
+else
+    readonly AUTOLOGIN_USERNAME="$1"
+    readonly add_user=0
+fi
 readonly AUTOLOGIN_UID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_uid")
 readonly AUTOLOGIN_GID=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_gid")
-readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
 readonly AUTOLOGIN_MAIN_PASSWORD=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_main_password")
 readonly AUTOLOGIN_INTERMEDIATE_KEY=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_intermediate_key")
 
@@ -42,7 +49,9 @@ readonly AUTOLOGIN_CMD="start-sessionrunner"
 
 readonly AUTOLOGIN_USER_HOME_DIR="/home/$AUTOLOGIN_USERNAME"
 
-useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
+if [ "$add_user" -eq 1 ]; then
+    useradd -d "$AUTOLOGIN_USER_HOME_DIR" -m -e 2199-12-31 $AUTOLOGIN_USERNAME
+fi
 
 echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 

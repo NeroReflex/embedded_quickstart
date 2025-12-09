@@ -17,7 +17,7 @@ SRC_URI += " \
     file://user_autologin_username \
 "
 
-RDEPENDS:${PN} = "sudo bash greetd loginng polyauth sessionrunner weston"
+RDEPENDS:${PN} = "sudo bash greetd seatd loginng polyauth sessionrunner weston"
 #DEPENDS = ""
 
 do_install:append () {
@@ -49,3 +49,13 @@ inherit systemd
 
 SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "autologin-setup.service"
+
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "-s /bin/bash \
+                       -d /home/autologin \
+                       -m -e 2199-12-31 \
+                       --user-group \
+                        user \
+                    "
