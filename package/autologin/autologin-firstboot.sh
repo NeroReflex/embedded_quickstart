@@ -27,11 +27,6 @@ if [ ! -d "/etc/autologin" ]; then
     exit -1
 fi
 
-if [ ! -f "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username" ]; then
-    echo "No autologin specified"
-    exit 0
-fi
-
 # If user already exists avoid creating it again
 if [ -z "$1" ]; then
     readonly AUTOLOGIN_USERNAME=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/autologin/user_autologin_username")
@@ -157,6 +152,15 @@ if [ -z "$tty_presence" ]; then
 else
     echo "User $AUTOLOGIN_USERNAME already in tty group"
 fi
+
+readonly plugdev_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep plugdev | head -n1)
+if [ -z "$plugdev_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to plugdev group"
+    usermod -aG plugdev $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in plugdev group"
+fi
+
 # ========================================================================
 
 if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup -i "${AUTOLOGIN_INTERMEDIATE_KEY}"; then
