@@ -106,32 +106,50 @@ umount $AUTOLOGIN_USER_HOME_DIR
 # add groups to be able to render the GUI application
 readonly render_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep render | head -n1)
 if [ -z "$render_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to render group"
     usermod -aG render $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in render group"
 fi
 
 readonly video_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep video | head -n1)
 if [ -z "$video_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to video group"
     usermod -aG video $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in video group"
 fi
 
 readonly audio_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep audio | head -n1)
 if [ -z "$audio_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to audio group"
     usermod -aG audio $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in audio group"
 fi
 
 readonly seat_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep seat | head -n1)
 if [ -z "$seat_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to seat group"
     usermod -aG seat $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in seat group"
 fi
 
 readonly input_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep input | head -n1)
 if [ -z "$input_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to input group"
     usermod -aG input $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in input group"
 fi
 
 readonly tty_presence=$(cat "${EXTRACTED_ROOTFS_HOST_PATH}/etc/group" | grep $AUTOLOGIN_USERNAME | grep tty | head -n1)
 if [ -z "$tty_presence" ]; then
+    echo "Adding user $AUTOLOGIN_USERNAME to tty group"
     usermod -aG tty $AUTOLOGIN_USERNAME
+else
+    echo "User $AUTOLOGIN_USERNAME already in tty group"
 fi
 # ========================================================================
 
