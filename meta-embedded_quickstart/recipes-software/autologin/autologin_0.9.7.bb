@@ -46,15 +46,3 @@ inherit systemd
 
 SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_SERVICE:${PN} = "autologin-setup.service"
-
-inherit useradd
-
-GROUPADD_PARAM:${PN} = "-g 1002 user"
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "-s /bin/bash \
-                       -d /home/autologin \
-                       -m -e 2199-12-31 \
-                       --no-user-group \
-                       -g 1002 -u 1002 \
-                        user \
-                    "
