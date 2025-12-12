@@ -20,7 +20,7 @@ inherit cargo
 
 do_install:append () {
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0755 ${WORKDIR}/hmidaemon.service ${D}${systemd_unitdir}/system/
+    install -m 0644 ${WORKDIR}/hmidaemon.service ${D}${systemd_unitdir}/system/
 }
 
 inherit systemd
