@@ -51,7 +51,7 @@ else
     echo "User $AUTOLOGIN_USERNAME already exists, skipping creation"
 fi
 
-if ! [ -x "$(command -v chpasswd)" ]; then
+if [ -x "$(command -v chpasswd)" ]; then
     echo "Changing password for user $AUTOLOGIN_USERNAME"
     echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 else
