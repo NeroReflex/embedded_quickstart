@@ -29,7 +29,23 @@ if [ ! -d "$CURRENT_SCRIPT_DIR/downloads" ]; then
     ln -s "../downloads" "$CURRENT_SCRIPT_DIR/downloads"
 fi
 
-bitbake meta-b2qt-embedded-qbsp
+if [ ! -z "${BUILD_QBSP}" ]; then
+    echo "Building QBSP"
+    bitbake meta-b2qt-embedded-qbsp
+else
+    echo "Building minimal image"
+    bitbake b2qt-embedded-qt6-image
+
+    # one can build SDK separately if needed
+    if [ ! -z "${BUILD_SDK}" ]; then
+        if [ -z "${SDK_MACHINE}" ]; then
+            echo "No SDK_MACHINE defined: building default SDK"
+        else
+            echo "Building SDK for SDK_MACHINE=${SDK_MACHINE}"
+        fi
+        bitbake meta-toolchain-b2qt-embedded-qt6-sdk
+    fi
+fi
 
 echo "Running genimage.sh from $CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh"
 sudo bash "$CURRENT_SCRIPT_DIRNAME/sources/embedded_quickstart/genimage.sh" "$CURRENT_SCRIPT_DIRNAME/build-$MACHINE/tmp/deploy/images/$MACHINE" "${VERSION}"
