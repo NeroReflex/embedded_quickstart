@@ -578,6 +578,24 @@ if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux" ]; then
         echo "SELINUX=disabled" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
         echo "Configured SELinux to disabled mode."
     fi
+
+    if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/targeted" ]; then
+        readonly POL_TYPE="targeted"
+    elif [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/mls" ]; then
+        readonly POL_TYPE="mls"
+    else
+        echo "ERROR: Unknown SELinux policy type."
+        dismantle
+        exit -1
+    fi
+
+    if setfiles -m -F -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/${POL_TYPE}/contexts/files/file_contexts" "${EXTRACTED_ROOTFS_HOST_PATH}"; then
+        echo "SELinux file contexts applied successfully."
+    else
+        echo "ERROR: Could not apply SELinux file contexts."
+        dismantle
+        exit -1
+    fi
 else
     echo "SELinux not found: skipping configuration."
 fi
