@@ -590,7 +590,10 @@ if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux" ]; then
     fi
 
     # This is required for audit logs
-    mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/var/log/audit"
+    if [ ! -e "${EXTRACTED_ROOTFS_HOST_PATH}/var/log/audit" ]; then
+        echo "Creating /var/log/audit for SELinux"
+        mkdir -p "${EXTRACTED_ROOTFS_HOST_PATH}/var/log/audit"
+    fi
 
     if setfiles -m -F -r "${EXTRACTED_ROOTFS_HOST_PATH}" "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/${POL_TYPE}/contexts/files/file_contexts" "${EXTRACTED_ROOTFS_HOST_PATH}"; then
         echo "SELinux file contexts applied successfully."
