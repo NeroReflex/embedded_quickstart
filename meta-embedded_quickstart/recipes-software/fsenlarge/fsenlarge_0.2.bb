@@ -34,3 +34,5 @@ FILES:${PN} += " \
     ${bindir}/autoresize-firstboot.sh \
     ${systemd_unitdir}/system/autoresize-setup.service \
 "
+
+require ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${BPN}_selinux.inc', '', d)}
