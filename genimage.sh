@@ -572,8 +572,8 @@ if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux" ]; then
     echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
 
     if [ -d "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/targeted" ]; then
-        echo "SELINUX=enforcing" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
-        echo "Configured SELinux to enforcing mode."
+        echo "SELINUX=permissive" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
+        echo "Configured SELinux to permissive mode."
     else
         echo "SELINUX=disabled" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/selinux/config"
         echo "Configured SELinux to disabled mode."
