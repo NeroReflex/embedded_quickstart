@@ -610,8 +610,8 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/weston" ]; then
 
     echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
-    echo "if [ -x \"/mnt/app/default\" ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
-    echo "    readonly APPLICATION='/mnt/app/default'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "if [ -x \"/mnt/app/hmi\" ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "    readonly APPLICATION='/mnt/app/hmi'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "else" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "    readonly APPLICATION='/usr/bin/startupscreen'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "fi" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
