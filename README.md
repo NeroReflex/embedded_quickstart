@@ -7,6 +7,13 @@ capabilities for remote support.
 Minimal yocto support is also in-development: this is used to create a disk image in
 a way that the updater of choice can use.
 
+## Autologin
+
+If weston is present files for starting /mnt/app/hmi will be created.
+
+There is a yocto recipe to start /mnt/app/hmi_daemon and there is an /mnt/app_data subvolume
+meant to contain the data of the daemon/hmi.
+
 ## Yocto
 
 To use yocto you will need to ensure the bootloader and the kernel are both compiled with btrfs
