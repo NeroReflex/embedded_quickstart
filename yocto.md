@@ -46,3 +46,9 @@ source ./opt/Qt/6.10.1/Boot2Qt/imx8mm-var-dart/toolchain/environment-setup-corte
 ```
 
 __NOTE__ It might be needed to have rustup and add the specific target beforehand
+
+__WARNING__ If c libraries fails:
+
+```sh
+export OPENSSL_DIR=/opt/Qt/6.10.1/Boot2Qt/imx8mm-var-dart/toolchain/sysroots/cortexa53-crypto-poky-linux/usr
+```
