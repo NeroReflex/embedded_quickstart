@@ -1,13 +1,13 @@
 [Unit]
 Description=HMI Daemon Service
 After=network.target
-ConditionPathExists=/mnt/app/hmi_daemon
+ConditionPathExists=/mnt/app/hmidaemon
 
 [Service]
 User=hmidaemon
 EnvironmentFile=/mnt/app/hmidaemon.env
 ExecStartPre=+chown -R hmidaemon:hmidaemon /mnt/app_data/current
-ExecStart=-/usr/bin/sh -c "/mnt/app/hmi_daemon"
+ExecStart=-/usr/bin/sh -c "/mnt/app/hmidaemon"
 
 [Install]
 WantedBy=multi-user.target
