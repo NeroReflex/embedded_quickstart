@@ -16,6 +16,8 @@ RDEPENDS:${PN}:append = " base-files systemd bash btrfs-tools "
 
 FILES:${PN} += " \
     ${systemd_unitdir}/system/hmidaemon.service \
+    ${systemd_unitdir}/system/hmibackup.service \
+    ${bindir}/hmibackup \
 "
 
 inherit cargo
