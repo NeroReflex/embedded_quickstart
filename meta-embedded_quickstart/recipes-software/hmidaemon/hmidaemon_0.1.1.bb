@@ -12,7 +12,7 @@ SRC_URI += " \
 SRCREV = "${PV}"
 S = "${WORKDIR}/git"
 
-RDEPENDS:${PN}:append = " base-files systemd "
+RDEPENDS:${PN}:append = " base-files systemd bash btrfs-tools "
 
 FILES:${PN} += " \
     ${systemd_unitdir}/system/hmidaemon.service \
@@ -24,6 +24,8 @@ do_install:append () {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/hmidaemon.service ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/hmibackup.service ${D}${systemd_unitdir}/system/
+
+    install -d ${D}/${bindir}
     install -m 0755 ${WORKDIR}/hmibackup ${D}${bindir}/
 }
 

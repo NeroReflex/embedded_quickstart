@@ -91,7 +91,9 @@ echo "command=/usr/bin/weston --config=$WESTON_VNC_INI" >> "${WESTON_INI}"
 echo 'start-on-startup=true' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[autolaunch]' >> "${WESTON_INI}"
-echo 'path=/etc/start_script.sh' >> "${WESTON_INI}"
+if [ -x "/etc/start_script.sh" ]; then
+    echo 'path=/etc/start_script.sh' >> "${WESTON_INI}"
+fi
 echo 'watch=true' >> "${WESTON_INI}"
 
 mkdir -p "${TARGET_ROOTFS}/user_data/upperdir"
