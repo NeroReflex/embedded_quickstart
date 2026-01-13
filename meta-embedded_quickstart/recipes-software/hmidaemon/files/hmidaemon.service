@@ -1,6 +1,7 @@
 [Unit]
 Description=HMI Daemon Service
 After=network.target
+Wants=hmibackup.service
 ConditionPathExists=/mnt/app/hmidaemon
 
 [Service]

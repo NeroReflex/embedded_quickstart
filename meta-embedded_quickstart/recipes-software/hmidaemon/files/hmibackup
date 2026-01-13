@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$(id -u)" -eq 0 ]; then
+  echo "Taking a snapshot of the application data"
+else
+  echo "Cannot snapshot application data without root privileges"
+fi
+
+readonly dt=$(date +%%Y%%m%%d)
+readonly src="/mnt/app_data/current"
+readonly dst="/mnt/app_data/${dt}"
+
+if [ ! -e "$dst" ]; then
+    /usr/bin/btrfs subvolume snapshot "$src" "$dst"
+else
+    echo "Snapshot for today already exists"
+fi

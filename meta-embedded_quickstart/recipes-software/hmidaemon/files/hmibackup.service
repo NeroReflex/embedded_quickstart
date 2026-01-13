@@ -1,0 +1,11 @@
+[Unit]
+Description=Take Btrfs snapshot of /mnt/app_data/current
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/hmibackup
+
+[Install]
+WantedBy=multi-user.target

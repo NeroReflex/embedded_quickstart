@@ -46,7 +46,8 @@ mkdir "${SUBVOL_DATA}/opt_overlay/workdir"
 btrfs subvolume create "${TARGET_ROOTFS}/app"
 echo "" | tee "${TARGET_ROOTFS}/app/hmidaemon.env"
 btrfs property set -fts "${TARGET_ROOTFS}/app" ro true
-mkdir -p "${TARGET_ROOTFS}/app_data"
+# Create writable app_data subvolumes: mkdir won't work here
+btrfs subvolume create "${TARGET_ROOTFS}/app_data"
 btrfs subvolume create "${TARGET_ROOTFS}/app_data/current"
 
 btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
