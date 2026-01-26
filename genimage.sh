@@ -81,7 +81,7 @@ if [ -d "${BINARIES_DIR}" ]; then
     if [ ! -f "${IMAGE_FILE_PATH}" ]; then
         echo "Image Disk file not found: creating a new one"
         # Less than 2GB will fail to host the rootfs
-        if ! fallocate -l 2G "${IMAGE_FILE_PATH}"; then
+        if ! fallocate -l 4G "${IMAGE_FILE_PATH}"; then
             echo "ERROR: Could not allocate space for target file '${IMAGE_FILE_PATH}'"
             exit -1
         fi
