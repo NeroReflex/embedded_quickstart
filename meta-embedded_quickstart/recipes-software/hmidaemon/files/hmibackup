@@ -6,7 +6,7 @@ else
   echo "Cannot snapshot application data without root privileges"
 fi
 
-readonly dt=$(date +%%Y%%m%%d)
+readonly dt=$(date +%Y%m%d)
 readonly src="/mnt/app_data/current"
 readonly dst="/mnt/app_data/${dt}"
 
