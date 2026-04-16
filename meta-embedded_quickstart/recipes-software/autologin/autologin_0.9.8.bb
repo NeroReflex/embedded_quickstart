@@ -16,7 +16,7 @@ SRC_URI += " \
     file://user_autologin_main_password \
 "
 
-RDEPENDS:${PN} = "sudo bash greetd seatd loginng polyauth sessionrunner weston chpasswd"
+RDEPENDS:${PN} = "sudo bash greetd seatd loginng polyauth sessionrunner weston shadow"
 #DEPENDS = ""
 
 do_install:append () {
