@@ -183,11 +183,11 @@ if "${LNG_CTL}" -u "${AUTOLOGIN_USERNAME}" -p "${AUTOLOGIN_MAIN_PASSWORD}" setup
         exit -1
     fi
 
-    if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
-        echo "Error writing the /etc/passwd file"
-        exit -1
-    fi
-
+    #if ! echo "${AUTOLOGIN_USERNAME}:x:${AUTOLOGIN_UID}:${AUTOLOGIN_GID}::/home/${AUTOLOGIN_USERNAME}:/bin/bash" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/passwd"; then
+    #    echo "Error writing the /etc/passwd file"
+    #    exit -1
+    #fi
+    #
     #readonly hashed_password=$(openssl passwd -6 -salt xyz "${AUTOLOGIN_MAIN_PASSWORD}")
     #if ! echo "${AUTOLOGIN_USERNAME}:${hashed_password}:18000:0:99999:7:-1:-1:" | tee -a "${EXTRACTED_ROOTFS_HOST_PATH}/etc/shadow"; then
     #    echo "Error writing the /etc/shadow file"
