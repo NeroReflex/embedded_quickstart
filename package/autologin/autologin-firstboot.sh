@@ -55,25 +55,12 @@ if [ -x "$(command -v chpasswd)" ]; then
     echo "Changing password for user $AUTOLOGIN_USERNAME"
     echo "$AUTOLOGIN_USERNAME:$AUTOLOGIN_MAIN_PASSWORD" | chpasswd
 else
-    echo "chpasswd not found: password won't be changed for user $AUTOLOGIN_USERNAME"
+    echo "chpasswd not found: using passwd instead"
+    bash -ic "set -e; printf '%s\n%s\n' '$AUTOLOGIN_MAIN_PASSWORD' '$AUTOLOGIN_MAIN_PASSWORD' | passwd $AUTOLOGIN_USERNAME"
 fi
 
 mkdir -p "$AUTOLOGIN_USER_HOME_DIR/.config"
 chown $AUTOLOGIN_USERNAME:$AUTOLOGIN_USERNAME "$AUTOLOGIN_USER_HOME_DIR/.config"
-
-# Write weston-vnc.ini file
-#echo "Writing weston-vnc.ini file"
-#readonly WESTON_VNC_INI="$AUTOLOGIN_USER_HOME_DIR/.config/weston-vnc.ini"
-#echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_VNC_INI}"
-#echo '[core]' >> "${WESTON_VNC_INI}"
-#echo 'shell=kiosk' >> "${WESTON_VNC_INI}"
-#echo 'backend=vnc' >> "${WESTON_VNC_INI}"
-#echo 'idle-time=0' >> "${WESTON_VNC_INI}"
-#echo '' >> "${WESTON_VNC_INI}"
-#echo '[vnc]' >> "${WESTON_VNC_INI}"
-#echo 'refresh-rate=15' >> "${WESTON_VNC_INI}"
-#echo "tls-key=/etc/certs/$AUTOLOGIN_USERNAME/tls.key" >> "${WESTON_VNC_INI}"
-#echo "tls-cert=/etc/certs/$AUTOLOGIN_USERNAME/tls.crt" >> "${WESTON_VNC_INI}"
 
 # Write weston.ini file
 echo "Writing weston.ini file"
