@@ -17,8 +17,6 @@ if [ -z "${VERSION}" ]; then
     exit 1
 fi
 
-source setup-environment.sh
-
 if [ -z "$CURRENT_SCRIPT_DIR" ]; then
     CURRENT_SCRIPT_DIR="."
 fi
@@ -28,6 +26,9 @@ if [ ! -d "$CURRENT_SCRIPT_DIR/downloads" ]; then
     mkdir -p "$CURRENT_SCRIPT_DIR/../downloads"
     ln -s "../downloads" "$CURRENT_SCRIPT_DIR/downloads"
 fi
+
+# se sposti questa chiama il link simbolico a downloads si spacca.
+source setup-environment.sh
 
 if [ ! -z "${BUILD_QBSP}" ]; then
     echo "Building QBSP"
