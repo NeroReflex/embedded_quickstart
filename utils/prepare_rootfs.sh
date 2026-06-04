@@ -18,6 +18,7 @@ HOME_SUBVOL_NAME=${2}
 DEPLOYMENT_SUBVOL_NAME=${3}
 DEPLOYMENTS_DIR=${4}
 DEPLOYMENTS_DATA_DIR=${5}
+FACTORY_DATA_DIR=${6}
 
 # Create the home subvolume
 btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
@@ -25,6 +26,7 @@ btrfs subvolume create "${TARGET_ROOTFS}/${HOME_SUBVOL_NAME}"
 # Create subvolumes for deployments and deployment-specific data
 btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DIR}"
 btrfs subvolume create "${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}"
+btrfs subvolume create "${TARGET_ROOTFS}/${FACTORY_DATA_DIR}"
 
 readonly SUBVOL_DATA="${TARGET_ROOTFS}/${DEPLOYMENTS_DATA_DIR}/${DEPLOYMENT_SUBVOL_NAME}"
 btrfs subvolume create "${SUBVOL_DATA}"
