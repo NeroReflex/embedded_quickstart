@@ -718,7 +718,7 @@ echo "----------------------------------------------------------"
 
 echo "-------------------- Factory Data ------------------------"
 
-readonly REALPATH_FACTORY_DATA_HOST_PATH=$(realpath -s "../factory_data")
+readonly REALPATH_FACTORY_DATA_HOST_PATH=$(realpath -s "../../factory_data")
 
 if [ -d "$REALPATH_FACTORY_DATA_HOST_PATH" ]; then
     echo "Copying factory data from '${REALPATH_FACTORY_DATA_HOST_PATH}' to the deployment snapshot..."
