@@ -36,3 +36,20 @@ do_install:append() {
         fi
     fi
 }
+
+# Upstream libyuv CMake does not install a .pc file; pkg-config consumers probe "libyuv".
+do_install:append() {
+    install -d ${D}${libdir}/pkgconfig
+    cat > ${D}${libdir}/pkgconfig/libyuv.pc <<EOF
+prefix=${prefix}
+exec_prefix=\${prefix}
+libdir=${libdir}
+includedir=${includedir}
+
+Name: libyuv
+Description: YUV scaling and conversion
+Version: ${PV}
+Libs: -L\${libdir} -lyuv
+Cflags: -I\${includedir}
+EOF
+}
