@@ -23,6 +23,12 @@ export EXTRACTED_ROOTFS_HOST_PATH=""
 LNG_CTL="polyauthctl"
 
 if [ ! -d "/etc/autologin" ]; then
+    # A finished run deletes /etc/autologin. The unit is still started on
+    # later boots; that is not a failed setup.
+    if grep -q -- '-c start-sessionrunner' /etc/greetd/config.toml 2>/dev/null; then
+        echo "Autologin data already applied"
+        exit 0
+    fi
     echo "No autologin data to be applied"
     exit -1
 fi
@@ -69,7 +75,7 @@ echo '# weston configuration generated from autologin-firstboot.sh' > "${WESTON_
 echo '[core]' >> "${WESTON_INI}"
 echo 'shell=kiosk' >> "${WESTON_INI}"
 #echo 'xwayland=true' >> "${WESTON_INI}"
-echo 'backend=drm,vnc' >> "${WESTON_INI}"
+echo 'backend=drm,vnc,pipewire' >> "${WESTON_INI}"
 echo 'idle-time=0' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[vnc]' >> "${WESTON_INI}"
@@ -83,6 +89,10 @@ echo 'name=LVDS-1' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[output]' >> "${WESTON_INI}"
 echo 'name=vnc' >> "${WESTON_INI}"
+echo 'mirror-of=LVDS-1' >> "${WESTON_INI}"
+echo '' >> "${WESTON_INI}"
+echo '[output]' >> "${WESTON_INI}"
+echo 'name=pipewire' >> "${WESTON_INI}"
 echo 'mirror-of=LVDS-1' >> "${WESTON_INI}"
 echo '' >> "${WESTON_INI}"
 echo '[autolaunch]' >> "${WESTON_INI}"

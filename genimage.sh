@@ -500,7 +500,16 @@ echo "----------------------------------------------------------"
 echo "---------------------- Session ---------------------------"
 
 if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/sessionrunner" ]; then
-    if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/wayland-sessions/weston.desktop" ]; then
+    if [ -x "${EXTRACTED_ROOTFS_HOST_PATH}/usr/lib/mitec/weston-user-session.sh" ]; then
+        # User session only. Collaudo and firstboot start weston with their own ini.
+        cat > "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/wayland-sessions/game-mode.desktop" << 'EOF'
+[Desktop Entry]
+Name=Weston
+Comment=Weston with a PipeWire mirror of the panel
+Exec=/usr/lib/mitec/weston-user-session.sh
+Type=Application
+EOF
+    elif [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/wayland-sessions/weston.desktop" ]; then
         ln -s weston.desktop "${EXTRACTED_ROOTFS_HOST_PATH}/usr/share/wayland-sessions/game-mode.desktop"
     fi
 
@@ -610,6 +619,14 @@ if [ -f "${EXTRACTED_ROOTFS_HOST_PATH}/usr/bin/weston" ]; then
     echo "QTWEBENGINE_DISABLE_SANDBOX=1" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/default/qt"
 
     echo "#!/bin/sh" > "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    # User Weston only. Collaudo and firstboot use their own ini and never run this script.
+    echo "if [ -n \"\${WAYLAND_DISPLAY:-}\" ] && [ -f /usr/lib/mitec/start-pipewire-portal.sh ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "    . /usr/lib/mitec/start-pipewire-portal.sh" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "fi" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "if [ -n \"\${WAYLAND_DISPLAY:-}\" ] && [ -x /usr/lib/mitec/start-rustdesk-session.sh ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "    /usr/lib/mitec/start-rustdesk-session.sh" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
+    echo "fi" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "if [ -x \"/mnt/app/hmi\" ]; then" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
     echo "    readonly APPLICATION='/mnt/app/hmi'" >> "${EXTRACTED_ROOTFS_HOST_PATH}/etc/start_script.sh"
